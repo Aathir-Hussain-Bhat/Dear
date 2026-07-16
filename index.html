@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-[#F8F6F2]">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dear — Intentional Letter Messaging</title>
+    
+    <!-- Design System Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Caveat&display=swap" rel="stylesheet">
+    
+    <!-- Core External Dependencies -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+
+    <!-- Tailwind Config Sync -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        forest: '#1F4D3A',
+                        beige: '#F5EFE6',
+                        gold: '#C8A96A',
+                        ivory: '#FFFDF8',
+                        ink: '#3A2F28',
+                        linen: '#F8F6F2'
+                    },
+                    fontFamily: {
+                        serif: ['"Cormorant Garamond"', 'serif'],
+                        sans: ['Inter', 'sans-serif'],
+                        handwriting: ['Caveat', 'cursive']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #E5E1DA;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="h-full font-sans text-ink selection:bg-gold selection:text-forest overflow-hidden">
+
+    <!-- =========================================================================
+         VIEW 1: AUTHENTICATION GATEWAY
+         ========================================================================= -->
+    <div id="view-auth" class="hidden h-full flex items-center justify-center p-4 overflow-y-auto">
+        <div class="w-full max-w-md bg-ivory border border-beige rounded-2xl shadow-xl p-8 md:p-10 relative overflow-hidden">
+            
+            <div class="text-center mb-8">
+                <h1 class="font-serif text-5xl italic text-forest select-none mb-2">Dear</h1>
+                <p class="font-sans text-sm text-ink/70 tracking-wide">Intentional writing. Delayed delivery.</p>
+            </div>
+
+            <!-- Global Status Box -->
+            <div id="auth-status-box" class="hidden mb-6 p-4 rounded-lg text-sm transition-all" role="alert"></div>
+
+            <!-- SUBVIEW: SIGN IN -->
+            <div id="auth-signin" class="space-y-6">
+                <form id="form-signin" class="space-y-4">
+                    <div>
+                        <label for="signin-email" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Email Address</label>
+                        <input type="email" id="signin-email" required class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label for="signin-password" class="block text-xs uppercase tracking-wider font-semibold text-ink/70">Password</label>
+                            <button type="button" id="btn-goto-forgot" class="text-xs text-gold hover:text-forest font-medium">Forgot?</button>
+                        </div>
+                        <input type="password" id="signin-password" required class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink">
+                    </div>
+                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">
+                        Enter the Sanctuary
+                    </button>
+                </form>
+
+                <div class="relative flex py-2 items-center">
+                    <div class="flex-grow border-t border-beige"></div>
+                    <span class="flex-shrink mx-4 text-xs uppercase tracking-widest text-ink/40 font-semibold">Or</span>
+                    <div class="flex-grow border-t border-beige"></div>
+                </div>
+
+                <button id="btn-oauth-google" class="w-full flex items-center justify-center space-x-3 bg-ivory border border-beige text-ink font-medium py-3 rounded-lg hover:bg-beige/40 transition-colors text-sm">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.29c1.92,-1.77 3.02,-4.38 3.02,-7.38C21.65,11.73 21.55,11.37 21.35,11.1z" fill="#4285F4" />
+                        <path d="M12,20.5c2.3,0 4.23,-0.76 5.64,-2.07l-3.29,-2.58c-0.91,0.61 -2.07,0.98 -3.29,0.98 -2.25,0 -4.15,-1.52 -4.83,-3.57H2.81v2.66C4.22,18.4 7.82,20.5 12,20.5z" fill="#34A853" />
+                        <path d="M7.17,13.26c-0.17,-0.52 -0.27,-1.08 -0.27,-1.66s0.1,-1.14 0.27,-1.66V7.28H2.81C2.2,8.5 1.85,9.88 1.85,11.6s0.35,3.1 0.96,4.32l4.36,-3.66z" fill="#FBBC05" />
+                        <path d="M12,6.15c1.25,0 2.37,0.43 3.25,1.27l2.43,-2.43C16.21,3.57 14.28,3 12,3 7.82,3 4.22,5.1 2.81,8.12l4.36,3.66C7.85,7.73 9.75,6.15 12,6.15z" fill="#EA4335" />
+                    </svg>
+                    <span>Continue with Google</span>
+                </button>
+
+                <div class="text-center">
+                    <p class="text-xs text-ink/70">
+                        A newcomer? 
+                        <button id="btn-goto-signup" class="text-gold hover:text-forest font-semibold underline underline-offset-4 ml-1">Create an envelope</button>
+                    </p>
+                </div>
+            </div>
+
+            <!-- SUBVIEW: SIGN UP -->
+            <div id="auth-signup" class="hidden space-y-6">
+                <form id="form-signup" class="space-y-4">
+                    <div>
+                        <label for="signup-displayname" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Full Name</label>
+                        <input type="text" id="signup-displayname" required class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink" placeholder="Emily Dickinson">
+                    </div>
+                    <div>
+                        <label for="signup-username" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Pen Name (Unique Username)</label>
+                        <input type="text" id="signup-username" required minlength="3" pattern="^[a-zA-Z0-9_]+$" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink" placeholder="emily_d">
+                    </div>
+                    <div>
+                        <label for="signup-email" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Email Address</label>
+                        <input type="email" id="signup-email" required class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink" placeholder="emily@example.com">
+                    </div>
+                    <div>
+                        <label for="signup-password" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Password</label>
+                        <input type="password" id="signup-password" required minlength="6" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink">
+                    </div>
+                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">
+                        Seal & Create Profile
+                    </button>
+                </form>
+
+                <div class="text-center">
+                    <p class="text-xs text-ink/70">
+                        Already registered? 
+                        <button id="btn-goto-signin" class="text-gold hover:text-forest font-semibold underline underline-offset-4 ml-1">Step inside</button>
+                    </p>
+                </div>
+            </div>
+
+            <!-- SUBVIEW: FORGOT PASSWORD -->
+            <div id="auth-forgot" class="hidden space-y-6">
+                <div class="text-center">
+                    <p class="text-xs text-ink/80 leading-relaxed">Enter your registered email address, and we will dispatch a secure recovery link.</p>
+                </div>
+                <form id="form-forgot" class="space-y-4">
+                    <div>
+                        <label for="forgot-email" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Email Address</label>
+                        <input type="email" id="forgot-email" required class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink" placeholder="emily@example.com">
+                    </div>
+                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">
+                        Send Recovery Link
+                    </button>
+                </form>
+
+                <div class="text-center">
+                    <button id="btn-back-to-signin" class="text-xs text-gold hover:text-forest font-semibold flex items-center justify-center mx-auto space-x-1">
+                        <i data-lucide="arrow-left" class="h-3 w-3"></i>
+                        <span>Return to entry</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- =========================================================================
+         VIEW 2: CENTRAL SANCTUARY DASHBOARD (WHATSAPP WEB LAYOUT STYLE)
+         ========================================================================= -->
+    <div id="view-dashboard" class="hidden h-full flex flex-col bg-[#F5EFE6]">
+        
+        <!-- Header / Navigation Bar matching WhatsApp Style but in Dear Aesthetic -->
+        <header class="bg-forest px-6 py-4 flex justify-between items-center shadow-md select-none z-10 flex-shrink-0">
+            <div class="flex items-center space-x-3">
+                <span class="font-serif text-3xl italic text-ivory tracking-wide">Dear</span>
+            </div>
+            
+            <!-- Core Navigation Bar Icons -->
+            <div class="flex items-center space-x-6 text-ivory/80">
+                <button id="nav-search-btn" class="hover:text-gold transition-colors focus:outline-none" title="Search Letters">
+                    <i data-lucide="search" class="h-5 w-5"></i>
+                </button>
+                <button id="nav-inbox-btn" class="hover:text-gold transition-colors focus:outline-none relative" title="Inbox Mailboxes">
+                    <i data-lucide="inbox" class="h-5 w-5"></i>
+                    <span id="badge-inbox" class="hidden absolute -top-1.5 -right-1.5 text-[9px] bg-gold text-forest font-bold px-1.5 py-0.5 rounded-full">0</span>
+                </button>
+                <button id="nav-friends-btn" class="hover:text-gold transition-colors focus:outline-none" title="Companions Directory">
+                    <i data-lucide="users" class="h-5 w-5"></i>
+                </button>
+                <button id="nav-profile-btn" class="hover:text-gold transition-colors focus:outline-none" title="My Profile Settings">
+                    <i data-lucide="user" class="h-5 w-5"></i>
+                </button>
+                <button id="btn-open-composer" class="bg-gold text-forest px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-ivory hover:text-forest transition-all flex items-center space-x-1 shadow-sm" title="Write a New Letter">
+                    <i data-lucide="feather" class="h-3.5 w-3.5"></i>
+                    <span>Compose</span>
+                </button>
+                <button id="nav-more-btn" class="hover:text-gold transition-colors focus:outline-none" title="More Options">
+                    <i data-lucide="more-vertical" class="h-5 w-5"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Workspace Dual-Pane Layout -->
+        <main class="flex-grow flex w-full overflow-hidden relative">
+            
+            <!-- LEFT COLUMN: Directory List Pane (Mailbox list, Friends list, search outputs) -->
+            <section id="dashboard-left-col" class="w-full md:w-96 flex flex-col bg-ivory border-r border-beige flex-shrink-0">
+                
+                <!-- Sub-Header showing Directory Status / Mailbox Folder Name -->
+                <div class="px-4 py-3 border-b border-beige bg-[#FAF8F5] flex justify-between items-center flex-shrink-0 select-none">
+                    <h2 id="mailbox-title" class="font-serif text-lg font-semibold text-forest">Inbox</h2>
+                    <span id="letter-count" class="text-[10px] font-semibold text-ink/40 uppercase tracking-wider">0 Letters</span>
+                </div>
+
+                <!-- Search Filter Input bar (Toggled by Search icon) -->
+                <div id="filter-search-container" class="hidden p-3 border-b border-beige bg-linen flex-shrink-0">
+                    <div class="relative flex items-center">
+                        <i data-lucide="search" class="absolute left-3 text-ink/40 h-4 w-4"></i>
+                        <input type="text" id="filter-search-input" placeholder="Search title or content..." class="w-full bg-ivory border border-beige rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-forest text-ink">
+                    </div>
+                </div>
+
+                <!-- Inbox Folder Nav Tabs (Hidden in companions view) -->
+                <div id="mailbox-folder-tabs" class="flex border-b border-beige bg-[#FAF8F5] text-xs font-medium text-ink/60 uppercase tracking-wider flex-shrink-0">
+                    <button data-folder="delivered" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-forest text-forest font-semibold">Inbox</button>
+                    <button data-folder="scheduled" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Pending</button>
+                    <button data-folder="sent" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Sent</button>
+                    <button data-folder="draft" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Drafts</button>
+                </div>
+
+                <!-- Scrollable List Context container -->
+                <div class="flex-grow overflow-y-auto custom-scrollbar relative p-4 bg-ivory">
+                    
+                    <!-- Loading Status -->
+                    <div id="dashboard-loader" class="flex flex-col items-center justify-center py-20 space-y-3">
+                        <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-forest"></div>
+                        <p class="font-serif italic text-xs text-ink/60">Reading letter catalog...</p>
+                    </div>
+
+                    <!-- Empty List Warning -->
+                    <div id="dashboard-empty" class="hidden flex-col items-center justify-center py-20 text-center space-y-3">
+                        <i data-lucide="mail-open" class="h-8 w-8 text-gold"></i>
+                        <p class="font-serif italic text-sm text-ink/60">Your envelopes list is currently clear.</p>
+                    </div>
+
+                    <!-- Letters Catalog dynamic list -->
+                    <div id="letters-list" class="hidden space-y-3"></div>
+
+                    <!-- ==========================================
+                         DIRECTORY COMPANIONS PANEL
+                         ========================================== -->
+                    <div id="friends-panel" class="hidden space-y-6">
+                        
+                        <!-- Search profile bar -->
+                        <div class="bg-[#FCFBF9] border border-beige rounded-xl p-4">
+                            <label for="companion-search-input" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1.5">Search Directory</label>
+                            <div class="flex gap-2">
+                                <input type="text" id="companion-search-input" placeholder="Companion user pen name..." class="flex-grow bg-ivory border border-beige rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-forest text-ink">
+                                <button id="btn-companion-search" class="bg-forest text-ivory px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-forest/90 transition-all shadow-sm">Search</button>
+                            </div>
+                            <!-- Search query output -->
+                            <div id="companion-search-results" class="mt-3 hidden space-y-2 border-t border-beige pt-3"></div>
+                        </div>
+
+                        <!-- Requests -->
+                        <div class="space-y-2">
+                            <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">Pending Requests</h3>
+                            <div id="incoming-requests-list" class="space-y-2"></div>
+                        </div>
+
+                        <!-- Main companions directory -->
+                        <div class="space-y-2">
+                            <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">My Active Companions</h3>
+                            <div id="companions-list" class="space-y-2"></div>
+                        </div>
+
+                    </div>
+                </div>
+            </section>
+
+            <!-- RIGHT COLUMN: active Reading Desk (unfolded parchment display panel) -->
+            <section id="dashboard-right-col" class="hidden md:flex flex-grow flex-col bg-[#F8F6F2] relative overflow-hidden">
+                
+                <!-- Unopened/Empty Screen Desk -->
+                <div id="right-col-empty" class="flex flex-col items-center justify-center flex-grow p-8 text-center bg-[#F8F6F2]">
+                    <div class="max-w-xs space-y-4">
+                        <i data-lucide="feather" class="h-12 w-12 text-gold/60 mx-auto"></i>
+                        <h3 class="font-serif text-2xl text-forest italic">Your Sanctuary Reading Desk</h3>
+                        <p class="text-xs text-ink/50 leading-relaxed">Select a seal from your mailbox list to unfold your letter, or compose an intentional manuscript to your companion.</p>
+                    </div>
+                </div>
+
+                <!-- Dynamic Profile Desk Settings view (Editable Form & Picture Uploader Implemented) -->
+                <div id="right-col-profile" class="hidden flex-col items-center justify-center flex-grow p-8 bg-[#F8F6F2] text-center overflow-y-auto">
+                    <div class="max-w-md w-full bg-ivory border border-beige p-8 rounded-2xl shadow-sm text-left space-y-6">
+                        
+                        <!-- Form Header card with Interactive Profile Picture Upload Trigger -->
+                        <div class="border-b border-beige pb-4 flex items-center space-x-4">
+                            <button id="btn-back-to-list-profile" class="md:hidden text-forest hover:text-gold transition-colors">
+                                <i data-lucide="arrow-left" class="h-5 w-5"></i>
+                            </button>
+                            
+                            <!-- Interactive Profile Photo Circle wrapper [1] -->
+                            <div class="relative group cursor-pointer flex-shrink-0" id="avatar-container" title="Update Profile Photo">
+                                <img id="profile-avatar-img" class="h-14 w-12 rounded-full object-cover border border-beige hidden" src="" alt="Avatar">
+                                <div id="profile-avatar-fallback" class="h-12 w-12 rounded-full bg-forest text-ivory flex items-center justify-center font-bold text-lg">C</div>
+                                <!-- Hover Upload icon overlay -->
+                                <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                    <i data-lucide="camera" class="h-4 w-4 text-ivory"></i>
+                                </div>
+                                <input type="file" id="avatar-file-input" class="hidden" accept="image/*">
+                            </div>
+
+                            <div>
+                                <h3 id="profile-display-name" class="font-serif text-2xl text-forest font-semibold">Dear Companion</h3>
+                                <p id="profile-username" class="text-sm text-gold">@username</p>
+                            </div>
+                        </div>
+
+                        <!-- Local Action Alert message box -->
+                        <div id="profile-status-box" class="hidden p-3 rounded-lg text-xs" role="alert"></div>
+
+                        <!-- Editable Fields Form -->
+                        <form id="form-edit-profile" class="space-y-4">
+                            <div>
+                                <label for="edit-display-name" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Display Name</label>
+                                <input type="text" id="edit-display-name" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink">
+                            </div>
+                            <div>
+                                <label for="edit-bio" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Biography / Pen Musings</label>
+                                <textarea id="edit-bio" rows="3" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink resize-none custom-scrollbar" placeholder="Share your silent thoughts..."></textarea>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="edit-country" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Country</label>
+                                    <input type="text" id="edit-country" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink">
+                                </div>
+                                <div>
+                                    <label class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Account Email</label>
+                                    <input type="text" id="profile-email-input" readonly class="w-full bg-[#FAF8F5] border border-beige rounded-lg px-3 py-2 text-sm text-ink/50 focus:outline-none cursor-not-allowed">
+                                </div>
+                            </div>
+                            <div class="pt-2 flex justify-between items-center">
+                                <span id="profile-joined-text" class="text-[10px] text-ink/50">Joined Sanctuary: ---</span>
+                                <button type="submit" class="bg-forest text-ivory text-xs px-4 py-2.5 rounded-lg font-semibold hover:bg-forest/90 shadow-sm transition-all">
+                                    Save Profile
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Active Letter Reading Board view -->
+                <div id="active-letter-board" class="hidden flex-col h-full overflow-hidden bg-ivory">
+                    
+                    <!-- Reading Pane mobile/desktop navigation top bar -->
+                    <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none">
+                        <div class="flex items-center space-x-3">
+                            <button id="btn-back-to-list" class="md:hidden text-forest hover:text-gold mr-2 transition-colors">
+                                <i data-lucide="arrow-left" class="h-5 w-5"></i>
+                            </button>
+                            <div>
+                                <h3 id="desk-letter-title" class="font-serif text-xl font-semibold text-forest">Subject</h3>
+                                <p id="desk-letter-subtitle" class="text-xs text-ink/50">Sender details</p>
+                            </div>
+                        </div>
+                        <div class="text-xs text-gold font-serif" id="desk-letter-date">Date</div>
+                    </div>
+
+                    <!-- Inner Scrollable Parchment Area -->
+                    <div class="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-12 bg-ivory relative">
+                        <!-- Canvas content displays using custom styled styles -->
+                        <div id="desk-letter-content" class="max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-serif text-ink"></div>
+                    </div>
+
+                </div>
+
+            </section>
+        </main>
+    </div>
+
+
+    <!-- =========================================================================
+         VIEW 3: STATIONERY & COMPOSER SUITE (SCROLL TRAP RESOLVED)
+         ========================================================================= -->
+    <div id="view-composer" class="hidden h-full flex flex-col bg-linen overflow-hidden">
+        
+        <!-- Top Composer Nav (Contains header-level Seal & Send button [1]) -->
+        <header class="bg-ivory border-b border-beige px-6 py-4 flex justify-between items-center flex-shrink-0">
+            <div class="flex items-center space-x-4">
+                <button id="btn-close-composer" class="text-ink/60 hover:text-ink transition-colors">
+                    <i data-lucide="arrow-left" class="h-5 w-5"></i>
+                </button>
+                <span class="font-serif text-2xl italic text-forest select-none">Write Letter</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span id="autosave-badge" class="text-xs text-ink/40 italic hidden sm:inline">Parchment draft saved</span>
+                <button id="btn-save-draft" class="text-xs font-semibold text-forest border border-forest px-3 py-2 rounded-lg hover:bg-beige/20 transition-colors">
+                    Save Draft
+                </button>
+                <!-- Lock-fixed header "Seal & Send" button to completely bypass scrolling traps [1] -->
+                <button id="btn-seal-envelope-header" class="bg-forest text-ivory text-xs px-3 py-2 rounded-lg font-semibold hover:bg-forest/90 shadow-sm transition-all flex items-center space-x-1">
+                    <i data-lucide="mail" class="h-3.5 w-3.5"></i>
+                    <span>Seal & Send</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Composer Setup -->
+        <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8 overflow-y-auto custom-scrollbar">
+            
+            <!-- Writing Canvas -->
+            <section class="flex-grow bg-ivory border border-beige rounded-2xl shadow-sm p-8 md:p-12 flex flex-col relative transition-colors duration-300" id="paper-canvas">
+                <input type="text" id="letter-subject" placeholder="Title of your letter" class="bg-transparent border-b border-beige pb-3 text-3xl font-serif text-forest placeholder-forest/30 focus:outline-none focus:border-gold transition-colors w-full mb-8">
+                
+                <textarea id="letter-body" placeholder="Write with calm intention. There are no instant reactions here..." class="bg-transparent flex-grow text-lg leading-relaxed focus:outline-none resize-none font-serif placeholder-ink/20 text-[#3A2F28] min-h-[350px] w-full"></textarea>
+            </section>
+
+            <!-- Setting Drawers -->
+            <aside class="w-full md:w-80 space-y-6">
+                <div class="bg-ivory border border-beige rounded-2xl p-6 shadow-sm space-y-6">
+                    <h3 class="font-serif text-xl font-semibold text-forest pb-3 border-b border-beige">Stationery Settings</h3>
+                    
+                    <!-- Search Recipient -->
+                    <div>
+                        <label for="recipient-search" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Recipient Pen Name</label>
+                        <div class="relative">
+                            <input type="text" id="recipient-search" placeholder="Type name..." class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink">
+                            <div id="recipient-results" class="hidden absolute left-0 right-0 bg-ivory border border-beige rounded-lg shadow-lg mt-1 z-20 max-h-40 overflow-y-auto custom-scrollbar"></div>
+                        </div>
+                        <input type="hidden" id="recipient-id">
+                        <p id="selected-recipient-label" class="text-xs italic text-gold mt-2 hidden"></p>
+                    </div>
+
+                    <!-- Customize Ink colors -->
+                    <div>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Ink Pigment</span>
+                        <div class="flex space-x-3" id="ink-palette">
+                            <button data-color="#3A2F28" class="h-6 w-6 rounded-full border-2 border-forest" style="background-color: #3A2F28;"></button>
+                            <button data-color="#1F4D3A" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1F4D3A;"></button>
+                            <button data-color="#1E293B" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1E293B;"></button>
+                        </div>
+                    </div>
+
+                    <!-- Customize Paper quality -->
+                    <div>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Paper Quality</span>
+                        <div class="grid grid-cols-2 gap-2" id="paper-styles">
+                            <button data-paper="linen" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-medium text-forest">Antique Linen</button>
+                            <button data-paper="parchment" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-medium text-ink/70">Parchment</button>
+                        </div>
+                    </div>
+
+                    <!-- Customize Hand / Writing font -->
+                    <div>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Writing Hand</span>
+                        <div class="grid grid-cols-2 gap-2" id="typeface-styles">
+                            <button data-font="serif" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-serif text-forest">Classic Serif</button>
+                            <button data-font="handwriting" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting text-ink/70">Cursive Hand</button>
+                        </div>
+                    </div>
+
+                    <!-- Delay selection -->
+                    <div>
+                        <label for="delivery-speed" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Delivery Transit</label>
+                        <select id="delivery-speed" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink">
+                            <option value="immediate">Immediate Delivery</option>
+                            <option value="1h">1 Hour (Deliberate delay)</option>
+                            <option value="12h">12 Hours (Overnight)</option>
+                            <option value="1d" selected>1 Day (Standard carriage)</option>
+                            <option value="7d">7 Days (Cross country)</option>
+                        </select>
+                    </div>
+
+                    <!-- Sidebar Send button (Still active) -->
+                    <button id="btn-seal-envelope" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-sm hover:shadow transition-all text-sm flex items-center justify-center space-x-2">
+                        <i data-lucide="mail" class="h-4 w-4"></i>
+                        <span>Seal & Send Letter</span>
+                    </button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+
+    <!-- =========================================================================
+         MORE OPTIONS DROPDOWN MODAL
+         ========================================================================= -->
+    <div id="more-dropdown-modal" class="hidden fixed inset-0 z-30" aria-haspopup="true">
+        <div class="absolute inset-0 bg-transparent"></div>
+        <div class="absolute right-6 top-16 w-48 bg-ivory border border-beige rounded-xl shadow-xl py-2 z-40">
+            <button id="btn-dropdown-profile" class="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-beige/40 flex items-center space-x-2">
+                <i data-lucide="user" class="h-4 w-4 text-forest"></i>
+                <span>View Profile</span>
+            </button>
+            <button id="btn-dropdown-logout" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2">
+                <i data-lucide="log-out" class="h-4 w-4"></i>
+                <span>Logout Session</span>
+            </button>
+        </div>
+    </div>
+
+
+    <!-- =========================================================================
+         GLOBAL INTERACTIVE LETTER/ENVELOPE MODAL (FALLBACK)
+         ========================================================================= -->
+    <div id="letter-modal" class="hidden fixed inset-0 bg-ink/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div id="envelope-wrapper" class="w-full max-w-2xl bg-ivory rounded-2xl shadow-2xl border border-beige overflow-hidden transform scale-95 opacity-0 transition-all duration-300 relative flex flex-col p-8 md:p-12">
+            
+            <button id="btn-close-modal" class="absolute top-6 right-6 text-ink/40 hover:text-ink transition-colors">
+                <i data-lucide="x" class="h-5 w-5"></i>
+            </button>
+
+            <!-- Letter Envelope metadata -->
+            <div class="border-b border-beige pb-6 mb-6">
+                <p class="text-xs uppercase tracking-widest font-bold text-gold mb-1">Delivered Correspondence</p>
+                <h3 id="modal-subject" class="font-serif text-3xl font-semibold text-forest mb-2">Subject</h3>
+                <div class="flex justify-between items-center text-xs text-ink/60">
+                    <span id="modal-author">From: ---</span>
+                    <span id="modal-date">Date: ---</span>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="flex-grow overflow-y-auto max-h-[350px] pr-2 custom-scrollbar">
+                <div id="modal-content" class="text-base leading-relaxed whitespace-pre-wrap font-serif text-ink"></div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- =========================================================================
+         APPLICATION CORE DRIVER
+         ========================================================================= -->
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+
+        // Connects to your custom Supabase Project ID
+        const SUPABASE_URL = "https://lnmvtxxfeireptqurpoj.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxubXZ0eHhmZWlyZXB0cXVycG9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNjYxMzgsImV4cCI6MjA5OTc0MjEzOH0.tZeRHYv5NSV1COfRQtfeEkb6qVQX8PSJM46JTL6PZWc"; 
+
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // Core App Context State
+        let currentUser = null;
+        let activeDraftId = null;
+        let currentFolder = 'delivered';
+        let debounceTimer = null;
+        let activeStyling = { inkColor: '#3A2F28', paperStyle: 'linen', fontFamily: 'serif' };
+        let localCachedLetters = [];
+
+        // Initialize Icons
+        lucide.createIcons();
+
+        // Router Toggles (Handles view- prefixed container IDs safely)
+        function routeTo(viewId) {
+            const authView = document.getElementById('view-auth');
+            const dashboardView = document.getElementById('view-dashboard');
+            const composerView = document.getElementById('view-composer');
+
+            if (authView) authView.classList.add('hidden');
+            if (dashboardView) dashboardView.classList.add('hidden');
+            if (composerView) composerView.classList.add('hidden');
+
+            const target = document.getElementById(viewId);
+            if (target) {
+                target.classList.remove('hidden');
+            } else {
+                console.error(`Target view container not found in DOM: ${viewId}`);
+                return;
+            }
+
+            if (viewId === 'view-dashboard') {
+                initDashboard();
+            } else if (viewId === 'view-composer') {
+                initComposer();
+            }
+        }
+
+        // Subview switching for auth views
+        function toggleAuthView(subview) {
+            clearAuthStatus();
+            document.getElementById('auth-signin').classList.add('hidden');
+            document.getElementById('auth-signup').classList.add('hidden');
+            document.getElementById('auth-forgot').classList.add('hidden');
+
+            document.getElementById(`auth-${subview}`).classList.remove('hidden');
+        }
+
+        // Handle Alert Dialogs
+        function showAuthStatus(message, type) {
+            const box = document.getElementById('auth-status-box');
+            if (!box) return;
+            box.classList.remove('hidden', 'bg-red-50', 'text-red-800', 'border-red-200', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+            box.textContent = message;
+
+            if (type === 'error') {
+                box.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
+            } else {
+                box.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+            }
+        }
+
+        function clearAuthStatus() {
+            const box = document.getElementById('auth-status-box');
+            if (box) box.classList.add('hidden');
+        }
+
+
+        // ==========================================
+        // AUTHENTICATION ENGINE
+        // ==========================================
+
+        document.getElementById('btn-goto-signup').addEventListener('click', () => toggleAuthView('signup'));
+        document.getElementById('btn-goto-signin').addEventListener('click', () => toggleAuthView('signin'));
+        document.getElementById('btn-goto-forgot').addEventListener('click', () => toggleAuthView('forgot'));
+        document.getElementById('btn-back-to-signin').addEventListener('click', () => toggleAuthView('signin'));
+
+        // Action: Sign In
+        document.getElementById('form-signin').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAuthStatus();
+            const email = document.getElementById('signin-email').value.trim();
+            const password = document.getElementById('signin-password').value;
+
+            try {
+                showAuthStatus('Retrieving credentials...', 'info');
+                const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+                if (error) throw error;
+                currentUser = data.user;
+                showAuthStatus('Welcome back. Loading sanctuary...', 'success');
+                setTimeout(() => routeTo('view-dashboard'), 1000);
+            } catch (err) {
+                showAuthStatus(err.message, 'error');
+            }
+        });
+
+        // Action: Sign Up
+        document.getElementById('form-signup').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAuthStatus();
+            const displayName = document.getElementById('signup-displayname').value.trim();
+            const username = document.getElementById('signup-username').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+
+            if (username.length < 3 || !/^[a-zA-Z0-9_]+$/.test(username)) {
+                showAuthStatus('Your pen name must be 3+ characters, letters, numbers and underscores only.', 'error');
+                return;
+            }
+
+            try {
+                showAuthStatus('Sealing credentials...', 'info');
+                const { data, error } = await supabase.auth.signUp({
+                    email, password,
+                    options: { data: { username: username.toLowerCase(), display_name: displayName } }
+                });
+                if (error) throw error;
+                showAuthStatus('A validation letter has been dispatched to your email.', 'success');
+                document.getElementById('form-signup').reset();
+            } catch (err) {
+                showAuthStatus(err.message, 'error');
+            }
+        });
+
+        // Action: Password Recovery
+        document.getElementById('form-forgot').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearAuthStatus();
+            const email = document.getElementById('forgot-email').value.trim();
+            try {
+                showAuthStatus('Routing path...', 'info');
+                const { error } = await supabase.auth.resetPasswordForEmail(email, {
+                    redirectTo: window.location.origin
+                });
+                if (error) throw error;
+                showAuthStatus('A recovery script was sent to your inbox.', 'success');
+                document.getElementById('form-forgot').reset();
+            } catch (err) {
+                showAuthStatus(err.message, 'error');
+            }
+        });
+
+        async function logoutSession() {
+            await supabase.auth.signOut();
+            currentUser = null;
+            routeTo('view-auth');
+            toggleAuthView('signin');
+        }
+
+        // OAuth Continue
+        document.getElementById('btn-oauth-google').addEventListener('click', async () => {
+            try {
+                const { error } = await supabase.auth.signInWithOAuth({
+                    provider: 'google',
+                    options: { redirectTo: window.location.origin }
+                });
+                if (error) throw error;
+            } catch (err) {
+                showAuthStatus(err.message, 'error');
+            }
+        });
+
+
+        // ==========================================
+        // SANCTUARY DASHBOARD & DUAL-PANE WHATSAPP ENGINE
+        // ==========================================
+
+        // Upper bar navigation controls
+        document.getElementById('nav-search-btn').addEventListener('click', () => {
+            const searchBar = document.getElementById('filter-search-container');
+            searchBar.classList.toggle('hidden');
+            if (!searchBar.classList.contains('hidden')) {
+                document.getElementById('filter-search-input').focus();
+            }
+        });
+
+        document.getElementById('nav-inbox-btn').addEventListener('click', () => {
+            switchToCompanionsMode(false);
+            const deliveredBtn = document.querySelector('[data-folder="delivered"]');
+            if (deliveredBtn) deliveredBtn.click();
+        });
+
+        document.getElementById('nav-friends-btn').addEventListener('click', () => {
+            switchToCompanionsMode(true);
+        });
+
+        document.getElementById('nav-profile-btn').addEventListener('click', async () => {
+            await showProfilePane();
+        });
+
+        document.getElementById('nav-more-btn').addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.getElementById('more-dropdown-modal').classList.toggle('hidden');
+        });
+
+        // Action: Open Composer View (Restored)
+        document.getElementById('btn-open-composer').addEventListener('click', () => {
+            activeDraftId = null;
+            routeTo('view-composer');
+        });
+
+        // Dropdown actions
+        document.getElementById('btn-dropdown-profile').addEventListener('click', async () => {
+            document.getElementById('more-dropdown-modal').classList.add('hidden');
+            await showProfilePane();
+        });
+
+        document.getElementById('btn-dropdown-logout').addEventListener('click', async () => {
+            document.getElementById('more-dropdown-modal').classList.add('hidden');
+            await logoutSession();
+        });
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', () => {
+            document.getElementById('more-dropdown-modal').classList.add('hidden');
+        });
+
+        function switchToCompanionsMode(enable) {
+            const folderTabs = document.getElementById('mailbox-folder-tabs');
+            const searchBar = document.getElementById('filter-search-container');
+            const lettersList = document.getElementById('letters-list');
+            const companionsPanel = document.getElementById('friends-panel');
+
+            // Hide normal folder tabs if viewing companions
+            if (enable) {
+                folderTabs.classList.add('hidden');
+                searchBar.classList.add('hidden');
+                lettersList.classList.add('hidden');
+                companionsPanel.classList.remove('hidden');
+                
+                document.getElementById('mailbox-title').textContent = 'Companions Directory';
+                document.getElementById('letter-count').textContent = 'Companions list';
+                initCompanionsEngine();
+                toggleDashboardState('list');
+                showMobileRightPane(false);
+            } else {
+                folderTabs.classList.remove('hidden');
+                lettersList.classList.remove('hidden');
+                companionsPanel.classList.add('hidden');
+                showMobileRightPane(false);
+            }
+        }
+
+        // Folders Selection Tabbing
+        document.querySelectorAll('.folder-tab-btn').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                document.querySelectorAll('.folder-tab-btn').forEach(b => b.classList.remove('border-forest', 'text-forest', 'font-semibold'));
+                e.currentTarget.classList.add('border-forest', 'text-forest', 'font-semibold');
+                currentFolder = e.currentTarget.dataset.folder;
+                
+                const displayTitles = {
+                    delivered: 'Inbox',
+                    scheduled: 'Scheduled Transit',
+                    sent: 'Sent Records',
+                    draft: 'Saved Drafts'
+                };
+                document.getElementById('mailbox-title').textContent = displayTitles[currentFolder];
+                await fetchInboxFeed();
+            });
+        });
+
+        // Search Input Filter Engine
+        document.getElementById('filter-search-input').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.letter-card');
+            
+            cards.forEach(card => {
+                const title = card.querySelector('h4').textContent.toLowerCase();
+                const content = card.dataset.content ? card.dataset.content.toLowerCase() : '';
+                if (title.includes(val) || content.includes(val)) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        });
+
+        async function initDashboard() {
+            currentFolder = 'delivered';
+            
+            // Layout views reset
+            document.getElementById('right-col-empty').classList.remove('hidden');
+            document.getElementById('right-col-profile').classList.add('hidden');
+            document.getElementById('active-letter-board').classList.add('hidden');
+            showMobileRightPane(false);
+
+            document.querySelectorAll('.folder-tab-btn').forEach(b => b.classList.remove('border-forest', 'text-forest', 'font-semibold'));
+            const inboxTab = document.querySelector('[data-folder="delivered"]');
+            if (inboxTab) inboxTab.classList.add('border-forest', 'text-forest', 'font-semibold');
+            
+            document.getElementById('mailbox-title').textContent = 'Inbox';
+            switchToCompanionsMode(false);
+            await fetchInboxFeed();
+            updateUnreadInboxBadge();
+        }
+
+        async function fetchInboxFeed() {
+            toggleDashboardState('loader');
+            const list = document.getElementById('letters-list');
+            if (!list) return;
+            list.innerHTML = '';
+
+            let query = supabase.from('letters').select('*, sender:profiles!letters_sender_id_fkey(display_name, username), recipient:profiles!letters_recipient_id_fkey(display_name)');
+
+            if (currentFolder === 'delivered') {
+                query = query.eq('recipient_id', currentUser.id).eq('status', 'delivered');
+            } else if (currentFolder === 'scheduled') {
+                query = query.eq('sender_id', currentUser.id).eq('status', 'scheduled');
+            } else if (currentFolder === 'sent') {
+                query = query.eq('sender_id', currentUser.id).eq('status', 'sent');
+            } else if (currentFolder === 'draft') {
+                query = query.eq('sender_id', currentUser.id).eq('status', 'draft');
+            }
+
+            const { data: letters, error } = await query.order('created_at', { ascending: false });
+
+            if (error || !letters || letters.length === 0) {
+                toggleDashboardState('empty');
+                document.getElementById('letter-count').textContent = '0 Letters';
+                return;
+            }
+
+            document.getElementById('letter-count').textContent = `${letters.length} Letter${letters.length === 1 ? '' : 's'}`;
+            toggleDashboardState('list');
+
+            letters.forEach(letter => {
+                const card = document.createElement('div');
+                card.className = "letter-card bg-ivory border border-beige hover:border-gold p-4 rounded-xl cursor-pointer transition-all hover:shadow-sm flex justify-between items-center group relative overflow-hidden";
+                card.dataset.content = letter.content || '';
+
+                const isUnread = currentFolder === 'delivered' && letter.status === 'delivered';
+                const dot = isUnread ? `<span class="h-2 w-2 rounded-full bg-gold mr-3 inline-block flex-shrink-0"></span>` : '';
+                const dateStr = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                const nameLabel = currentFolder === 'delivered' 
+                    ? `From: ${letter.sender?.display_name || 'Anonymous'}`
+                    : `To: ${letter.recipient?.display_name || 'Future Self'}`;
+
+                card.innerHTML = `
+                    <div class="flex items-center overflow-hidden min-w-0 mr-2">
+                        ${dot}
+                        <div class="min-w-0">
+                            <h4 class="font-serif text-base font-semibold text-forest group-hover:text-gold transition-colors truncate">${letter.subject || '(Untitled Scroll)'}</h4>
+                            <p class="text-[11px] text-ink/50 mt-0.5 truncate">${nameLabel}</p>
+                        </div>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                        <span class="text-[10px] text-ink/40">${dateStr}</span>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => openLetterDetails(letter));
+                list.appendChild(card);
+            });
+        }
+
+        function toggleDashboardState(state) {
+            const list = document.getElementById('letters-list');
+            const loader = document.getElementById('dashboard-loader');
+            const empty = document.getElementById('dashboard-empty');
+
+            if (loader) loader.classList.add('hidden');
+            if (empty) empty.classList.add('hidden');
+            if (list) list.classList.add('hidden');
+
+            if (state === 'loader' && loader) loader.classList.remove('hidden');
+            else if (state === 'empty' && empty) empty.classList.remove('hidden');
+            else if (list) list.classList.remove('hidden');
+        }
+
+        async function updateUnreadInboxBadge() {
+            const badge = document.getElementById('badge-inbox');
+            if (!badge) return;
+            const { count, error } = await supabase
+                .from('letters')
+                .select('*', { count: 'exact', head: true })
+                .eq('recipient_id', currentUser.id)
+                .eq('status', 'delivered');
+
+            if (!error && count > 0) {
+                badge.textContent = count;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // Manage Mobile collapsing layout
+        function showMobileRightPane(show) {
+            const leftCol = document.getElementById('dashboard-left-col');
+            const rightCol = document.getElementById('dashboard-right-col');
+            
+            if (show) {
+                leftCol.classList.add('hidden');
+                leftCol.classList.remove('md:flex');
+                
+                rightCol.classList.remove('hidden');
+                rightCol.classList.add('flex');
+            } else {
+                leftCol.classList.remove('hidden');
+                leftCol.classList.add('md:flex');
+                
+                rightCol.classList.add('hidden');
+                rightCol.classList.remove('flex');
+            }
+        }
+
+        document.getElementById('btn-back-to-list').addEventListener('click', () => {
+            showMobileRightPane(false);
+        });
+
+        const btnBackProfile = document.getElementById('btn-back-to-list-profile');
+        if (btnBackProfile) {
+            btnBackProfile.addEventListener('click', () => {
+                showMobileRightPane(false);
+            });
+        }
+
+
+        // ==========================================
+        // COMPANIONS SUB-SYSTEM ENGINE
+        // ==========================================
+
+        async function initCompanionsEngine() {
+            await fetchMyCompanions();
+            await fetchIncomingRequests();
+            document.getElementById('companion-search-results').innerHTML = '';
+            document.getElementById('companion-search-results').classList.add('hidden');
+            document.getElementById('companion-search-input').value = '';
+        }
+
+        // Active Companions Fetch (reads from user_friends view)
+        async function fetchMyCompanions() {
+            const list = document.getElementById('companions-list');
+            list.innerHTML = '';
+
+            const { data: friends, error } = await supabase
+                .from('user_friends')
+                .select('*');
+
+            if (error || !friends || friends.length === 0) {
+                list.innerHTML = `<p class="text-xs italic text-ink/40">You have not recorded any active companions yet.</p>`;
+                return;
+            }
+
+            friends.forEach(friend => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-3 bg-ivory border border-beige rounded-xl";
+                item.innerHTML = `
+                    <div class="flex items-center space-x-3 overflow-hidden min-w-0 mr-2">
+                        <div class="h-8 w-8 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest">
+                            ${friend.display_name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="min-w-0">
+                            <h4 class="text-sm font-semibold truncate">${friend.display_name}</h4>
+                            <p class="text-xs text-ink/50 truncate">@${friend.username}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-1.5 flex-shrink-0">
+                        <button class="btn-write-friend bg-forest text-ivory text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-forest/90 font-semibold" data-id="${friend.friend_id}" data-name="${friend.display_name}" data-user="${friend.username}">
+                            Compose
+                        </button>
+                        <button class="btn-remove-friend text-red-600 hover:bg-red-50 p-1.5 rounded-lg" data-friendship="${friend.friendship_id}" title="Remove Companion">
+                            <i data-lucide="user-minus" class="h-3.5 w-3.5"></i>
+                        </button>
+                    </div>
+                `;
+
+                // Quick compose redirect event
+                item.querySelector('.btn-write-friend').addEventListener('click', (e) => {
+                    activeDraftId = null;
+                    routeTo('view-composer');
+                    
+                    // Directly populate target recipient
+                    const btn = e.currentTarget;
+                    document.getElementById('recipient-id').value = btn.dataset.id;
+                    const lbl = document.getElementById('selected-recipient-label');
+                    lbl.textContent = `Address to: ${btn.dataset.name} (@${btn.dataset.user})`;
+                    lbl.classList.remove('hidden');
+                });
+
+                item.querySelector('.btn-remove-friend').addEventListener('click', async (e) => {
+                    const friendshipId = e.currentTarget.dataset.friendship;
+                    if (confirm('Are you sure you want to remove this companion connection?')) {
+                        await supabase.from('friendships').delete().eq('id', friendshipId);
+                        await initCompanionsEngine();
+                    }
+                });
+
+                list.appendChild(item);
+            });
+            lucide.createIcons();
+        }
+
+        // Fetch Incoming Friend Requests (reads from view)
+        async function fetchIncomingRequests() {
+            const list = document.getElementById('incoming-requests-list');
+            list.innerHTML = '';
+
+            const { data: requests, error } = await supabase
+                .from('my_friend_requests')
+                .select('*')
+                .eq('receiver_id', currentUser.id)
+                .eq('status', 'pending');
+
+            if (error || !requests || requests.length === 0) {
+                list.innerHTML = `<p class="text-xs italic text-ink/40">No pending incoming requests.</p>`;
+                return;
+            }
+
+            requests.forEach(req => {
+                const item = document.createElement('div');
+                item.className = "flex items-center justify-between p-3 bg-ivory border border-beige rounded-xl";
+                item.innerHTML = `
+                    <div class="min-w-0 mr-2">
+                        <h4 class="text-sm font-semibold truncate">${req.sender_display_name}</h4>
+                        <p class="text-xs text-ink/50 truncate">@${req.sender_username}</p>
+                    </div>
+                    <div class="flex space-x-1.5 flex-shrink-0">
+                        <button class="btn-accept bg-forest text-ivory text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-forest/90 font-semibold" data-id="${req.request_id}">
+                            Accept
+                        </button>
+                        <button class="btn-reject bg-beige text-ink/75 text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-beige/80" data-id="${req.request_id}">
+                            Decline
+                        </button>
+                    </div>
+                `;
+
+                item.querySelector('.btn-accept').addEventListener('click', async (e) => {
+                    await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', e.currentTarget.dataset.id);
+                    await initCompanionsEngine();
+                });
+
+                item.querySelector('.btn-reject').addEventListener('click', async (e) => {
+                    await supabase.from('friend_requests').update({ status: 'rejected' }).eq('id', e.currentTarget.dataset.id);
+                    await initCompanionsEngine();
+                });
+
+                list.appendChild(item);
+            });
+        }
+
+        // Search directory profiles
+        document.getElementById('btn-companion-search').addEventListener('click', async () => {
+            const val = document.getElementById('companion-search-input').value.trim();
+            const container = document.getElementById('companion-search-results');
+            container.innerHTML = '';
+
+            if (val.length < 2) {
+                alert('Please input at least 2 characters to run a search query.');
+                return;
+            }
+
+            // Look up profile by username
+            const { data: users, error } = await supabase
+                .from('profiles')
+                .select('id, username, display_name')
+                .ilike('username', `%${val}%`)
+                .neq('id', currentUser.id)
+                .limit(5);
+
+            if (error || !users || users.length === 0) {
+                container.innerHTML = `<p class="text-xs italic text-red-700">No companions matching that pen name were found.</p>`;
+                container.classList.remove('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+
+            users.forEach(user => {
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between p-2 bg-ivory rounded border border-beige/60 text-xs";
+                row.innerHTML = `
+                    <div class="min-w-0 mr-2">
+                        <span class="font-bold truncate">${user.display_name}</span> <span class="text-ink/50 truncate">@${user.username}</span>
+                    </div>
+                    <button class="btn-send-request bg-forest text-ivory px-2 py-1 rounded hover:bg-forest/90 font-semibold flex-shrink-0" data-id="${user.id}">
+                        Request
+                    </button>
+                `;
+
+                row.querySelector('.btn-send-request').addEventListener('click', async (e) => {
+                    const btn = e.currentTarget;
+                    btn.disabled = true;
+                    btn.textContent = 'Sending...';
+
+                    const { error } = await supabase.from('friend_requests').insert({
+                        sender_id: currentUser.id,
+                        receiver_id: btn.dataset.id,
+                        status: 'pending'
+                    });
+
+                    if (error) {
+                        alert(error.message.includes('unique') ? 'A request is already pending between you.' : error.message);
+                        btn.textContent = 'Request';
+                        btn.disabled = false;
+                    } else {
+                        btn.className = "bg-beige text-ink/50 px-2 py-1 rounded cursor-not-allowed";
+                        btn.textContent = 'Sent';
+                    }
+                });
+
+                container.appendChild(row);
+            });
+        });
+
+
+        // ==========================================
+        // COMPOSER MODULE ENGINE
+        // ==========================================
+
+        document.getElementById('btn-close-composer').addEventListener('click', () => {
+            routeTo('view-dashboard');
+        });
+
+        function initComposer() {
+            // Reset state
+            document.getElementById('letter-subject').value = '';
+            document.getElementById('letter-body').value = '';
+            document.getElementById('recipient-search').value = '';
+            document.getElementById('recipient-id').value = '';
+            document.getElementById('selected-recipient-label').classList.add('hidden');
+            document.getElementById('autosave-badge').textContent = 'Ready to compose';
+            
+            // Stylings reset
+            activeStyling = { inkColor: '#3A2F28', paperStyle: 'linen', fontFamily: 'serif' };
+            const body = document.getElementById('letter-body');
+            body.style.color = '#3A2F28';
+            body.className = "bg-transparent flex-grow text-lg leading-relaxed focus:outline-none resize-none font-serif placeholder-ink/20 text-[#3A2F28] min-h-[350px] w-full";
+            document.getElementById('paper-canvas').style.backgroundColor = '#FFFDF8';
+        }
+
+        // Ink choice
+        document.querySelectorAll('#ink-palette button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('#ink-palette button').forEach(b => b.classList.replace('border-forest', 'border-transparent'));
+                const color = e.currentTarget.dataset.color;
+                e.currentTarget.classList.replace('border-transparent', 'border-forest');
+                activeStyling.inkColor = color;
+                document.getElementById('letter-body').style.color = color;
+            });
+        });
+
+        // Paper choice
+        document.querySelectorAll('#paper-styles button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('#paper-styles button').forEach(b => b.classList.replace('border-gold', 'border-beige'));
+                document.querySelectorAll('#paper-styles button').forEach(b => b.classList.replace('text-forest', 'text-ink/70'));
+                e.currentTarget.classList.replace('border-beige', 'border-gold');
+                e.currentTarget.classList.replace('text-ink/70', 'text-forest');
+
+                const paper = e.currentTarget.dataset.paper;
+                activeStyling.paperStyle = paper;
+            });
+        });
+
+        // Typeface hand choice
+        document.querySelectorAll('#typeface-styles button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('#typeface-styles button').forEach(b => b.classList.replace('border-gold', 'border-beige'));
+                document.querySelectorAll('#typeface-styles button').forEach(b => b.classList.replace('text-forest', 'text-ink/70'));
+                e.currentTarget.classList.replace('border-beige', 'border-gold');
+                e.currentTarget.classList.replace('text-ink/70', 'text-forest');
+
+                const font = e.currentTarget.dataset.font;
+                activeStyling.fontFamily = font;
+
+                const body = document.getElementById('letter-body');
+                if (font === 'handwriting') {
+                    body.classList.remove('font-serif');
+                    body.classList.add('font-handwriting');
+                } else {
+                    body.classList.remove('font-handwriting');
+                    body.classList.add('font-serif');
+                }
+            });
+        });
+
+        // Recipient search (Debounced autocomplete)
+        document.getElementById('recipient-search').addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            const val = e.target.value.trim();
+            const results = document.getElementById('recipient-results');
+            
+            if (val.length < 2) {
+                results.classList.add('hidden');
+                return;
+            }
+
+            debounceTimer = setTimeout(async () => {
+                const { data: users, error } = await supabase
+                    .from('profiles')
+                    .select('id, username, display_name')
+                    .ilike('username', `%${val}%`)
+                    .neq('id', currentUser.id)
+                    .limit(5);
+
+                if (error || users.length === 0) {
+                    results.classList.add('hidden');
+                    return;
+                }
+
+                results.innerHTML = '';
+                results.classList.remove('hidden');
+
+                users.forEach(user => {
+                    const btn = document.createElement('button');
+                    btn.className = "w-full text-left px-3 py-2 text-xs hover:bg-beige/40 block border-b border-beige/40 last:border-b-0";
+                    btn.innerHTML = `<span class="font-bold">${user.display_name}</span> <span class="text-ink/50">@${user.username}</span>`;
+                    
+                    btn.addEventListener('click', () => {
+                        document.getElementById('recipient-id').value = user.id;
+                        const lbl = document.getElementById('selected-recipient-label');
+                        lbl.textContent = `Address to: ${user.display_name} (@${user.username})`;
+                        lbl.classList.remove('hidden');
+                        document.getElementById('recipient-search').value = '';
+                        results.classList.add('hidden');
+                        triggerAutosaveProcess();
+                    });
+                    results.appendChild(btn);
+                });
+            }, 400);
+        });
+
+        // Autosave Logic triggers
+        async function triggerAutosaveProcess() {
+            const autosaveText = document.getElementById('autosave-badge');
+            if (autosaveText) autosaveText.textContent = "Sealing thoughts...";
+            
+            const payload = {
+                sender_id: currentUser.id,
+                recipient_id: document.getElementById('recipient-id').value || null,
+                subject: document.getElementById('letter-subject').value.trim(),
+                content: document.getElementById('letter-body').value,
+                ink_color: activeStyling.inkColor,
+                paper_style: activeStyling.paperStyle,
+                font_family: activeStyling.fontFamily,
+                status: 'draft'
+            };
+
+            if (activeDraftId) {
+                await supabase.from('letters').update(payload).eq('id', activeDraftId);
+            } else {
+                const { data, error } = await supabase.from('letters').insert(payload).select().single();
+                if (!error && data) {
+                    activeDraftId = data.id;
+                }
+            }
+            if (autosaveText) autosaveText.textContent = "Parchment draft saved";
+        }
+
+        document.getElementById('letter-subject').addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(triggerAutosaveProcess, 1500);
+        });
+
+        document.getElementById('letter-body').addEventListener('input', () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(triggerAutosaveProcess, 1500);
+        });
+
+        // Manual Save Draft
+        document.getElementById('btn-save-draft').addEventListener('click', async () => {
+            await triggerAutosaveProcess();
+            routeTo('view-dashboard');
+        });
+
+        // Process Deliveries Delay
+        function calculateDeliveryDelay() {
+            const speed = document.getElementById('delivery-speed').value;
+            const now = new Date();
+
+            if (speed === '1h') now.setHours(now.getHours() + 1);
+            else if (speed === '12h') now.setHours(now.getHours() + 12);
+            else if (speed === '1d') now.setDate(now.getDate() + 1);
+            else if (speed === '7d') now.setDate(now.getDate() + 7);
+            else return null;
+
+            return now.toISOString();
+        }
+
+        // Shared Seal & Send Core Logic wrapper [1]
+        async function executeLetterSendProcess() {
+            let recipientId = document.getElementById('recipient-id').value;
+            const typedUsername = document.getElementById('recipient-search').value.trim().replace(/^@/, '');
+            const subject = document.getElementById('letter-subject').value.trim();
+            const content = document.getElementById('letter-body').value.trim();
+
+            if (!subject || !content) {
+                alert('Ensure both a title and contents are scripted before delivery.');
+                return;
+            }
+
+            // Fallback username profile lookup
+            if (!recipientId && typedUsername) {
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('id')
+                    .eq('username', typedUsername.toLowerCase())
+                    .single();
+
+                if (profile) {
+                    recipientId = profile.id;
+                } else {
+                    alert(`We couldn't find a companion with the pen name "${typedUsername}". Please verify the spelling or select a profile from the dropdown.`);
+                    return;
+                }
+            }
+
+            if (!recipientId) {
+                alert('An envelope requires a valid recipient pen name to route delivery.');
+                return;
+            }
+
+            const deliveryAt = calculateDeliveryDelay();
+            const isScheduled = deliveryAt !== null;
+
+            const payload = {
+                sender_id: currentUser.id,
+                recipient_id: recipientId,
+                subject,
+                content,
+                ink_color: activeStyling.inkColor,
+                paper_style: activeStyling.paperStyle,
+                font_family: activeStyling.fontFamily,
+                status: isScheduled ? 'scheduled' : 'delivered',
+                delivery_at: deliveryAt,
+                sent_at: isScheduled ? null : new Date().toISOString()
+            };
+
+            let result;
+            if (activeDraftId) {
+                result = await supabase.from('letters').update(payload).eq('id', activeDraftId);
+            } else {
+                result = await supabase.from('letters').insert(payload).select().single();
+                if (!result.error && result.data) {
+                    activeDraftId = result.data.id;
+                }
+            }
+
+            if (result.error) {
+                alert(`Error executing transit dispatch: ${result.error.message}`);
+                return;
+            }
+
+            // Sync with scheduler queue table
+            if (isScheduled && activeDraftId) {
+                await supabase.from('scheduled_letters').insert({
+                    letter_id: activeDraftId,
+                    delivery_at: deliveryAt
+                });
+            }
+
+            routeTo('view-dashboard');
+        }
+
+        // Bind both Send Actions (Sidebar & Header)
+        document.getElementById('btn-seal-envelope').addEventListener('click', executeLetterSendProcess);
+        document.getElementById('btn-seal-envelope-header').addEventListener('click', executeLetterSendProcess);
+
+
+        // ==========================================
+        // DYNAMIC READING DESK DISPLAY (PHYSICAL UNFOLD IN RIGHT PANE)
+        // ==========================================
+
+        async function openLetterDetails(letter) {
+            // Hide alternative desk displays
+            document.getElementById('right-col-empty').classList.add('hidden');
+            document.getElementById('right-col-profile').classList.add('hidden');
+            
+            const board = document.getElementById('active-letter-board');
+            board.classList.remove('hidden');
+
+            document.getElementById('desk-letter-title').textContent = letter.subject || '(Untitled Scroll)';
+            document.getElementById('desk-letter-subtitle').textContent = currentFolder === 'delivered' 
+                ? `From: ${letter.sender?.display_name || 'Anonymous'}` 
+                : `To: ${letter.recipient?.display_name || 'Future Self'}`;
+            
+            document.getElementById('desk-letter-date').textContent = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+            
+            const textContent = document.getElementById('desk-letter-content');
+            textContent.textContent = letter.content || '';
+
+            // Render dynamic typography styles on canvas
+            textContent.style.color = letter.ink_color || '#3A2F28';
+            if (letter.font_family === 'handwriting') {
+                textContent.className = "max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-handwriting";
+            } else {
+                textContent.className = "max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-serif";
+            }
+
+            // Handle Mobile Pane slide-in
+            showMobileRightPane(true);
+
+            // Synthesise Soft unfold audio pulse
+            try {
+                const ctx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+                osc.frequency.setValueAtTime(120, ctx.currentTime);
+                osc.frequency.exponentialRampToValueAtTime(260, ctx.currentTime + 0.3);
+                gain.gain.setValueAtTime(0.08, ctx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+                osc.start();
+                osc.stop(ctx.currentTime + 0.3);
+            } catch (err) {}
+
+            // GSAP physical unfolding transition on inner text elements
+            gsap.killTweensOf(textContent);
+            gsap.set(textContent, { opacity: 0, y: 15 });
+            gsap.to(textContent, { duration: 0.5, opacity: 1, y: 0, ease: 'power2.out' });
+
+            // Mark unread messages as read
+            if (currentFolder === 'delivered' && letter.status === 'delivered') {
+                await supabase.from('letters').update({ status: 'read' }).eq('id', letter.id);
+                updateUnreadInboxBadge();
+            }
+        }
+
+
+        // ==========================================
+        // PROFILE DESK DISPLAY MODULE & PHOTO UPLOADER
+        // ==========================================
+
+        async function showProfilePane() {
+            document.getElementById('right-col-empty').classList.add('hidden');
+            document.getElementById('active-letter-board').classList.add('hidden');
+
+            const profileView = document.getElementById('right-col-profile');
+            profileView.classList.remove('hidden');
+
+            showMobileRightPane(true);
+            clearProfileStatus();
+
+            // Fetch profile metrics details from database
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', currentUser.id)
+                .single();
+
+            if (profile && !error) {
+                document.getElementById('profile-display-name').textContent = profile.display_name || 'Dear Companion';
+                document.getElementById('profile-username').textContent = `@${profile.username || 'username'}`;
+                
+                // Toggle Fallback vs Avatar URL Image [1]
+                updateAvatarUI(profile.avatar_url, profile.display_name);
+                
+                // Populating editable fields
+                document.getElementById('edit-display-name').value = profile.display_name || '';
+                document.getElementById('edit-bio').value = profile.bio || '';
+                document.getElementById('edit-country').value = profile.country || '';
+                document.getElementById('profile-email-input').value = currentUser.email || '';
+                document.getElementById('profile-joined-text').textContent = `Joined: ${new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+            }
+        }
+
+        // Toggle Avatar fallback and image visibility safely [1]
+        function updateAvatarUI(url, displayName) {
+            const img = document.getElementById('profile-avatar-img');
+            const fallback = document.getElementById('profile-avatar-fallback');
+            if (url) {
+                img.src = url;
+                img.classList.remove('hidden');
+                fallback.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                fallback.classList.remove('hidden');
+                fallback.textContent = (displayName || 'D').charAt(0).toUpperCase();
+            }
+        }
+
+        // Event: File uploader click triggers [1]
+        document.getElementById('avatar-container').addEventListener('click', () => {
+            document.getElementById('avatar-file-input').click();
+        });
+
+        // Event: File selection change upload pipeline [1]
+        document.getElementById('avatar-file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            // Validate image files size limit (5MB constraint)
+            if (file.size > 5242880) {
+                showProfileStatus('Profile image must be smaller than 5MB.', 'error');
+                return;
+            }
+
+            try {
+                showProfileStatus('Sealing photo to archive...', 'info');
+
+                const fileExt = file.name.split('.').pop();
+                const filePath = `${currentUser.id}/avatar_${Date.now()}.${fileExt}`;
+
+                // Upload selected image straight to Storage bucket [1]
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('avatars')
+                    .upload(filePath, file, { cacheControl: '3600', upsert: true });
+
+                if (uploadError) throw uploadError;
+
+                // Grab secure Public URL matching public configuration [1]
+                const { data: { publicUrl } } = supabase.storage
+                    .from('avatars')
+                    .getPublicUrl(filePath);
+
+                // Update profiles row mapping [1]
+                const { error: updateError } = await supabase
+                    .from('profiles')
+                    .update({ avatar_url: publicUrl })
+                    .eq('id', currentUser.id);
+
+                if (updateError) throw updateError;
+
+                showProfileStatus('Profile photo updated.', 'success');
+
+                const currentName = document.getElementById('edit-display-name').value || 'Dear Companion';
+                updateAvatarUI(publicUrl, currentName);
+            } catch (err) {
+                showProfileStatus(`Photo upload failed: ${err.message}`, 'error');
+            }
+        });
+
+        // Action: Save Profile configuration edits to database
+        document.getElementById('form-edit-profile').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearProfileStatus();
+
+            const displayName = document.getElementById('edit-display-name').value.trim();
+            const bio = document.getElementById('edit-bio').value.trim();
+            const country = document.getElementById('edit-country').value.trim();
+
+            if (!displayName) {
+                showProfileStatus('A display name is required.', 'error');
+                return;
+            }
+
+            try {
+                showProfileStatus('Updating database records...', 'info');
+                const { error } = await supabase
+                    .from('profiles')
+                    .update({
+                        display_name: displayName,
+                        bio: bio,
+                        country: country
+                    })
+                    .eq('id', currentUser.id);
+
+                if (error) throw error;
+                
+                showProfileStatus('Profile configuration updated successfully.', 'success');
+                
+                // Immediately refresh view cards values
+                document.getElementById('profile-display-name').textContent = displayName;
+                // Re-evaluate photo falling back to initials if necessary
+                const img = document.getElementById('profile-avatar-img');
+                if (img.classList.contains('hidden')) {
+                    document.getElementById('profile-avatar-fallback').textContent = displayName.charAt(0).toUpperCase();
+                }
+            } catch (err) {
+                showProfileStatus(err.message, 'error');
+            }
+        });
+
+        function showProfileStatus(message, type) {
+            const box = document.getElementById('profile-status-box');
+            if (!box) return;
+            box.classList.remove('hidden', 'bg-red-50', 'text-red-800', 'border-red-200', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-blue-50', 'text-blue-800', 'border-blue-200');
+            box.textContent = message;
+
+            if (type === 'error') {
+                box.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
+            } else if (type === 'success') {
+                box.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+            } else {
+                box.classList.add('bg-blue-50', 'text-blue-800', 'border', 'border-blue-200');
+            }
+        }
+
+        function clearProfileStatus() {
+            const box = document.getElementById('profile-status-box');
+            if (box) box.classList.add('hidden');
+        }
+
+
+        // ==========================================
+        // SYSTEM SESSION INITIALIZER
+        // ==========================================
+
+        async function initAppSession() {
+            const { data: { user }, error } = await supabase.auth.getUser();
+            if (!error && user) {
+                currentUser = user;
+                routeTo('view-dashboard');
+            } else {
+                routeTo('view-auth');
+                toggleAuthView('signin');
+            }
+        }
+
+        initAppSession();
+
+    </script>
+</body>
+                                                            </html>

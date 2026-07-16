@@ -14,7 +14,7 @@
     <!-- Design System Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Caveat&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600&family=Caveat&family=Dancing+Script:wght@600&family=Homemade+Apple&display=swap" rel="stylesheet">
     
     <!-- Core External Dependencies -->
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -37,22 +37,29 @@
                     fontFamily: {
                         serif: ['"Cormorant Garamond"', 'serif'],
                         sans: ['Inter', 'sans-serif'],
-                        handwriting: ['Caveat', 'cursive']
+                        handwriting: ['Caveat', 'cursive'],
+                        handwriting2: ['"Dancing Script"', 'cursive'],
+                        handwriting3: ['"Homemade Apple"', 'cursive']
                     }
                 }
             }
         }
     </script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 4px;
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E1DA; border-radius: 2px; }
+        
+        /* Vintage Postcard Styling */
+        .vintage-postcard {
+            border: 8px solid #FFFDF8;
+            box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+            transform: rotate(-2deg);
+            filter: sepia(0.4) contrast(1.1) brightness(0.95);
+            transition: transform 0.3s ease;
         }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #E5E1DA;
-            border-radius: 2px;
+        .vintage-postcard:hover {
+            transform: rotate(0deg) scale(1.02);
         }
     </style>
 </head>
@@ -64,21 +71,32 @@
         <span id="toast-message" class="text-xs font-serif italic text-ivory">A new sealed envelope has arrived</span>
     </div>
 
-    <!-- =========================================================================
-         VIEW 1: AUTHENTICATION GATEWAY
-         ========================================================================= -->
+    <!-- Global App Confirmation Modal -->
+    <div id="app-confirm-modal" class="hidden fixed inset-0 bg-ink/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
+        <div class="bg-ivory border border-beige rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center space-y-4 transform scale-95 opacity-0 transition-all duration-300" id="app-confirm-box">
+            <div class="flex justify-center">
+                <div class="h-12 w-12 rounded-full bg-red-50 flex items-center justify-center border border-red-100">
+                    <i data-lucide="alert-triangle" class="h-6 w-6 text-red-500"></i>
+                </div>
+            </div>
+            <h3 class="font-serif text-2xl text-forest" id="app-confirm-title">Confirm Action</h3>
+            <p class="text-sm text-ink/70 leading-relaxed" id="app-confirm-message">Are you sure you want to proceed?</p>
+            <div class="flex justify-center space-x-3 pt-2">
+                <button id="app-confirm-cancel" class="px-5 py-2 text-xs font-semibold text-ink/60 border border-beige rounded-lg hover:bg-beige/40 transition-colors">Cancel</button>
+                <button id="app-confirm-ok" class="px-5 py-2 text-xs font-semibold text-ivory bg-red-500 rounded-lg hover:bg-red-600 transition-colors">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW 1: AUTHENTICATION GATEWAY -->
     <div id="view-auth" class="hidden h-full flex items-center justify-center p-4 overflow-y-auto">
         <div class="w-full max-w-md bg-ivory border border-beige rounded-2xl shadow-xl p-8 md:p-10 relative overflow-hidden">
-            
             <div class="text-center mb-8">
                 <h1 class="font-serif text-5xl italic text-forest select-none mb-2">Dear</h1>
                 <p class="font-sans text-sm text-ink/70 tracking-wide">Intentional writing. Delayed delivery.</p>
             </div>
-
-            <!-- Global Status Box -->
             <div id="auth-status-box" class="hidden mb-6 p-4 rounded-lg text-sm transition-all" role="alert"></div>
-
-            <!-- SUBVIEW: SIGN IN -->
+            
             <div id="auth-signin" class="space-y-6">
                 <form id="form-signin" class="space-y-4">
                     <div>
@@ -92,17 +110,13 @@
                         </div>
                         <input type="password" id="signin-password" required class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink">
                     </div>
-                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">
-                        Enter the Sanctuary
-                    </button>
+                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">Enter the Sanctuary</button>
                 </form>
-
                 <div class="relative flex py-2 items-center">
                     <div class="flex-grow border-t border-beige"></div>
                     <span class="flex-shrink mx-4 text-xs uppercase tracking-widest text-ink/40 font-semibold">Or</span>
                     <div class="flex-grow border-t border-beige"></div>
                 </div>
-
                 <button id="btn-oauth-google" class="w-full flex items-center justify-center space-x-3 bg-ivory border border-beige text-ink font-medium py-3 rounded-lg hover:bg-beige/40 transition-colors text-sm">
                     <svg class="h-4 w-4" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path d="M21.35,11.1H12v2.7h5.38c-0.24,1.28 -0.96,2.37 -2.04,3.1v2.58h3.29c1.92,-1.77 3.02,-4.38 3.02,-7.38C21.65,11.73 21.55,11.37 21.35,11.1z" fill="#4285F4" />
@@ -112,16 +126,11 @@
                     </svg>
                     <span>Continue with Google</span>
                 </button>
-
                 <div class="text-center">
-                    <p class="text-xs text-ink/70">
-                        A newcomer? 
-                        <button id="btn-goto-signup" class="text-gold hover:text-forest font-semibold underline underline-offset-4 ml-1">Create an envelope</button>
-                    </p>
+                    <p class="text-xs text-ink/70">A newcomer? <button id="btn-goto-signup" class="text-gold hover:text-forest font-semibold underline underline-offset-4 ml-1">Create an envelope</button></p>
                 </div>
             </div>
 
-            <!-- SUBVIEW: SIGN UP -->
             <div id="auth-signup" class="hidden space-y-6">
                 <form id="form-signup" class="space-y-4">
                     <div>
@@ -140,20 +149,13 @@
                         <label for="signup-password" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Password</label>
                         <input type="password" id="signup-password" required minlength="6" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink">
                     </div>
-                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">
-                        Seal & Create Profile
-                    </button>
+                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">Seal & Create Profile</button>
                 </form>
-
                 <div class="text-center">
-                    <p class="text-xs text-ink/70">
-                        Already registered? 
-                        <button id="btn-goto-signin" class="text-gold hover:text-forest font-semibold underline underline-offset-4 ml-1">Step inside</button>
-                    </p>
+                    <p class="text-xs text-ink/70">Already registered? <button id="btn-goto-signin" class="text-gold hover:text-forest font-semibold underline underline-offset-4 ml-1">Step inside</button></p>
                 </div>
             </div>
 
-            <!-- SUBVIEW: FORGOT PASSWORD -->
             <div id="auth-forgot" class="hidden space-y-6">
                 <div class="text-center">
                     <p class="text-xs text-ink/80 leading-relaxed">Enter your registered email address, and we will dispatch a secure recovery link.</p>
@@ -163,142 +165,87 @@
                         <label for="forgot-email" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Email Address</label>
                         <input type="email" id="forgot-email" required class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-forest text-ink" placeholder="emily@example.com">
                     </div>
-                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">
-                        Send Recovery Link
-                    </button>
+                    <button type="submit" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-md hover:shadow-lg transition-all transform hover:-translate-y-px duration-150 text-sm">Send Recovery Link</button>
                 </form>
-
                 <div class="text-center">
                     <button id="btn-back-to-signin" class="text-xs text-gold hover:text-forest font-semibold flex items-center justify-center mx-auto space-x-1">
-                        <i data-lucide="arrow-left" class="h-3 w-3"></i>
-                        <span>Return to entry</span>
+                        <i data-lucide="arrow-left" class="h-3 w-3"></i><span>Return to entry</span>
                     </button>
                 </div>
             </div>
-
         </div>
     </div>
 
-
-    <!-- =========================================================================
-         VIEW 2: CENTRAL SANCTUARY DASHBOARD (WHATSAPP WEB LAYOUT STYLE)
-         ========================================================================= -->
+    <!-- VIEW 2: CENTRAL SANCTUARY DASHBOARD -->
     <div id="view-dashboard" class="hidden h-full flex flex-col bg-[#F5EFE6]">
-        
-        <!-- Header / Navigation Bar matching WhatsApp Style but in Dear Aesthetic -->
         <header class="bg-forest px-6 py-4 flex justify-between items-center shadow-md select-none z-10 flex-shrink-0">
             <div class="flex items-center space-x-3">
                 <span class="font-serif text-3xl italic text-ivory tracking-wide">Dear</span>
             </div>
-            
-            <!-- Core Navigation Bar Icons -->
             <div class="flex items-center space-x-6 text-ivory/80">
-                <button id="nav-search-btn" class="hover:text-gold transition-colors focus:outline-none" title="Search Letters">
-                    <i data-lucide="search" class="h-5 w-5"></i>
-                </button>
+                <button id="nav-search-btn" class="hover:text-gold transition-colors focus:outline-none" title="Search Letters"><i data-lucide="search" class="h-5 w-5"></i></button>
                 <button id="nav-inbox-btn" class="hover:text-gold transition-colors focus:outline-none relative" title="Inbox Mailboxes">
                     <i data-lucide="inbox" class="h-5 w-5"></i>
                     <span id="badge-inbox" class="hidden absolute -top-1.5 -right-1.5 text-[9px] bg-gold text-forest font-bold px-1.5 py-0.5 rounded-full">0</span>
                 </button>
-                <button id="nav-friends-btn" class="hover:text-gold transition-colors focus:outline-none" title="Companions Directory">
-                    <i data-lucide="users" class="h-5 w-5"></i>
-                </button>
-                <button id="nav-profile-btn" class="hover:text-gold transition-colors focus:outline-none" title="My Profile Settings">
-                    <i data-lucide="user" class="h-5 w-5"></i>
-                </button>
+                <button id="nav-friends-btn" class="hover:text-gold transition-colors focus:outline-none" title="Companions Directory"><i data-lucide="users" class="h-5 w-5"></i></button>
+                <button id="nav-profile-btn" class="hover:text-gold transition-colors focus:outline-none" title="My Profile Settings"><i data-lucide="user" class="h-5 w-5"></i></button>
                 <button id="btn-open-composer" class="bg-gold text-forest px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-ivory hover:text-forest transition-all flex items-center space-x-1 shadow-sm" title="Write a New Letter">
-                    <i data-lucide="feather" class="h-3.5 w-3.5"></i>
-                    <span>Compose</span>
+                    <i data-lucide="feather" class="h-3.5 w-3.5"></i><span>Compose</span>
                 </button>
-                <button id="nav-more-btn" class="hover:text-gold transition-colors focus:outline-none" title="More Options">
-                    <i data-lucide="more-vertical" class="h-5 w-5"></i>
-                </button>
+                <button id="nav-more-btn" class="hover:text-gold transition-colors focus:outline-none" title="More Options"><i data-lucide="more-vertical" class="h-5 w-5"></i></button>
             </div>
         </header>
 
-        <!-- Main Workspace Dual-Pane Layout -->
         <main class="flex-grow flex w-full overflow-hidden relative">
-            
-            <!-- LEFT COLUMN: Directory List Pane (Mailbox list, Friends list, search outputs) -->
             <section id="dashboard-left-col" class="w-full md:w-96 flex flex-col bg-ivory border-r border-beige flex-shrink-0">
-                
-                <!-- Sub-Header showing Directory Status / Mailbox Folder Name -->
                 <div class="px-4 py-3 border-b border-beige bg-[#FAF8F5] flex justify-between items-center flex-shrink-0 select-none">
                     <h2 id="mailbox-title" class="font-serif text-lg font-semibold text-forest">Inbox</h2>
                     <span id="letter-count" class="text-[10px] font-semibold text-ink/40 uppercase tracking-wider">0 Letters</span>
                 </div>
-
-                <!-- Search Filter Input bar (Toggled by Search icon) -->
                 <div id="filter-search-container" class="hidden p-3 border-b border-beige bg-[#F8F6F2] flex-shrink-0">
                     <div class="relative flex items-center">
                         <i data-lucide="search" class="absolute left-3 text-ink/40 h-4 w-4"></i>
                         <input type="text" id="filter-search-input" placeholder="Search title or content..." class="w-full bg-ivory border border-beige rounded-lg pl-9 pr-4 py-2 text-sm focus:outline-none focus:border-forest text-ink">
                     </div>
                 </div>
-
-                <!-- Inbox Folder Nav Tabs (Hidden in companions view) -->
                 <div id="mailbox-folder-tabs" class="flex border-b border-beige bg-[#FAF8F5] text-xs font-medium text-ink/60 uppercase tracking-wider flex-shrink-0">
                     <button data-folder="delivered" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-forest text-forest font-semibold">Inbox</button>
                     <button data-folder="scheduled" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Pending</button>
                     <button data-folder="sent" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Sent</button>
                     <button data-folder="draft" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Drafts</button>
                 </div>
-
-                <!-- Scrollable List Context container -->
                 <div class="flex-grow overflow-y-auto custom-scrollbar relative p-4 bg-ivory">
-                    
-                    <!-- Loading Status -->
                     <div id="dashboard-loader" class="flex flex-col items-center justify-center py-20 space-y-3">
                         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-forest"></div>
                         <p class="font-serif italic text-xs text-ink/60">Reading letter catalog...</p>
                     </div>
-
-                    <!-- Empty List Warning -->
                     <div id="dashboard-empty" class="hidden flex-col items-center justify-center py-20 text-center space-y-3">
                         <i data-lucide="mail-open" class="h-8 w-8 text-gold"></i>
                         <p class="font-serif italic text-sm text-ink/60">Your envelopes list is currently clear.</p>
                     </div>
-
-                    <!-- Letters Catalog dynamic list -->
                     <div id="letters-list" class="hidden space-y-3"></div>
-
-                    <!-- ==========================================
-                         DIRECTORY COMPANIONS PANEL
-                         ========================================== -->
                     <div id="friends-panel" class="hidden space-y-6">
-                        
-                        <!-- Search profile bar -->
                         <div class="bg-[#FCFBF9] border border-beige rounded-xl p-4">
                             <label for="companion-search-input" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1.5">Search Directory</label>
                             <div class="flex gap-2">
                                 <input type="text" id="companion-search-input" placeholder="Companion user pen name..." class="flex-grow bg-ivory border border-beige rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-forest text-ink">
                                 <button id="btn-companion-search" class="bg-forest text-ivory px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-forest/90 transition-all shadow-sm">Search</button>
                             </div>
-                            <!-- Search query output -->
                             <div id="companion-search-results" class="mt-3 hidden space-y-2 border-t border-beige pt-3"></div>
                         </div>
-
-                        <!-- Requests -->
                         <div class="space-y-2">
                             <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">Pending Requests</h3>
                             <div id="incoming-requests-list" class="space-y-2"></div>
                         </div>
-
-                        <!-- Main companions directory -->
                         <div class="space-y-2">
                             <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">My Active Companions</h3>
                             <div id="companions-list" class="space-y-2"></div>
                         </div>
-
                     </div>
-
-                    <!-- ==========================================
-                         DIRECTORY SANCTUARY SETTINGS PANEL
-                         ========================================== -->
                     <div id="settings-panel" class="hidden space-y-6">
                         <div class="bg-[#FCFBF9] border border-beige rounded-xl p-4 space-y-4">
                             <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">Display Preferences</h3>
-                            
                             <div>
                                 <label for="settings-font-size" class="block text-xs font-semibold text-ink/70 mb-1.5">Sanctuary Text Size</label>
                                 <select id="settings-font-size" class="w-full bg-ivory border border-beige rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-forest text-ink">
@@ -307,26 +254,16 @@
                                     <option value="large">Large</option>
                                 </select>
                             </div>
-
                             <div class="flex items-center justify-between pt-2 border-t border-linen">
                                 <span class="text-xs font-semibold text-ink/70">Audio Unfolding Sound</span>
                                 <input type="checkbox" id="settings-audio-enabled" checked class="w-4 h-4 accent-forest">
                             </div>
                         </div>
-
-                        <div class="bg-[#FCFBF9] border border-beige rounded-xl p-4 space-y-2">
-                            <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">Sanctuary Safety</h3>
-                            <p class="text-[10px] text-ink/50 leading-relaxed">Your pen name is visible to global searches so friends can locate your address. Adjust settings via the database controls if you require extreme privacy.</p>
-                        </div>
                     </div>
-
                 </div>
             </section>
 
-            <!-- RIGHT COLUMN: active Reading Desk (unfolded parchment display panel) -->
             <section id="dashboard-right-col" class="hidden md:flex flex-grow flex-col bg-[#F8F6F2] relative overflow-hidden">
-                
-                <!-- Unopened/Empty Screen Desk -->
                 <div id="right-col-empty" class="flex flex-col items-center justify-center flex-grow p-8 text-center bg-[#F8F6F2]">
                     <div class="max-w-xs space-y-4">
                         <i data-lucide="feather" class="h-12 w-12 text-gold/60 mx-auto"></i>
@@ -335,187 +272,202 @@
                     </div>
                 </div>
 
-                <!-- Dynamic Profile Desk Settings view (Editable Form & Picture Uploader Implemented) -->
-                <div id="right-col-profile" class="hidden flex-col items-center justify-center flex-grow p-8 bg-[#F8F6F2] text-center overflow-y-auto">
-                    <div class="max-w-md w-full bg-ivory border border-beige p-8 rounded-2xl shadow-sm text-left space-y-6">
-                        
-                        <!-- Form Header card with Interactive Profile Picture Upload Trigger -->
-                        <div class="border-b border-beige pb-4 flex items-center space-x-4">
-                            <button id="btn-back-to-list-profile" class="md:hidden text-forest hover:text-gold transition-colors">
-                                <i data-lucide="arrow-left" class="h-5 w-5"></i>
-                            </button>
-                            
-                            <!-- Interactive Profile Photo Circle wrapper [1] -->
-                            <div class="relative group cursor-pointer flex-shrink-0" id="avatar-container" title="Update Profile Photo">
-                                <img id="profile-avatar-img" class="h-12 w-12 rounded-full object-cover border border-beige hidden" src="" alt="Avatar">
-                                <div id="profile-avatar-fallback" class="h-12 w-12 rounded-full bg-forest text-ivory flex items-center justify-center font-bold text-lg">C</div>
-                                <!-- Hover Upload icon overlay -->
-                                <div class="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <i data-lucide="camera" class="h-4 w-4 text-ivory"></i>
-                                </div>
-                                <input type="file" id="avatar-file-input" class="hidden" accept="image/*">
-                            </div>
+                <!-- Profile View -->
+                <div id="right-col-profile" class="hidden flex-col h-full overflow-hidden bg-[#F8F6F2] relative">
+                    <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none relative z-10">
+                        <div class="flex items-center space-x-3">
+                            <button id="btn-back-to-list-profile" class="md:hidden text-forest hover:text-gold transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
+                            <h3 class="font-serif text-xl font-semibold text-forest">My Sanctuary Profile</h3>
+                        </div>
+                        <button id="btn-upload-bg" class="text-xs text-forest hover:text-gold flex items-center gap-1">
+                            <i data-lucide="image" class="h-4 w-4"></i> Custom BG
+                        </button>
+                        <input type="file" id="bg-file-input" class="hidden" accept="image/*">
+                    </div>
 
-                            <div>
-                                <h3 id="profile-display-name" class="font-serif text-2xl text-forest font-semibold">Dear Companion</h3>
-                                <p id="profile-username" class="text-sm text-gold">@username</p>
+                    <!-- Custom Background Image Layer -->
+                    <div id="profile-bg-layer" class="absolute inset-0 bg-cover bg-center pointer-events-none" style="background-image: none;"></div>
+                    <div class="absolute inset-0 bg-ivory/80 pointer-events-none"></div>
+
+                    <div class="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center relative z-10">
+                        <div class="max-w-md w-full bg-ivory/90 backdrop-blur-sm border border-beige rounded-2xl shadow-xl overflow-hidden">
+                            <div class="bg-forest p-6 flex flex-col items-center relative">
+                                <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[5deg]">
+                                    <span class="text-[8px] block font-bold tracking-widest">SANCTUARY</span>
+                                    <span class="text-[6px] block">EST. 1840</span>
+                                </div>
+                                <div class="relative group cursor-pointer mb-4" id="avatar-container" title="Update Profile Photo">
+                                    <div class="p-1 bg-gold rounded-full shadow-lg">
+                                        <img id="profile-avatar-img" class="h-24 w-24 rounded-full object-cover hidden" src="" alt="Avatar">
+                                        <div id="profile-avatar-fallback" class="h-24 w-24 rounded-full bg-ivory text-forest flex items-center justify-center font-serif font-bold text-4xl">C</div>
+                                    </div>
+                                    <div class="absolute inset-1 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                        <i data-lucide="camera" class="h-6 w-6 text-ivory"></i>
+                                    </div>
+                                    <input type="file" id="avatar-file-input" class="hidden" accept="image/*">
+                                </div>
+                                <h3 id="profile-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Dear Companion</h3>
+                                <p id="profile-username" class="text-sm text-gold tracking-wide">@username</p>
+                            </div>
+                            <div class="grid grid-cols-3 border-b border-beige divide-x divide-beige">
+                                <div class="p-4 text-center">
+                                    <span id="stat-sent" class="block font-serif text-2xl text-forest font-bold">0</span>
+                                    <span class="text-[10px] text-ink/50 uppercase tracking-wider">Dispatched</span>
+                                </div>
+                                <div class="p-4 text-center">
+                                    <span id="stat-received" class="block font-serif text-2xl text-forest font-bold">0</span>
+                                    <span class="text-[10px] text-ink/50 uppercase tracking-wider">Received</span>
+                                </div>
+                                <div class="p-4 text-center">
+                                    <span id="stat-pending" class="block font-serif text-2xl text-forest font-bold">0</span>
+                                    <span class="text-[10px] text-ink/50 uppercase tracking-wider">In Transit</span>
+                                </div>
+                            </div>
+                            <div class="p-6 space-y-5">
+                                <div id="profile-status-box" class="hidden p-3 rounded-lg text-xs" role="alert"></div>
+                                <form id="form-edit-profile" class="space-y-5">
+                                    <div>
+                                        <label for="edit-display-name" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Signature Name</label>
+                                        <input type="text" id="edit-display-name" class="w-full bg-transparent border-b border-beige pb-2 text-lg font-serif text-ink focus:outline-none focus:border-gold transition-colors">
+                                    </div>
+                                    <div>
+                                        <label for="edit-bio" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Pen Musings / Biography</label>
+                                        <textarea id="edit-bio" rows="3" class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink focus:outline-none focus:border-gold transition-colors resize-none custom-scrollbar" placeholder="Share your silent thoughts..."></textarea>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-6">
+                                        <div>
+                                            <label for="edit-country" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Origin Location</label>
+                                            <input type="text" id="edit-country" class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink focus:outline-none focus:border-gold transition-colors">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Account Email</label>
+                                            <input type="text" id="profile-email-input" readonly class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink/40 focus:outline-none cursor-not-allowed">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Custom Wax Seal Settings -->
+                                    <div class="pt-4 border-t border-beige">
+                                        <label class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-2">Signet Ring (Wax Seal)</label>
+                                        <div class="flex gap-2 mb-3" id="wax-color-palette">
+                                            <button type="button" data-wax="#801818" class="h-6 w-6 rounded-full border-2 border-forest" style="background-color: #801818;"></button>
+                                            <button type="button" data-wax="#1F4D3A" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1F4D3A;"></button>
+                                            <button type="button" data-wax="#C8A96A" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #C8A96A;"></button>
+                                            <button type="button" data-wax="#1E293B" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1E293B;"></button>
+                                        </div>
+                                        <input type="text" id="edit-monogram" maxlength="2" class="w-16 bg-transparent border-b border-beige pb-2 text-lg font-serif text-ink focus:outline-none focus:border-gold transition-colors uppercase text-center" placeholder="ED">
+                                    </div>
+
+                                    <div class="pt-4 flex justify-between items-center">
+                                        <span id="profile-joined-text" class="text-[10px] text-ink/40 italic">Joined: ---</span>
+                                        <button type="submit" class="bg-forest text-ivory text-xs px-5 py-2.5 rounded-lg font-semibold hover:bg-gold hover:text-forest shadow-sm transition-all flex items-center space-x-1">
+                                            <i data-lucide="save" class="h-3 w-3"></i><span>Update Profile</span>
+                                        </button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
-
-                        <!-- Local Action Alert message box -->
-                        <div id="profile-status-box" class="hidden p-3 rounded-lg text-xs" role="alert"></div>
-
-                        <!-- Editable Fields Form -->
-                        <form id="form-edit-profile" class="space-y-4">
-                            <div>
-                                <label for="edit-display-name" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Display Name</label>
-                                <input type="text" id="edit-display-name" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink">
-                            </div>
-                            <div>
-                                <label for="edit-bio" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Biography / Pen Musings</label>
-                                <textarea id="edit-bio" rows="3" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink resize-none custom-scrollbar" placeholder="Share your silent thoughts..."></textarea>
-                            </div>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label for="edit-country" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Country</label>
-                                    <input type="text" id="edit-country" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink">
-                                </div>
-                                <div>
-                                    <label class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1">Account Email</label>
-                                    <input type="text" id="profile-email-input" readonly class="w-full bg-[#FAF8F5] border border-beige rounded-lg px-3 py-2 text-sm text-ink/50 focus:outline-none cursor-not-allowed">
-                                </div>
-                            </div>
-                            <div class="pt-2 flex justify-between items-center">
-                                <span id="profile-joined-text" class="text-[10px] text-ink/50">Joined Sanctuary: ---</span>
-                                <button type="submit" class="bg-forest text-ivory text-xs px-4 py-2.5 rounded-lg font-semibold hover:bg-forest/90 shadow-sm transition-all">
-                                    Save Profile
-                                </button>
-                            </div>
-                        </form>
                     </div>
                 </div>
 
-                <!-- Active Letter Reading Board view (With tactile Burn/Delete action) -->
+                <!-- Active Letter Board -->
                 <div id="active-letter-board" class="hidden flex-col h-full overflow-hidden bg-ivory">
-                    
-                    <!-- Reading Pane mobile/desktop navigation top bar -->
                     <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none">
                         <div class="flex items-center space-x-3">
-                            <button id="btn-back-to-list" class="md:hidden text-forest hover:text-gold mr-2 transition-colors">
-                                <i data-lucide="arrow-left" class="h-5 w-5"></i>
-                            </button>
+                            <button id="btn-back-to-list" class="md:hidden text-forest hover:text-gold mr-2 transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
                             <div>
                                 <h3 id="desk-letter-title" class="font-serif text-xl font-semibold text-forest">Subject</h3>
                                 <p id="desk-letter-subtitle" class="text-xs text-ink/50">Sender details</p>
                             </div>
                         </div>
-                        <div class="flex items-center space-x-4">
-                            <div class="text-xs text-gold font-serif" id="desk-letter-date">Date</div>
-                            <!-- Burn Letter Action button -->
-                            <button id="btn-delete-letter" class="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded transition-colors" title="Burn Letter Permanently [1]">
-                                <i data-lucide="trash-2" class="h-4 w-4"></i>
-                            </button>
+                        <div class="flex items-center space-x-2">
+                            <div class="text-xs text-gold font-serif mr-2" id="desk-letter-date">Date</div>
+                            <button id="btn-reply-letter" class="hidden text-forest hover:text-gold p-1.5 hover:bg-beige/40 rounded transition-colors" title="Pen a Reply"><i data-lucide="reply" class="h-4 w-4"></i></button>
+                            <button id="btn-delete-letter" class="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded transition-colors" title="Burn Letter Permanently"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
                         </div>
                     </div>
-
-                    <!-- Inner Scrollable Parchment Area -->
                     <div class="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-12 bg-ivory relative">
-                        <!-- Canvas content displays using custom styled styles -->
+                        <!-- Vintage Postcard Container -->
+                        <div id="desk-postcard-container" class="hidden max-w-xs mx-auto mb-8">
+                            <img id="desk-postcard-img" src="" alt="Postcard" class="w-full h-auto vintage-postcard">
+                        </div>
                         <div id="desk-letter-content" class="max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-serif text-ink"></div>
                     </div>
-
                 </div>
 
-                <!-- ==========================================
-                     DYNAMIC COMPANION PROFILE DESK PANEL
-                     ========================================== -->
-                <div id="right-col-friend-profile" class="hidden flex-col h-full overflow-hidden bg-ivory">
+                <!-- Friend Profile View -->
+                <div id="right-col-friend-profile" class="hidden flex-col h-full overflow-hidden bg-[#F8F6F2]">
                     <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none">
                         <div class="flex items-center space-x-3">
-                            <button id="btn-back-to-list-friend-profile" class="md:hidden text-forest hover:text-gold mr-2 transition-colors">
-                                <i data-lucide="arrow-left" class="h-5 w-5"></i>
-                            </button>
+                            <button id="btn-back-to-list-friend-profile" class="md:hidden text-forest hover:text-gold mr-2 transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
                             <h3 class="font-serif text-xl font-semibold text-forest">Companion Profile</h3>
                         </div>
                     </div>
-                    
-                    <div class="flex-grow overflow-y-auto custom-scrollbar p-6 space-y-6">
-                        <div class="flex items-center space-x-4 border-b border-beige pb-4">
-                            <img id="friend-profile-img" class="h-16 w-16 rounded-full object-cover border border-beige hidden" src="" alt="Avatar">
-                            <div id="friend-profile-fallback" class="h-16 w-16 rounded-full bg-forest text-ivory flex items-center justify-center font-bold text-xl">F</div>
-                            <div>
-                                <h4 id="friend-display-name" class="font-serif text-2xl text-forest font-semibold">Companion Name</h4>
-                                <p id="friend-username" class="text-sm text-gold">@username</p>
+                    <div class="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center">
+                        <div class="max-w-md w-full bg-ivory border border-beige rounded-2xl shadow-xl overflow-hidden">
+                            <div class="bg-forest p-6 flex flex-col items-center relative">
+                                <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[-5deg]"><span class="text-[8px] block font-bold tracking-widest">FRIEND</span></div>
+                                <div class="mb-4 p-1 bg-gold rounded-full shadow-lg">
+                                    <img id="friend-profile-img" class="h-24 w-24 rounded-full object-cover hidden" src="" alt="Avatar">
+                                    <div id="friend-profile-fallback" class="h-24 w-24 rounded-full bg-ivory text-forest flex items-center justify-center font-serif font-bold text-4xl">F</div>
+                                </div>
+                                <h4 id="friend-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Companion Name</h4>
+                                <p id="friend-username" class="text-sm text-gold tracking-wide">@username</p>
                             </div>
-                        </div>
-                        
-                        <div class="space-y-3 text-xs text-ink/70">
-                            <p class="flex justify-between border-b border-linen pb-2"><span>Country Location</span> <strong id="friend-country">---</strong></p>
-                            <p class="flex justify-between border-b border-linen pb-2"><span>Sanctuary Entry Date</span> <strong id="friend-joined">---</strong></p>
-                            <div class="flex flex-col gap-1 border-b border-linen pb-2">
-                                <span>Pen Musings / Biography</span>
-                                <span id="friend-bio" class="italic text-ink/60 leading-relaxed">No shared musings compiled yet...</span>
+                            <div class="p-6 space-y-4">
+                                <div class="space-y-3 text-sm">
+                                    <div class="flex justify-between items-center border-b border-linen pb-2"><span class="text-ink/50 text-xs uppercase tracking-widest">Origin</span><strong id="friend-country" class="text-ink font-serif">---</strong></div>
+                                    <div class="flex justify-between items-center border-b border-linen pb-2"><span class="text-ink/50 text-xs uppercase tracking-widest">Joined</span><strong id="friend-joined" class="text-ink font-serif">---</strong></div>
+                                    <div class="flex flex-col gap-1 border-b border-linen pb-3 pt-1"><span class="text-ink/50 text-xs uppercase tracking-widest mb-1">Pen Musings</span><span id="friend-bio" class="italic text-ink/70 leading-relaxed font-serif text-sm">No shared musings compiled yet...</span></div>
+                                </div>
+                                <button id="btn-write-from-friend-profile" class="w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm">
+                                    <i data-lucide="feather" class="h-4 w-4"></i><span>Address a Letter</span>
+                                </button>
+                                <div class="space-y-3 pt-2">
+                                    <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold flex items-center gap-1 select-none"><i data-lucide="mail" class="h-3.5 w-3.5"></i><span>Sanctuary Correspondence Log</span></h4>
+                                    <div id="friend-letters-list" class="space-y-3"></div>
+                                </div>
                             </div>
-                        </div>
-
-                        <!-- Mutual letters list -->
-                        <div class="space-y-3 pt-4">
-                            <h4 class="text-xs uppercase tracking-widest text-ink/40 font-bold flex items-center gap-1 select-none">
-                                <i data-lucide="mail" class="h-3.5 w-3.5"></i>
-                                <span>Sanctuary Correspondence Log [1]</span>
-                            </h4>
-                            <div id="friend-letters-list" class="space-y-3"></div>
                         </div>
                     </div>
                 </div>
-
             </section>
         </main>
     </div>
 
-
-    <!-- =========================================================================
-         VIEW 3: STATIONERY & COMPOSER SUITE (SCROLL TRAP RESOLVED)
-         ========================================================================= -->
+    <!-- VIEW 3: STATIONERY & COMPOSER SUITE -->
     <div id="view-composer" class="hidden h-full flex flex-col bg-linen overflow-hidden">
-        
-        <!-- Top Composer Nav -->
         <header class="bg-ivory border-b border-beige px-6 py-4 flex justify-between items-center flex-shrink-0">
             <div class="flex items-center space-x-4">
-                <button id="btn-close-composer" class="text-ink/60 hover:text-ink transition-colors">
-                    <i data-lucide="arrow-left" class="h-5 w-5"></i>
-                </button>
+                <button id="btn-close-composer" class="text-ink/60 hover:text-ink transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
                 <span class="font-serif text-2xl italic text-forest select-none">Write Letter</span>
+                
+                <!-- Ambience Toggle -->
+                <div class="hidden md:flex items-center space-x-2 ml-6 border-l border-beige pl-6">
+                    <span class="text-xs text-ink/50 uppercase tracking-wider">Ambience:</span>
+                    <button id="btn-ambience-none" class="text-xs px-2 py-1 rounded bg-beige/40 text-forest font-semibold">Off</button>
+                    <button id="btn-ambience-rain" class="text-xs px-2 py-1 rounded text-ink/50 hover:bg-beige/20">Rain</button>
+                    <button id="btn-ambience-fire" class="text-xs px-2 py-1 rounded text-ink/50 hover:bg-beige/20">Fire</button>
+                </div>
             </div>
             <div class="flex items-center space-x-3">
                 <span id="autosave-badge" class="text-xs text-ink/40 italic hidden sm:inline">Parchment draft saved</span>
-                <button id="btn-save-draft" class="text-xs font-semibold text-forest border border-forest px-3 py-2 rounded-lg hover:bg-beige/20 transition-colors">
-                    Save Draft
-                </button>
-                <!-- Lock-fixed header "Seal & Send" button to completely bypass scrolling traps [1] -->
+                <button id="btn-save-draft" class="text-xs font-semibold text-forest border border-forest px-3 py-2 rounded-lg hover:bg-beige/20 transition-colors">Save Draft</button>
                 <button id="btn-seal-envelope-header" class="bg-forest text-ivory text-xs px-3 py-2 rounded-lg font-semibold hover:bg-forest/90 shadow-sm transition-all flex items-center space-x-1">
-                    <i data-lucide="mail" class="h-3.5 w-3.5"></i>
-                    <span>Seal & Send</span>
+                    <i data-lucide="mail" class="h-3.5 w-3.5"></i><span>Seal & Send</span>
                 </button>
             </div>
         </header>
 
-        <!-- Main Composer Setup -->
         <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8 overflow-y-auto custom-scrollbar">
-            
-            <!-- Writing Canvas -->
             <section class="flex-grow bg-ivory border border-beige rounded-2xl shadow-sm p-8 md:p-12 flex flex-col relative transition-colors duration-300" id="paper-canvas">
                 <input type="text" id="letter-subject" placeholder="Title of your letter" class="bg-transparent border-b border-beige pb-3 text-3xl font-serif text-forest placeholder-forest/30 focus:outline-none focus:border-gold transition-colors w-full mb-8">
-                
                 <textarea id="letter-body" placeholder="Write with calm intention. There are no instant reactions here..." class="bg-transparent flex-grow text-lg leading-relaxed focus:outline-none resize-none font-serif placeholder-ink/20 text-[#3A2F28] min-h-[350px] w-full"></textarea>
             </section>
 
-            <!-- Setting Drawers -->
             <aside class="w-full md:w-80 space-y-6">
                 <div class="bg-ivory border border-beige rounded-2xl p-6 shadow-sm space-y-6">
                     <h3 class="font-serif text-xl font-semibold text-forest pb-3 border-b border-beige">Stationery Settings</h3>
                     
-                    <!-- Search Recipient -->
                     <div>
                         <label for="recipient-search" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Recipient Pen Name</label>
                         <div class="relative">
@@ -526,7 +478,20 @@
                         <p id="selected-recipient-label" class="text-xs italic text-gold mt-2 hidden"></p>
                     </div>
 
-                    <!-- Customize Ink colors -->
+                    <!-- Postcard Image Upload -->
+                    <div>
+                        <label class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Enclose Postcard (Optional)</label>
+                        <div id="postcard-upload-zone" class="border-2 border-dashed border-beige rounded-lg p-4 text-center hover:border-gold cursor-pointer transition-colors">
+                            <input type="file" id="postcard-file-input" class="hidden" accept="image/*">
+                            <i data-lucide="image-plus" class="h-6 w-6 text-ink/40 mx-auto mb-1"></i>
+                            <p class="text-xs text-ink/50">Attach a vintage photograph</p>
+                        </div>
+                        <div id="postcard-preview-container" class="hidden mt-3 relative">
+                            <img id="postcard-preview-img" src="" alt="Postcard preview" class="w-full h-32 object-cover rounded-lg">
+                            <button id="btn-remove-postcard" class="absolute top-1 right-1 bg-red-500 text-ivory rounded-full p-1 hover:bg-red-600"><i data-lucide="x" class="h-3 w-3"></i></button>
+                        </div>
+                    </div>
+
                     <div>
                         <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Ink Pigment</span>
                         <div class="flex space-x-3" id="ink-palette">
@@ -536,7 +501,6 @@
                         </div>
                     </div>
 
-                    <!-- Customize Paper quality -->
                     <div>
                         <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Paper Quality</span>
                         <div class="grid grid-cols-2 gap-2" id="paper-styles">
@@ -545,20 +509,19 @@
                         </div>
                     </div>
 
-                    <!-- Customize Hand / Writing font -->
                     <div>
                         <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Writing Hand</span>
-                        <div class="grid grid-cols-2 gap-2" id="typeface-styles">
-                            <button data-font="serif" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-serif text-forest">Classic Serif</button>
-                            <button data-font="handwriting" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting text-ink/70">Cursive Hand</button>
+                        <div class="grid grid-cols-3 gap-2" id="typeface-styles">
+                            <button data-font="serif" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-serif text-forest">Serif</button>
+                            <button data-font="handwriting" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting text-ink/70">Caveat</button>
+                            <button data-font="handwriting2" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting2 text-ink/70">Dancing</button>
                         </div>
                     </div>
 
-                    <!-- Delay selection -->
                     <div>
                         <label for="delivery-speed" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Delivery Transit</label>
                         <select id="delivery-speed" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink">
-                            <option value="immediate" selected>Immediate Delivery</option> <!-- Default set to Immediate [1] -->
+                            <option value="immediate" selected>Immediate Delivery</option>
                             <option value="1h">1 Hour (Deliberate delay)</option>
                             <option value="12h">12 Hours (Overnight)</option>
                             <option value="1d">1 Day (Standard carriage)</option>
@@ -566,150 +529,92 @@
                         </select>
                     </div>
 
-                    <!-- Sidebar Send button (Still active) -->
                     <button id="btn-seal-envelope" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-sm hover:shadow transition-all text-sm flex items-center justify-center space-x-2">
-                        <i data-lucide="mail" class="h-4 w-4"></i>
-                        <span>Seal & Send Letter</span>
+                        <i data-lucide="mail" class="h-4 w-4"></i><span>Seal & Send Letter</span>
                     </button>
                 </div>
             </aside>
         </main>
     </div>
 
-
-    <!-- ==========================================
-         MORE OPTIONS DROPDOWN MODAL
-         ========================================== -->
+    <!-- More Options Dropdown -->
     <div id="more-dropdown-modal" class="hidden fixed inset-0 z-30" aria-haspopup="true">
         <div class="absolute inset-0 bg-transparent"></div>
         <div class="absolute right-6 top-16 w-48 bg-ivory border border-beige rounded-xl shadow-xl py-2 z-40">
-            <button id="btn-dropdown-profile" class="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-beige/40 flex items-center space-x-2">
-                <i data-lucide="user" class="h-4 w-4 text-forest"></i>
-                <span>View Profile</span>
-            </button>
-            <button id="btn-dropdown-logout" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2">
-                <i data-lucide="log-out" class="h-4 w-4"></i>
-                <span>Logout Session</span>
-            </button>
+            <button id="btn-dropdown-profile" class="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-beige/40 flex items-center space-x-2"><i data-lucide="user" class="h-4 w-4 text-forest"></i><span>View Profile</span></button>
+            <button id="btn-dropdown-logout" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"><i data-lucide="log-out" class="h-4 w-4"></i><span>Logout Session</span></button>
         </div>
     </div>
 
-
-    <!-- ==========================================
-         TACTILE INTERACTIVE PHYSICAL ENVELOPE MODAL (REAL LETTERS)
-         ========================================== -->
+    <!-- Tactile Interactive Physical Envelope Modal -->
     <div id="envelope-modal" class="hidden fixed inset-0 bg-[#2C231E]/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
-        
-        <!-- Floating Close button once letter is open -->
-        <button id="btn-close-envelope-modal" class="hidden absolute top-6 right-6 text-ivory/60 hover:text-ivory bg-forest p-2 rounded-full border border-beige/20 shadow-lg transition-all z-[60]">
-            <i data-lucide="x" class="h-5 w-5"></i>
-        </button>
-
-        <!-- Dynamic Envelope Container -->
+        <button id="btn-close-envelope-modal" class="hidden absolute top-6 right-6 text-ivory/60 hover:text-ivory bg-forest p-2 rounded-full border border-beige/20 shadow-lg transition-all z-[60]"><i data-lucide="x" class="h-5 w-5"></i></button>
         <div id="envelope-container" class="relative w-full max-w-lg h-[400px] flex items-center justify-center select-none" style="perspective: 1200px;">
-            
-            <!-- 1. Envelope Cardboard body -->
             <div id="physical-envelope" class="absolute w-full h-[280px] bg-[#EADCC9] rounded-lg shadow-2xl border border-[#D5C2AF] overflow-hidden flex flex-col justify-between p-6">
-                <!-- Address Area -->
                 <div class="flex flex-col items-center justify-center h-full text-center">
                     <p class="font-handwriting text-2xl text-[#5C4B37] rotate-[-2deg]" id="envelope-address">To: Dear Companion</p>
                     <p class="text-[10px] tracking-widest text-[#8C765C] uppercase mt-2">Personal & Confidential</p>
                 </div>
-                <!-- Vintage Stamp design -->
                 <div class="absolute top-4 right-4 w-12 h-16 border-2 border-dashed border-[#8C765C]/40 bg-[#FAF3EC] flex flex-col items-center justify-center p-1 rounded-sm">
-                    <span class="text-[8px] text-[#8C765C] font-serif">DEAR</span>
-                    <i data-lucide="feather" class="h-4 w-4 text-[#8C765C]/60 my-0.5"></i>
-                    <span class="text-[6px] text-[#8C765C] font-serif">1840</span>
+                    <span class="text-[8px] text-[#8C765C] font-serif">DEAR</span><i data-lucide="feather" class="h-4 w-4 text-[#8C765C]/60 my-0.5"></i><span class="text-[6px] text-[#8C765C] font-serif">1840</span>
                 </div>
             </div>
-
-            <!-- 2. Inside Letter Sheet (Hidden tuck-in state) -->
             <div id="envelope-letter-sheet" class="absolute w-[94%] h-[385px] bg-ivory border border-beige shadow-2xl rounded-md p-8 md:p-10 overflow-y-auto custom-scrollbar transform translate-y-4 scale-90 opacity-0 z-10">
                 <div class="border-b border-beige pb-4 mb-4 select-text">
                     <h3 id="env-letter-title" class="font-serif text-2xl font-semibold text-forest">Subject</h3>
                     <div class="flex justify-between items-center text-xs text-ink/60 mt-1">
-                        <span id="env-letter-author">From: ---</span>
-                        <span id="env-letter-date">Date: ---</span>
+                        <span id="env-letter-author">From: ---</span><span id="env-letter-date">Date: ---</span>
                     </div>
+                </div>
+                <div id="env-postcard-container" class="hidden max-w-[200px] mx-auto mb-6">
+                    <img id="env-postcard-img" src="" alt="Postcard" class="w-full h-auto vintage-postcard">
                 </div>
                 <div id="env-letter-content" class="text-base leading-relaxed whitespace-pre-wrap font-serif text-ink select-text"></div>
             </div>
-
-            <!-- 3. Envelope Back Folds -->
             <div id="envelope-back" class="absolute w-full h-[280px] pointer-events-none z-20">
-                <!-- Top folding flap -->
-                <div id="envelope-flap" class="absolute top-0 left-0 right-0 h-[140px] bg-[#DFCBB7] origin-top border-b border-[#CBB3A1] shadow-md flex items-end justify-center pb-2 cursor-pointer pointer-events-auto" style="clip-path: polygon(0 0, 100% 0, 50% 100%);">
-                </div>
-                <!-- Triangle Side fold overlaps -->
-                <div class="absolute inset-0 bg-gradient-to-t from-[#D5C2AF]/20 to-transparent pointer-events-none"></div>
+                <div id="envelope-flap" class="absolute top-0 left-0 right-0 h-[140px] bg-[#DFCBB7] origin-top border-b border-[#CBB3A1] shadow-md flex items-end justify-center pb-2 cursor-pointer pointer-events-auto" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
             </div>
-
-            <!-- 4. Interactive wax seal stamp -->
             <div id="wax-seal" class="absolute z-30 cursor-pointer flex items-center justify-center transform active:scale-95 transition-transform" style="top: calc(50% - 15px);">
-                <div class="w-16 h-16 rounded-full bg-[#801818] shadow-lg border border-[#601010] flex items-center justify-center relative select-none">
+                <div id="wax-seal-bg" class="w-16 h-16 rounded-full bg-[#801818] shadow-lg border border-[#601010] flex items-center justify-center relative select-none">
                     <div class="w-12 h-12 rounded-full border border-dashed border-[#A02020] flex items-center justify-center">
-                        <span class="font-serif text-lg italic text-[#F0D0D0] font-bold">D</span>
+                        <span id="wax-seal-text" class="font-serif text-lg italic text-[#F0D0D0] font-bold">D</span>
                     </div>
-                    <!-- wax splat distortions -->
-                    <div class="absolute -top-1 -left-1 w-4 h-4 bg-[#801818] rounded-full blur-[1px]"></div>
-                    <div class="absolute -bottom-1 -right-1 w-5 h-5 bg-[#801818] rounded-full blur-[1px]"></div>
                 </div>
-            </div>
-
-        </div>
-    </div>
-
-
-    <!-- =========================================================================
-         GLOBAL INTERACTIVE LETTER/ENVELOPE MODAL (FALLBACK)
-         ========================================================================= -->
-    <div id="letter-modal" class="hidden fixed inset-0 bg-ink/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div id="envelope-wrapper" class="w-full max-w-2xl bg-ivory rounded-2xl shadow-2xl border border-beige overflow-hidden transform scale-95 opacity-0 transition-all duration-300 relative flex flex-col p-8 md:p-12">
-            
-            <button id="btn-close-modal" class="absolute top-6 right-6 text-ink/40 hover:text-ink transition-colors">
-                <i data-lucide="x" class="h-5 w-5"></i>
-            </button>
-
-            <!-- Letter Envelope metadata -->
-            <div class="border-b border-beige pb-6 mb-6">
-                <p class="text-xs uppercase tracking-widest font-bold text-gold mb-1">Delivered Correspondence</p>
-                <h3 id="modal-subject" class="font-serif text-3xl font-semibold text-forest mb-2">Subject</h3>
-                <div class="flex justify-between items-center text-xs text-ink/60">
-                    <span id="modal-author">From: ---</span>
-                    <span id="modal-date">Date: ---</span>
-                </div>
-            </div>
-
-            <!-- Content Area -->
-            <div class="flex-grow overflow-y-auto max-h-[350px] pr-2 custom-scrollbar">
-                <div id="modal-content" class="text-base leading-relaxed whitespace-pre-wrap font-serif text-ink"></div>
             </div>
         </div>
     </div>
 
-
-    <!-- =========================================================================
-         APPLICATION CORE DRIVER
-         ========================================================================= -->
+    <!-- APPLICATION CORE DRIVER -->
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-        // Connects to your custom Supabase Project ID
         const SUPABASE_URL = "https://lnmvtxxfeireptqurpoj.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxubXZ0eHhmZWlyZXB0cXVycG9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNjYxMzgsImV4cCI6MjA5OTc0MjEzOH0.tZeRHYv5NSV1COfRQtfeEkb6qVQX8PSJM46JTL6PZWc"; 
-
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Core App Context State
         let currentUser = null;
         let activeDraftId = null;
         let currentFolder = 'delivered';
         let debounceTimer = null;
         let activeStyling = { inkColor: '#3A2F28', paperStyle: 'linen', fontFamily: 'serif' };
-        let activeLetterOnDesk = null; // Caches open letter details [1]
-        let isRealtimeSubscribed = false; // Guard against multiple subscriptions [1]
+        let activeLetterOnDesk = null; 
+        let isRealtimeSubscribed = false;
+        let inboxChannel = null; 
+        let activeTargetLetterToUnseal = null;
+        let countdownInterval = null; 
+        let pendingPostcardUrl = null; // Holds the URL for the postcard before sending
 
-        // PWA Registration Engine [1]
+        // State for custom user metadata
+        let activeWaxColor = '#801818';
+        let activeMonogram = 'D';
+
+        const fontClassMap = {
+            serif: 'font-serif',
+            handwriting: 'font-handwriting',
+            handwriting2: 'font-handwriting2',
+            handwriting3: 'font-handwriting3'
+        };
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
@@ -718,170 +623,251 @@
             });
         }
 
-        // Initialize Icons
         lucide.createIcons();
 
-        // Router Toggles (Handles view- prefixed container IDs safely)
+        // ==========================================
+        // GLOBAL UI UTILITIES
+        // ==========================================
+        function showAppConfirm(title, message) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('app-confirm-modal');
+                const box = document.getElementById('app-confirm-box');
+                document.getElementById('app-confirm-title').textContent = title;
+                document.getElementById('app-confirm-message').textContent = message;
+                modal.classList.remove('hidden');
+                gsap.set(box, { scale: 0.9, opacity: 0 });
+                gsap.to(box, { duration: 0.3, scale: 1, opacity: 1, ease: 'power2.out' });
+                const okBtn = document.getElementById('app-confirm-ok');
+                const cancelBtn = document.getElementById('app-confirm-cancel');
+                const cleanup = () => { modal.classList.add('hidden'); okBtn.onclick = null; cancelBtn.onclick = null; };
+                okBtn.onclick = () => { gsap.to(box, { duration: 0.2, scale: 0.9, opacity: 0, onComplete: () => { cleanup(); resolve(true); } }); };
+                cancelBtn.onclick = () => { gsap.to(box, { duration: 0.2, scale: 0.9, opacity: 0, onComplete: () => { cleanup(); resolve(false); } }); };
+            });
+        }
+
+        function setButtonLoading(btn, isLoading, loadingText = 'Processing...') {
+            if (!btn) return;
+            if (isLoading) {
+                btn.dataset.originalText = btn.innerHTML;
+                btn.disabled = true;
+                btn.innerHTML = `<svg class="animate-spin h-4 w-4 mr-2 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> ${loadingText}`;
+            } else {
+                btn.disabled = false;
+                if (btn.dataset.originalText) btn.innerHTML = btn.dataset.originalText;
+            }
+        }
+
+        function getTimeRemaining(dateStr) {
+            const total = new Date(dateStr).getTime() - new Date().getTime();
+            if (total <= 0) return 'Arriving momentarily...';
+            const days = Math.floor(total / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((total % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
+            let str = 'Arrives in ';
+            if (days > 0) str += `${days} day${days > 1 ? 's' : ''}, `;
+            if (hours > 0 || days > 0) str += `${hours} hr${hours > 1 ? 's' : ''}`;
+            else str += `${mins} min${mins > 1 ? 's' : ''}`;
+            return str;
+        }
+
+        // Parses the [POSTCARD:url] tag from letter content safely
+        function parsePostcardFromContent(rawContent) {
+            if (!rawContent) return { url: null, text: '' };
+            const match = rawContent.match(/^\[POSTCARD:(.*?)\]\n?/);
+            if (match && match[1]) {
+                return { url: match[1], text: rawContent.replace(match[0], '') };
+            }
+            return { url: null, text: rawContent };
+        }
+
+        // ==========================================
+        // AMBIENCE & SOUNDSCAPE ENGINE (Web Audio API)
+        // ==========================================
+        let audioCtx = null;
+        let ambienceSource = null;
+        let ambienceGain = null;
+        let penScratchTimeout = null;
+
+        function initAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        function playPenScratch() {
+            if (!audioCtx) return;
+            const bufferSize = audioCtx.sampleRate * 0.05; // 50ms scratch
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2); // Fade out
+            }
+            const src = audioCtx.createBufferSource();
+            src.buffer = buffer;
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'bandpass';
+            filter.frequency.value = 2500 + Math.random() * 1000; // Randomize pitch slightly
+            const gain = audioCtx.createGain();
+            gain.gain.value = 0.04; // Very subtle
+            src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
+            src.start();
+        }
+
+        function startAmbience(type) {
+            stopAmbience();
+            initAudioCtx();
+            const bufferSize = 2 * audioCtx.sampleRate;
+            const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const output = noiseBuffer.getChannelData(0);
+
+            if (type === 'fire') {
+                let lastOut = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    output[i] = (lastOut + (0.02 * white)) / 1.02;
+                    lastOut = output[i];
+                    output[i] *= 3.5;
+                }
+            } else {
+                for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+            }
+
+            ambienceSource = audioCtx.createBufferSource();
+            ambienceSource.buffer = noiseBuffer;
+            ambienceSource.loop = true;
+
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = type === 'fire' ? 400 : 1200;
+
+            ambienceGain = audioCtx.createGain();
+            ambienceGain.gain.value = 0.08;
+
+            ambienceSource.connect(filter);
+            filter.connect(ambienceGain);
+            ambienceGain.connect(audioCtx.destination);
+            ambienceSource.start();
+        }
+
+        function stopAmbience() {
+            if (ambienceSource) {
+                try { ambienceSource.stop(); } catch(e){}
+                ambienceSource = null;
+            }
+        }
+
+        // ==========================================
+        // ROUTER & AUTH
+        // ==========================================
         function routeTo(viewId) {
             const authView = document.getElementById('view-auth');
             const dashboardView = document.getElementById('view-dashboard');
             const composerView = document.getElementById('view-composer');
-
             if (authView) authView.classList.add('hidden');
             if (dashboardView) dashboardView.classList.add('hidden');
             if (composerView) composerView.classList.add('hidden');
-
             const target = document.getElementById(viewId);
-            if (target) {
-                target.classList.remove('hidden');
-            } else {
-                console.error(`Target view container not found in DOM: ${viewId}`);
-                return;
-            }
+            if (target) target.classList.remove('hidden');
+            else { console.error(`Target view container not found in DOM: ${viewId}`); return; }
 
-            if (viewId === 'view-dashboard') {
-                initDashboard();
-            } else if (viewId === 'view-composer') {
-                initComposer();
-            }
+            if (viewId === 'view-dashboard') initDashboard();
+            else if (viewId === 'view-composer') initComposer();
+            
+            if (viewId !== 'view-composer') stopAmbience();
         }
 
-        // Subview switching for auth views
         function toggleAuthView(subview) {
             clearAuthStatus();
             document.getElementById('auth-signin').classList.add('hidden');
             document.getElementById('auth-signup').classList.add('hidden');
             document.getElementById('auth-forgot').classList.add('hidden');
-
             document.getElementById(`auth-${subview}`).classList.remove('hidden');
         }
 
-        // Handle Alert Dialogs
         function showAuthStatus(message, type) {
             const box = document.getElementById('auth-status-box');
             if (!box) return;
-            box.classList.remove('hidden', 'bg-red-50', 'text-red-800', 'border-red-200', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200');
+            box.classList.remove('hidden', 'bg-red-50', 'text-red-800', 'border-red-200', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-blue-50', 'text-blue-800', 'border-blue-200');
             box.textContent = message;
-
-            if (type === 'error') {
-                box.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
-            } else {
-                box.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
-            }
+            if (type === 'error') box.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
+            else if (type === 'success') box.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+            else box.classList.add('bg-blue-50', 'text-blue-800', 'border', 'border-blue-200');
         }
 
-        function clearAuthStatus() {
-            const box = document.getElementById('auth-status-box');
-            if (box) box.classList.add('hidden');
-        }
-
-
-        // ==========================================
-        // AUTHENTICATION ENGINE
-        // ==========================================
+        function clearAuthStatus() { const box = document.getElementById('auth-status-box'); if (box) box.classList.add('hidden'); }
 
         document.getElementById('btn-goto-signup').addEventListener('click', () => toggleAuthView('signup'));
         document.getElementById('btn-goto-signin').addEventListener('click', () => toggleAuthView('signin'));
         document.getElementById('btn-goto-forgot').addEventListener('click', () => toggleAuthView('forgot'));
         document.getElementById('btn-back-to-signin').addEventListener('click', () => toggleAuthView('signin'));
 
-        // Action: Sign In
         document.getElementById('form-signin').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearAuthStatus();
+            e.preventDefault(); clearAuthStatus();
             const email = document.getElementById('signin-email').value.trim();
             const password = document.getElementById('signin-password').value;
-
+            const btn = e.target.querySelector('button[type="submit"]');
             try {
-                showAuthStatus('Retrieving credentials...', 'info');
+                setButtonLoading(btn, true, 'Retrieving...');
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
                 if (error) throw error;
                 currentUser = data.user;
                 showAuthStatus('Welcome back. Loading sanctuary...', 'success');
                 setTimeout(() => routeTo('view-dashboard'), 1000);
-            } catch (err) {
-                showAuthStatus(err.message, 'error');
-            }
+            } catch (err) { showAuthStatus(err.message, 'error'); setButtonLoading(btn, false); }
         });
 
-        // Action: Sign Up
         document.getElementById('form-signup').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearAuthStatus();
+            e.preventDefault(); clearAuthStatus();
             const displayName = document.getElementById('signup-displayname').value.trim();
             const username = document.getElementById('signup-username').value.trim();
             const email = document.getElementById('signup-email').value.trim();
             const password = document.getElementById('signup-password').value;
-
-            if (username.length < 3 || !/^[a-zA-Z0-9_]+$/.test(username)) {
-                showAuthStatus('Your pen name must be 3+ characters, letters, numbers and underscores only.', 'error');
-                return;
-            }
-
+            const btn = e.target.querySelector('button[type="submit"]');
+            if (username.length < 3 || !/^[a-zA-Z0-9_]+$/.test(username)) { showAuthStatus('Your pen name must be 3+ characters, letters, numbers and underscores only.', 'error'); return; }
             try {
-                showAuthStatus('Sealing credentials...', 'info');
-                const { data, error } = await supabase.auth.signUp({
-                    email, password,
-                    options: { data: { username: username.toLowerCase(), display_name: displayName } }
-                });
+                setButtonLoading(btn, true, 'Sealing...');
+                const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { username: username.toLowerCase(), display_name: displayName } } });
                 if (error) throw error;
                 showAuthStatus('A validation letter has been dispatched to your email.', 'success');
                 document.getElementById('form-signup').reset();
-            } catch (err) {
-                showAuthStatus(err.message, 'error');
-            }
+                setButtonLoading(btn, false);
+            } catch (err) { showAuthStatus(err.message, 'error'); setButtonLoading(btn, false); }
         });
 
-        // Action: Password Recovery
         document.getElementById('form-forgot').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearAuthStatus();
+            e.preventDefault(); clearAuthStatus();
             const email = document.getElementById('forgot-email').value.trim();
+            const btn = e.target.querySelector('button[type="submit"]');
             try {
-                showAuthStatus('Routing path...', 'info');
-                const { error } = await supabase.auth.resetPasswordForEmail(email, {
-                    redirectTo: window.location.origin
-                });
+                setButtonLoading(btn, true, 'Routing...');
+                const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: window.location.origin });
                 if (error) throw error;
                 showAuthStatus('A recovery script was sent to your inbox.', 'success');
                 document.getElementById('form-forgot').reset();
-            } catch (err) {
-                showAuthStatus(err.message, 'error');
-            }
+                setButtonLoading(btn, false);
+            } catch (err) { showAuthStatus(err.message, 'error'); setButtonLoading(btn, false); }
         });
 
         async function logoutSession() {
+            if (inboxChannel) { await supabase.removeChannel(inboxChannel); inboxChannel = null; isRealtimeSubscribed = false; }
+            if (countdownInterval) clearInterval(countdownInterval);
+            stopAmbience();
             await supabase.auth.signOut();
             currentUser = null;
             routeTo('view-auth');
             toggleAuthView('signin');
         }
 
-        // OAuth Continue
         document.getElementById('btn-oauth-google').addEventListener('click', async () => {
-            try {
-                const { error } = await supabase.auth.signInWithOAuth({
-                    provider: 'google',
-                    options: { redirectTo: window.location.origin }
-                });
-                if (error) throw error;
-            } catch (err) {
-                showAuthStatus(err.message, 'error');
-            }
+            try { const { error } = await supabase.auth.signInWithOAuth({ provider: 'google', options: { redirectTo: window.location.origin } }); if (error) throw error; } 
+            catch (err) { showAuthStatus(err.message, 'error'); }
         });
 
-
         // ==========================================
-        // SANCTUARY DASHBOARD & DUAL-PANE WHATSAPP ENGINE
+        // DASHBOARD & LIST ENGINE
         // ==========================================
-
-        // Upper bar navigation controls
         document.getElementById('nav-search-btn').addEventListener('click', () => {
             const searchBar = document.getElementById('filter-search-container');
             searchBar.classList.toggle('hidden');
-            if (!searchBar.classList.contains('hidden')) {
-                document.getElementById('filter-search-input').focus();
-            }
+            if (!searchBar.classList.contains('hidden')) document.getElementById('filter-search-input').focus();
         });
 
         document.getElementById('nav-inbox-btn').addEventListener('click', () => {
@@ -890,40 +876,13 @@
             if (deliveredBtn) deliveredBtn.click();
         });
 
-        document.getElementById('nav-friends-btn').addEventListener('click', () => {
-            switchToCompanionsMode('friends');
-        });
-
-        document.getElementById('nav-profile-btn').addEventListener('click', async () => {
-            await showProfilePane();
-        });
-
-        document.getElementById('nav-more-btn').addEventListener('click', (e) => {
-            e.stopPropagation();
-            document.getElementById('more-dropdown-modal').classList.toggle('hidden');
-        });
-
-        // Action: Open Composer View
-        document.getElementById('btn-open-composer').addEventListener('click', () => {
-            activeDraftId = null;
-            routeTo('view-composer');
-        });
-
-        // Dropdown actions
-        document.getElementById('btn-dropdown-profile').addEventListener('click', async () => {
-            document.getElementById('more-dropdown-modal').classList.add('hidden');
-            await showProfilePane();
-        });
-
-        document.getElementById('btn-dropdown-logout').addEventListener('click', async () => {
-            document.getElementById('more-dropdown-modal').classList.add('hidden');
-            await logoutSession();
-        });
-
-        // Close dropdown when clicking outside
-        window.addEventListener('click', () => {
-            document.getElementById('more-dropdown-modal').classList.add('hidden');
-        });
+        document.getElementById('nav-friends-btn').addEventListener('click', () => switchToCompanionsMode('friends'));
+        document.getElementById('nav-profile-btn').addEventListener('click', async () => await showProfilePane());
+        document.getElementById('nav-more-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('more-dropdown-modal').classList.toggle('hidden'); });
+        document.getElementById('btn-open-composer').addEventListener('click', () => { activeDraftId = null; routeTo('view-composer'); });
+        document.getElementById('btn-dropdown-profile').addEventListener('click', async () => { document.getElementById('more-dropdown-modal').classList.add('hidden'); await showProfilePane(); });
+        document.getElementById('btn-dropdown-logout').addEventListener('click', async () => { document.getElementById('more-dropdown-modal').classList.add('hidden'); await logoutSession(); });
+        window.addEventListener('click', () => { document.getElementById('more-dropdown-modal').classList.add('hidden'); });
 
         function switchToCompanionsMode(targetMode) {
             const folderTabs = document.getElementById('mailbox-folder-tabs');
@@ -931,37 +890,17 @@
             const lettersList = document.getElementById('letters-list');
             const companionsPanel = document.getElementById('friends-panel');
             const settingsPanel = document.getElementById('settings-panel');
-
-            // Reset active highlights
-            const friendsSidebarBtn = document.querySelector('[data-folder="friends"]');
-            const settingsSidebarBtn = document.querySelector('[data-folder="settings"]');
-            
-            if (friendsSidebarBtn) friendsSidebarBtn.classList.remove('bg-beige/60', 'text-forest');
-            if (settingsSidebarBtn) settingsSidebarBtn.classList.remove('bg-beige/60', 'text-forest');
-
-            folderTabs.classList.add('hidden');
-            searchBar.classList.add('hidden');
-            lettersList.classList.add('hidden');
-            companionsPanel.classList.add('hidden');
-            settingsPanel.classList.add('hidden');
-
+            folderTabs.classList.add('hidden'); searchBar.classList.add('hidden'); lettersList.classList.add('hidden'); companionsPanel.classList.add('hidden'); settingsPanel.classList.add('hidden');
             if (targetMode === 'friends') {
                 companionsPanel.classList.remove('hidden');
-                if (friendsSidebarBtn) friendsSidebarBtn.classList.add('bg-beige/60', 'text-forest');
-                
                 document.getElementById('mailbox-title').textContent = 'Companions Directory';
                 document.getElementById('letter-count').textContent = 'Companions list';
-                initCompanionsEngine();
-                toggleDashboardState('list');
-                showMobileRightPane(false);
+                initCompanionsEngine(); toggleDashboardState('list'); showMobileRightPane(false);
             } else if (targetMode === 'settings') {
                 settingsPanel.classList.remove('hidden');
-                if (settingsSidebarBtn) settingsSidebarBtn.classList.add('bg-beige/60', 'text-forest');
-
                 document.getElementById('mailbox-title').textContent = 'Sanctuary Settings';
                 document.getElementById('letter-count').textContent = 'Preferences';
-                toggleDashboardState('list');
-                showMobileRightPane(false);
+                toggleDashboardState('list'); showMobileRightPane(false);
             } else {
                 folderTabs.classList.remove('hidden');
                 lettersList.classList.remove('hidden');
@@ -969,22 +908,6 @@
             }
         }
 
-        // Sidebar custom directory triggers [1]
-        const friendsSidebarTrigger = document.querySelector('[data-folder="friends"]');
-        if (friendsSidebarTrigger) {
-            friendsSidebarTrigger.addEventListener('click', () => {
-                switchToCompanionsMode('friends');
-            });
-        }
-
-        const settingsSidebarTrigger = document.querySelector('[data-folder="settings"]');
-        if (settingsSidebarTrigger) {
-            settingsSidebarTrigger.addEventListener('click', () => {
-                switchToCompanionsMode('settings');
-            });
-        }
-
-        // Sizing & Settings Preferences listeners [1]
         document.getElementById('settings-font-size').addEventListener('change', (e) => {
             const size = e.target.value;
             const contentPane = document.getElementById('desk-letter-content');
@@ -993,111 +916,68 @@
             else contentPane.style.fontSize = '18px';
         });
 
-        // Folders Selection Tabbing
         document.querySelectorAll('.folder-tab-btn').forEach(btn => {
             btn.addEventListener('click', async (e) => {
                 document.querySelectorAll('.folder-tab-btn').forEach(b => b.classList.remove('border-forest', 'text-forest', 'font-semibold'));
                 e.currentTarget.classList.add('border-forest', 'text-forest', 'font-semibold');
                 currentFolder = e.currentTarget.dataset.folder;
-                
-                const displayTitles = {
-                    delivered: 'Inbox',
-                    scheduled: 'Scheduled Transit',
-                    sent: 'Sent Records',
-                    draft: 'Saved Drafts'
-                };
+                const displayTitles = { delivered: 'Inbox', scheduled: 'Scheduled Transit', sent: 'Sent Records', draft: 'Saved Drafts' };
                 document.getElementById('mailbox-title').textContent = displayTitles[currentFolder];
                 await fetchInboxFeed();
             });
         });
 
-        // Search Input Filter Engine
         document.getElementById('filter-search-input').addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase().trim();
-            const cards = document.querySelectorAll('.letter-card');
-            
-            cards.forEach(card => {
+            document.querySelectorAll('.letter-card').forEach(card => {
                 const title = card.querySelector('h4').textContent.toLowerCase();
                 const content = card.dataset.content ? card.dataset.content.toLowerCase() : '';
-                if (title.includes(val) || content.includes(val)) {
-                    card.classList.remove('hidden');
-                } else {
-                    card.classList.add('hidden');
-                }
+                if (title.includes(val) || content.includes(val)) card.classList.remove('hidden');
+                else card.classList.add('hidden');
             });
         });
 
-        // Action: Burn / Delete open letter [1]
         document.getElementById('btn-delete-letter').addEventListener('click', async () => {
             if (!activeLetterOnDesk) return;
-
             const isDraft = activeLetterOnDesk.status === 'draft';
-            const confirmMsg = isDraft 
-                ? 'Are you sure you want to permanently discard this draft?' 
-                : 'Are you sure you want to burn this letter? It will be deleted from both you and your companion\'s records.';
-
-            if (confirm(confirmMsg)) {
+            const title = isDraft ? 'Discard Draft' : 'Burn Letter';
+            const msg = isDraft ? 'Are you sure you want to permanently discard this draft?' : 'Are you sure you want to burn this letter? It will be deleted from both you and your companion\'s records.';
+            const confirmed = await showAppConfirm(title, msg);
+            if (confirmed) {
                 try {
-                    const { error } = await supabase
-                        .from('letters')
-                        .delete()
-                        .eq('id', activeLetterOnDesk.id);
-
+                    const { error } = await supabase.from('letters').delete().eq('id', activeLetterOnDesk.id).or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`);
                     if (error) throw error;
-
-                    // Close reading desk and refresh mailbox
                     document.getElementById('active-letter-board').classList.add('hidden');
                     document.getElementById('right-col-empty').classList.remove('hidden');
-                    activeLetterOnDesk = null;
-                    showMobileRightPane(false);
-                    await fetchInboxFeed();
-                } catch (err) {
-                    alert(`Failed to burn letter: ${err.message}`);
-                }
+                    activeLetterOnDesk = null; showMobileRightPane(false); await fetchInboxFeed();
+                } catch (err) { await showAppConfirm('Error', `Failed to burn letter: ${err.message}`); }
             }
         });
 
         async function initDashboard() {
-            // Trigger client-driven background processor to run database delivery actions [1]
-            try {
-                await supabase.rpc('process_scheduled_letters');
-            } catch (err) {
-                console.warn('Silent processing request handled:', err);
-            }
-
+            try { await supabase.rpc('process_scheduled_letters'); } catch (err) { console.warn('Silent processing request handled:', err); }
             currentFolder = 'delivered';
-            
-            // Layout views reset
             document.getElementById('right-col-empty').classList.remove('hidden');
             document.getElementById('right-col-profile').classList.add('hidden');
             document.getElementById('right-col-friend-profile').classList.add('hidden');
             document.getElementById('active-letter-board').classList.add('hidden');
             showMobileRightPane(false);
-
             document.querySelectorAll('.folder-tab-btn').forEach(b => b.classList.remove('border-forest', 'text-forest', 'font-semibold'));
             const inboxTab = document.querySelector('[data-folder="delivered"]');
             if (inboxTab) inboxTab.classList.add('border-forest', 'text-forest', 'font-semibold');
-            
             document.getElementById('mailbox-title').textContent = 'Inbox';
             switchToCompanionsMode(false);
             await fetchInboxFeed();
             updateUnreadInboxBadge();
-            setupRealtimeInboxChannel(); // Initiate live inbox notifications [1]
+            setupRealtimeInboxChannel(); 
         }
 
-        // Secure Real-time Delivery listener [1]
         function setupRealtimeInboxChannel() {
-            if (isRealtimeSubscribed) return; // Prevent duplicate subscriptions [1]
-            isRealtimeSubscribed = true; // Lock subscription [1]
-
-            supabase
+            if (isRealtimeSubscribed || !currentUser) return; 
+            isRealtimeSubscribed = true; 
+            inboxChannel = supabase
                 .channel('realtime-letters-delivery')
-                .on('postgres_changes', { 
-                    event: 'INSERT', 
-                    schema: 'public', 
-                    table: 'letters', 
-                    filter: `recipient_id=eq.${currentUser.id}` 
-                }, (payload) => {
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'letters', filter: `recipient_id=eq.${currentUser.id}` }, (payload) => {
                     const letter = payload.new;
                     if (letter.status === 'delivered') {
                         triggerToastNotification(`A new envelope has been delivered: "${letter.subject || 'Correspondence'}"`);
@@ -1105,27 +985,25 @@
                         if (currentFolder === 'delivered') fetchInboxFeed();
                     }
                 })
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'letters', filter: `recipient_id=eq.${currentUser.id}` }, (payload) => {
+                    if (payload.new.status === 'delivered' && payload.old.status === 'scheduled') {
+                        triggerToastNotification(`A scheduled envelope has arrived: "${payload.new.subject || 'Correspondence'}"`);
+                        updateUnreadInboxBadge();
+                        if (currentFolder === 'delivered') fetchInboxFeed();
+                    }
+                })
                 .subscribe();
         }
 
-        // Show Toast banner [1]
         function triggerToastNotification(message) {
             const toast = document.getElementById('toast-notification');
             const text = document.getElementById('toast-message');
             text.textContent = message;
-            
             toast.classList.remove('hidden');
-            // GSAP slide down toast banner
             gsap.killTweensOf(toast);
             gsap.set(toast, { y: -100, opacity: 0 });
             gsap.to(toast, { duration: 0.5, y: 0, opacity: 1, ease: 'power2.out' });
-
-            // Hide after 4 seconds
-            setTimeout(() => {
-                gsap.to(toast, { duration: 0.5, y: -100, opacity: 0, ease: 'power2.in', onComplete: () => {
-                    toast.classList.add('hidden');
-                }});
-            }, 4000);
+            setTimeout(() => { gsap.to(toast, { duration: 0.5, y: -100, opacity: 0, ease: 'power2.in', onComplete: () => { toast.classList.add('hidden'); }}); }, 4000);
         }
 
         async function fetchInboxFeed() {
@@ -1133,72 +1011,53 @@
             const list = document.getElementById('letters-list');
             if (!list) return;
             list.innerHTML = '';
-
+            if (countdownInterval) clearInterval(countdownInterval);
             let query = supabase.from('letters').select('*, sender:profiles!letters_sender_id_fkey(display_name, username), recipient:profiles!letters_recipient_id_fkey(display_name)');
-
-            if (currentFolder === 'delivered') {
-                // Return both delivered and read states to keep opened letters in Inbox [1]
-                query = query.eq('recipient_id', currentUser.id).in('status', ['delivered', 'read']);
-            } else if (currentFolder === 'scheduled') {
-                query = query.eq('sender_id', currentUser.id).eq('status', 'scheduled');
-            } else if (currentFolder === 'sent') {
-                // Return all sender records that are delivered or read [1]
-                query = query.eq('sender_id', currentUser.id).in('status', ['delivered', 'read', 'sent', 'archived']);
-            } else if (currentFolder === 'draft') {
-                query = query.eq('sender_id', currentUser.id).eq('status', 'draft');
-            }
+            if (currentFolder === 'delivered') query = query.eq('recipient_id', currentUser.id).in('status', ['delivered', 'read']);
+            else if (currentFolder === 'scheduled') query = query.eq('sender_id', currentUser.id).eq('status', 'scheduled');
+            else if (currentFolder === 'sent') query = query.eq('sender_id', currentUser.id).in('status', ['delivered', 'read', 'sent', 'archived']);
+            else if (currentFolder === 'draft') query = query.eq('sender_id', currentUser.id).eq('status', 'draft');
 
             const { data: letters, error } = await query.order('created_at', { ascending: false });
-
-            if (error || !letters || letters.length === 0) {
-                toggleDashboardState('empty');
-                document.getElementById('letter-count').textContent = '0 Letters';
-                return;
-            }
-
+            if (error || !letters || letters.length === 0) { toggleDashboardState('empty'); document.getElementById('letter-count').textContent = '0 Letters'; return; }
             document.getElementById('letter-count').textContent = `${letters.length} Letter${letters.length === 1 ? '' : 's'}`;
             toggleDashboardState('list');
 
             letters.forEach(letter => {
                 const card = document.createElement('div');
                 card.className = "letter-card bg-ivory border border-beige hover:border-gold p-4 rounded-xl cursor-pointer transition-all hover:shadow-sm flex justify-between items-center group relative overflow-hidden";
-                card.dataset.content = letter.content || '';
-
+                const { text: parsedText } = parsePostcardFromContent(letter.content);
+                card.dataset.content = parsedText;
                 const isUnread = currentFolder === 'delivered' && letter.status === 'delivered';
                 const dot = isUnread ? `<span class="h-2 w-2 rounded-full bg-gold mr-3 inline-block flex-shrink-0"></span>` : '';
                 const dateStr = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                
-                const nameLabel = currentFolder === 'delivered' 
-                    ? `From: ${letter.sender?.display_name || 'Anonymous'}`
-                    : `To: ${letter.recipient?.display_name || 'Future Self'}`;
-
-                card.innerHTML = `
-                    <div class="flex items-center overflow-hidden min-w-0 mr-2">
-                        ${dot}
-                        <div class="min-w-0">
-                            <h4 class="font-serif text-base font-semibold text-forest group-hover:text-gold transition-colors truncate">${letter.subject || '(Untitled Scroll)'}</h4>
-                            <p class="text-[11px] text-ink/50 mt-0.5 truncate">${nameLabel}</p>
-                        </div>
-                    </div>
-                    <div class="text-right flex-shrink-0">
-                        <span class="text-[10px] text-ink/40">${dateStr}</span>
-                    </div>
-                `;
-
+                let metaContent = `<span class="text-[10px] text-ink/40">${dateStr}</span>`;
+                if (currentFolder === 'scheduled' && letter.delivery_at) {
+                    metaContent = `<span class="text-[10px] text-gold font-semibold countdown-meta block" data-delivery="${letter.delivery_at}">${getTimeRemaining(letter.delivery_at)}</span>`;
+                } else if (currentFolder === 'sent') {
+                    if (letter.status === 'read') metaContent = `<span class="text-[10px] text-forest flex items-center gap-1 justify-end"><i data-lucide="check-check" class="h-3 w-3"></i> Read</span>`;
+                    else metaContent = `<span class="text-[10px] text-ink/40 flex items-center gap-1 justify-end"><i data-lucide="check" class="h-3 w-3"></i> Sent</span>`;
+                }
+                const nameLabel = currentFolder === 'delivered' ? `From: ${letter.sender?.display_name || 'Anonymous'}` : `To: ${letter.recipient?.display_name || 'Future Self'}`;
+                card.innerHTML = `<div class="flex items-center overflow-hidden min-w-0 mr-2">${dot}<div class="min-w-0"><h4 class="font-serif text-base font-semibold text-forest group-hover:text-gold transition-colors truncate">${letter.subject || '(Untitled Scroll)'}</h4><p class="text-[11px] text-ink/50 mt-0.5 truncate">${nameLabel}</p></div></div><div class="text-right flex-shrink-0">${metaContent}</div>`;
                 card.addEventListener('click', () => openLetterDetails(letter));
                 list.appendChild(card);
             });
+            lucide.createIcons();
+            if (currentFolder === 'scheduled') {
+                countdownInterval = setInterval(() => { document.querySelectorAll('.countdown-meta').forEach(el => { el.textContent = getTimeRemaining(el.dataset.delivery); }); }, 60000);
+            }
+            const cards = list.querySelectorAll('.letter-card');
+            gsap.fromTo(cards, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out' });
         }
 
         function toggleDashboardState(state) {
             const list = document.getElementById('letters-list');
             const loader = document.getElementById('dashboard-loader');
             const empty = document.getElementById('dashboard-empty');
-
             if (loader) loader.classList.add('hidden');
             if (empty) empty.classList.add('hidden');
             if (list) list.classList.add('hidden');
-
             if (state === 'loader' && loader) loader.classList.remove('hidden');
             else if (state === 'empty' && empty) empty.classList.remove('hidden');
             else if (list) list.classList.remove('hidden');
@@ -1207,60 +1066,25 @@
         async function updateUnreadInboxBadge() {
             const badge = document.getElementById('badge-inbox');
             if (!badge) return;
-            const { count, error } = await supabase
-                .from('letters')
-                .select('*', { count: 'exact', head: true })
-                .eq('recipient_id', currentUser.id)
-                .eq('status', 'delivered');
-
-            if (!error && count > 0) {
-                badge.textContent = count;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
+            const { count, error } = await supabase.from('letters').select('*', { count: 'exact', head: true }).eq('recipient_id', currentUser.id).eq('status', 'delivered');
+            if (!error && count > 0) { badge.textContent = count; badge.classList.remove('hidden'); } else { badge.classList.add('hidden'); }
         }
 
-        // Manage Mobile collapsing layout
         function showMobileRightPane(show) {
             const leftCol = document.getElementById('dashboard-left-col');
             const rightCol = document.getElementById('dashboard-right-col');
-            
-            if (show) {
-                leftCol.classList.add('hidden');
-                leftCol.classList.remove('md:flex');
-                
-                rightCol.classList.remove('hidden');
-                rightCol.classList.add('flex');
-            } else {
-                leftCol.classList.remove('hidden');
-                leftCol.classList.add('md:flex');
-                
-                rightCol.classList.add('hidden');
-                rightCol.classList.remove('flex');
-            }
+            if (show) { leftCol.classList.add('hidden'); leftCol.classList.remove('md:flex'); rightCol.classList.remove('hidden'); rightCol.classList.add('flex'); } 
+            else { leftCol.classList.remove('hidden'); leftCol.classList.add('md:flex'); rightCol.classList.add('hidden'); rightCol.classList.remove('flex'); }
         }
 
-        document.getElementById('btn-back-to-list').addEventListener('click', () => {
-            showMobileRightPane(false);
-        });
-
+        document.getElementById('btn-back-to-list').addEventListener('click', () => showMobileRightPane(false));
         const btnBackProfile = document.getElementById('btn-back-to-list-profile');
-        if (btnBackProfile) {
-            btnBackProfile.addEventListener('click', () => {
-                showMobileRightPane(false);
-            });
-        }
-
-        document.getElementById('btn-back-to-list-friend-profile').addEventListener('click', () => {
-            showMobileRightPane(false);
-        });
-
+        if (btnBackProfile) btnBackProfile.addEventListener('click', () => showMobileRightPane(false));
+        document.getElementById('btn-back-to-list-friend-profile').addEventListener('click', () => showMobileRightPane(false));
 
         // ==========================================
-        // COMPANIONS SUB-SYSTEM ENGINE
+        // COMPANIONS SUB-SYSTEM
         // ==========================================
-
         async function initCompanionsEngine() {
             await fetchMyCompanions();
             await fetchIncomingRequests();
@@ -1269,798 +1093,579 @@
             document.getElementById('companion-search-input').value = '';
         }
 
-        // Active Companions Fetch (reads from user_friends view)
         async function fetchMyCompanions() {
             const list = document.getElementById('companions-list');
             list.innerHTML = '';
-
-            const { data: friends, error } = await supabase
-                .from('user_friends')
-                .select('*');
-
-            if (error || !friends || friends.length === 0) {
-                list.innerHTML = `<p class="text-xs italic text-ink/40">You have not recorded any active companions yet.</p>`;
-                return;
-            }
-
+            const { data: friends, error } = await supabase.from('user_friends').select('*');
+            if (error || !friends || friends.length === 0) { list.innerHTML = `<p class="text-xs italic text-ink/40">You have not recorded any active companions yet.</p>`; return; }
             friends.forEach(friend => {
                 const item = document.createElement('div');
                 item.className = "flex items-center justify-between p-3 bg-ivory border border-beige rounded-xl";
-                
-                // Clicking avatar triggers detailed profile view [1]
-                item.innerHTML = `
-                    <div class="flex items-center space-x-3 overflow-hidden min-w-0 mr-2">
-                        <div class="btn-view-friend-pfp h-10 w-10 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest cursor-pointer hover:bg-gold/20 border border-beige transition-all" data-id="${friend.friend_id}">
-                            ${friend.avatar_url ? `<img src="${friend.avatar_url}" class="h-10 w-10 rounded-full object-cover">` : friend.display_name.charAt(0).toUpperCase()}
-                        </div>
-                        <div class="min-w-0">
-                            <h4 class="text-sm font-semibold truncate">${friend.display_name}</h4>
-                            <p class="text-xs text-ink/50 truncate">@${friend.username}</p>
-                        </div>
-                    </div>
-                    <div class="flex items-center space-x-1.5 flex-shrink-0">
-                        <button class="btn-write-friend bg-forest text-ivory text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-forest/90 font-semibold" data-id="${friend.friend_id}" data-name="${friend.display_name}" data-user="${friend.username}">
-                            Compose
-                        </button>
-                        <button class="btn-remove-friend text-red-600 hover:bg-red-50 p-1.5 rounded-lg" data-friendship="${friend.friendship_id}" title="Remove Companion">
-                            <i data-lucide="user-minus" class="h-3.5 w-3.5"></i>
-                        </button>
-                    </div>
-                `;
-
-                // View Friend Profile [1]
-                item.querySelector('.btn-view-friend-pfp').addEventListener('click', async () => {
-                    await showCompanionProfilePane(friend);
-                });
-
-                // Quick compose redirect event
+                item.innerHTML = `<div class="flex items-center space-x-3 overflow-hidden min-w-0 mr-2"><div class="btn-view-friend-pfp h-10 w-10 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest cursor-pointer hover:bg-gold/20 border border-beige transition-all" data-id="${friend.friend_id}">${friend.avatar_url ? `<img src="${friend.avatar_url}" class="h-10 w-10 rounded-full object-cover">` : friend.display_name.charAt(0).toUpperCase()}</div><div class="min-w-0"><h4 class="text-sm font-semibold truncate">${friend.display_name}</h4><p class="text-xs text-ink/50 truncate">@${friend.username}</p></div></div><div class="flex items-center space-x-1.5 flex-shrink-0"><button class="btn-write-friend bg-forest text-ivory text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-forest/90 font-semibold" data-id="${friend.friend_id}" data-name="${friend.display_name}" data-user="${friend.username}">Compose</button><button class="btn-remove-friend text-red-600 hover:bg-red-50 p-1.5 rounded-lg" data-friendship="${friend.friendship_id}" title="Remove Companion"><i data-lucide="user-minus" class="h-3.5 w-3.5"></i></button></div>`;
+                item.querySelector('.btn-view-friend-pfp').addEventListener('click', async () => await showCompanionProfilePane(friend));
                 item.querySelector('.btn-write-friend').addEventListener('click', (e) => {
-                    activeDraftId = null;
-                    routeTo('view-composer');
-                    
-                    // Directly populate target recipient
-                    const btn = e.currentTarget;
+                    activeDraftId = null; routeTo('view-composer'); const btn = e.currentTarget;
                     document.getElementById('recipient-id').value = btn.dataset.id;
                     const lbl = document.getElementById('selected-recipient-label');
-                    lbl.textContent = `Address to: ${btn.dataset.name} (@${btn.dataset.user})`;
-                    lbl.classList.remove('hidden');
+                    lbl.textContent = `Address to: ${btn.dataset.name} (@${btn.dataset.user})`; lbl.classList.remove('hidden');
                 });
-
                 item.querySelector('.btn-remove-friend').addEventListener('click', async (e) => {
                     const friendshipId = e.currentTarget.dataset.friendship;
-                    if (confirm('Are you sure you want to remove this companion connection?')) {
-                        await supabase.from('friendships').delete().eq('id', friendshipId);
-                        await initCompanionsEngine();
-                    }
+                    const confirmed = await showAppConfirm('Remove Companion', 'Are you sure you want to remove this companion connection?');
+                    if (confirmed) { await supabase.from('friendships').delete().eq('id', friendshipId); await initCompanionsEngine(); }
                 });
-
                 list.appendChild(item);
             });
             lucide.createIcons();
         }
 
-        // Fetch Incoming Friend Requests (reads from view)
         async function fetchIncomingRequests() {
             const list = document.getElementById('incoming-requests-list');
             list.innerHTML = '';
-
-            const { data: requests, error } = await supabase
-                .from('my_friend_requests')
-                .select('*')
-                .eq('receiver_id', currentUser.id)
-                .eq('status', 'pending');
-
-            if (error || !requests || requests.length === 0) {
-                list.innerHTML = `<p class="text-xs italic text-ink/40">No pending incoming requests.</p>`;
-                return;
-            }
-
+            const { data: requests, error } = await supabase.from('my_friend_requests').select('*').eq('receiver_id', currentUser.id).eq('status', 'pending');
+            if (error || !requests || requests.length === 0) { list.innerHTML = `<p class="text-xs italic text-ink/40">No pending incoming requests.</p>`; return; }
             requests.forEach(req => {
                 const item = document.createElement('div');
                 item.className = "flex items-center justify-between p-3 bg-ivory border border-beige rounded-xl";
-                item.innerHTML = `
-                    <div class="min-w-0 mr-2">
-                        <h4 class="text-sm font-semibold truncate">${req.sender_display_name}</h4>
-                        <p class="text-xs text-ink/50 truncate">@${req.sender_username}</p>
-                    </div>
-                    <div class="flex space-x-1.5 flex-shrink-0">
-                        <button class="btn-accept bg-forest text-ivory text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-forest/90 font-semibold" data-id="${req.request_id}">
-                            Accept
-                        </button>
-                        <button class="btn-reject bg-beige text-ink/75 text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-beige/80" data-id="${req.request_id}">
-                            Decline
-                        </button>
-                    </div>
-                `;
-
-                item.querySelector('.btn-accept').addEventListener('click', async (e) => {
-                    await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', e.currentTarget.dataset.id);
-                    await initCompanionsEngine();
-                });
-
-                item.querySelector('.btn-reject').addEventListener('click', async (e) => {
-                    await supabase.from('friend_requests').update({ status: 'rejected' }).eq('id', e.currentTarget.dataset.id);
-                    await initCompanionsEngine();
-                });
-
+                item.innerHTML = `<div class="min-w-0 mr-2"><h4 class="text-sm font-semibold truncate">${req.sender_display_name}</h4><p class="text-xs text-ink/50 truncate">@${req.sender_username}</p></div><div class="flex space-x-1.5 flex-shrink-0"><button class="btn-accept bg-forest text-ivory text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-forest/90 font-semibold" data-id="${req.request_id}">Accept</button><button class="btn-reject bg-beige text-ink/75 text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-beige/80" data-id="${req.request_id}">Decline</button></div>`;
+                item.querySelector('.btn-accept').addEventListener('click', async (e) => { await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', e.currentTarget.dataset.id); await initCompanionsEngine(); });
+                item.querySelector('.btn-reject').addEventListener('click', async (e) => { await supabase.from('friend_requests').update({ status: 'rejected' }).eq('id', e.currentTarget.dataset.id); await initCompanionsEngine(); });
                 list.appendChild(item);
             });
         }
 
-        // Search directory profiles
         document.getElementById('btn-companion-search').addEventListener('click', async () => {
             const val = document.getElementById('companion-search-input').value.trim();
             const container = document.getElementById('companion-search-results');
             container.innerHTML = '';
-
-            if (val.length < 2) {
-                alert('Please input at least 2 characters to run a search query.');
-                return;
-            }
-
-            // Look up profile by username
-            const { data: users, error } = await supabase
-                .from('profiles')
-                .select('id, username, display_name')
-                .ilike('username', `%${val}%`)
-                .neq('id', currentUser.id)
-                .limit(5);
-
-            if (error || !users || users.length === 0) {
-                container.innerHTML = `<p class="text-xs italic text-red-700">No companions matching that pen name were found.</p>`;
-                container.classList.remove('hidden');
-                return;
-            }
-
+            if (val.length < 2) { await showAppConfirm('Search Too Short', 'Please input at least 2 characters to run a search query.'); return; }
+            const { data: users, error } = await supabase.from('profiles').select('id, username, display_name').ilike('username', `%${val}%`).neq('id', currentUser.id).limit(5);
+            if (error || !users || users.length === 0) { container.innerHTML = `<p class="text-xs italic text-red-700">No companions matching that pen name were found.</p>`; container.classList.remove('hidden'); return; }
             container.classList.remove('hidden');
-
             users.forEach(user => {
                 const row = document.createElement('div');
                 row.className = "flex items-center justify-between p-2 bg-ivory rounded border border-beige/60 text-xs";
-                row.innerHTML = `
-                    <div class="min-w-0 mr-2">
-                        <span class="font-bold truncate">${user.display_name}</span> <span class="text-ink/50 truncate">@${user.username}</span>
-                    </div>
-                    <button class="btn-send-request bg-forest text-ivory px-2 py-1 rounded hover:bg-forest/90 font-semibold flex-shrink-0" data-id="${user.id}">
-                        Request
-                    </button>
-                `;
-
+                row.innerHTML = `<div class="min-w-0 mr-2"><span class="font-bold truncate">${user.display_name}</span> <span class="text-ink/50 truncate">@${user.username}</span></div><button class="btn-send-request bg-forest text-ivory px-2 py-1 rounded hover:bg-forest/90 font-semibold flex-shrink-0" data-id="${user.id}">Request</button>`;
                 row.querySelector('.btn-send-request').addEventListener('click', async (e) => {
-                    const btn = e.currentTarget;
-                    btn.disabled = true;
-                    btn.textContent = 'Sending...';
-
-                    const { error } = await supabase.from('friend_requests').insert({
-                        sender_id: currentUser.id,
-                        receiver_id: btn.dataset.id,
-                        status: 'pending'
-                    });
-
-                    if (error) {
-                        alert(error.message.includes('unique') ? 'A request is already pending between you.' : error.message);
-                        btn.textContent = 'Request';
-                        btn.disabled = false;
-                    } else {
-                        btn.className = "bg-beige text-ink/50 px-2 py-1 rounded cursor-not-allowed";
-                        btn.textContent = 'Sent';
-                    }
+                    const btn = e.currentTarget; setButtonLoading(btn, true, 'Sending...'); btn.disabled = true;
+                    const { error } = await supabase.from('friend_requests').insert({ sender_id: currentUser.id, receiver_id: btn.dataset.id, status: 'pending' });
+                    if (error) { await showAppConfirm('Error', error.message.includes('unique') ? 'A request is already pending between you.' : error.message); setButtonLoading(btn, false, 'Request'); } 
+                    else { btn.className = "bg-beige text-ink/50 px-2 py-1 rounded cursor-not-allowed flex-shrink-0"; btn.textContent = 'Sent'; }
                 });
-
                 container.appendChild(row);
             });
         });
 
-
         // ==========================================
-        // COMPOSER MODULE ENGINE
+        // COMPOSER MODULE & AMBIENCE
         // ==========================================
+        document.getElementById('btn-close-composer').addEventListener('click', () => routeTo('view-dashboard'));
 
-        document.getElementById('btn-close-composer').addEventListener('click', () => {
-            routeTo('view-dashboard');
+        // Ambience Listeners
+        document.getElementById('btn-ambience-none').addEventListener('click', () => {
+            stopAmbience();
+            document.querySelectorAll('[id^="btn-ambience-"]').forEach(b => { b.classList.remove('bg-beige/40', 'text-forest', 'font-semibold'); b.classList.add('text-ink/50'); });
+            document.getElementById('btn-ambience-none').classList.add('bg-beige/40', 'text-forest', 'font-semibold');
+        });
+        document.getElementById('btn-ambience-rain').addEventListener('click', () => {
+            startAmbience('rain');
+            document.querySelectorAll('[id^="btn-ambience-"]').forEach(b => { b.classList.remove('bg-beige/40', 'text-forest', 'font-semibold'); b.classList.add('text-ink/50'); });
+            document.getElementById('btn-ambience-rain').classList.add('bg-beige/40', 'text-forest', 'font-semibold');
+        });
+        document.getElementById('btn-ambience-fire').addEventListener('click', () => {
+            startAmbience('fire');
+            document.querySelectorAll('[id^="btn-ambience-"]').forEach(b => { b.classList.remove('bg-beige/40', 'text-forest', 'font-semibold'); b.classList.add('text-ink/50'); });
+            document.getElementById('btn-ambience-fire').classList.add('bg-beige/40', 'text-forest', 'font-semibold');
+        });
+
+        // Pen Scratch Listener
+        document.getElementById('letter-body').addEventListener('input', () => {
+            initAudioCtx();
+            clearTimeout(penScratchTimeout);
+            // Play scratch if user is actively typing
+            playPenScratch();
         });
 
         function initComposer() {
-            // Reset state
             document.getElementById('letter-subject').value = '';
             document.getElementById('letter-body').value = '';
             document.getElementById('recipient-search').value = '';
             document.getElementById('recipient-id').value = '';
             document.getElementById('selected-recipient-label').classList.add('hidden');
             document.getElementById('autosave-badge').textContent = 'Ready to compose';
-            
-            // Stylings reset
             activeStyling = { inkColor: '#3A2F28', paperStyle: 'linen', fontFamily: 'serif' };
             const body = document.getElementById('letter-body');
             body.style.color = '#3A2F28';
             body.className = "bg-transparent flex-grow text-lg leading-relaxed focus:outline-none resize-none font-serif placeholder-ink/20 text-[#3A2F28] min-h-[350px] w-full";
             document.getElementById('paper-canvas').style.backgroundColor = '#FFFDF8';
+            pendingPostcardUrl = null;
+            document.getElementById('postcard-preview-container').classList.add('hidden');
+            document.getElementById('postcard-file-input').value = '';
         }
 
-        // Ink choice
         document.querySelectorAll('#ink-palette button').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('#ink-palette button').forEach(b => b.classList.replace('border-forest', 'border-transparent'));
-                const color = e.currentTarget.dataset.color;
-                e.currentTarget.classList.replace('border-transparent', 'border-forest');
-                activeStyling.inkColor = color;
-                document.getElementById('letter-body').style.color = color;
+                const color = e.currentTarget.dataset.color; e.currentTarget.classList.replace('border-transparent', 'border-forest'); activeStyling.inkColor = color; document.getElementById('letter-body').style.color = color;
             });
         });
 
-        // Paper choice
         document.querySelectorAll('#paper-styles button').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('#paper-styles button').forEach(b => b.classList.replace('border-gold', 'border-beige'));
                 document.querySelectorAll('#paper-styles button').forEach(b => b.classList.replace('text-forest', 'text-ink/70'));
-                e.currentTarget.classList.replace('border-beige', 'border-gold');
-                e.currentTarget.classList.replace('text-ink/70', 'text-forest');
-
-                const paper = e.currentTarget.dataset.paper;
-                activeStyling.paperStyle = paper;
+                e.currentTarget.classList.replace('border-beige', 'border-gold'); e.currentTarget.classList.replace('text-ink/70', 'text-forest'); activeStyling.paperStyle = e.currentTarget.dataset.paper;
             });
         });
 
-        // Typeface hand choice
         document.querySelectorAll('#typeface-styles button').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('#typeface-styles button').forEach(b => b.classList.replace('border-gold', 'border-beige'));
                 document.querySelectorAll('#typeface-styles button').forEach(b => b.classList.replace('text-forest', 'text-ink/70'));
-                e.currentTarget.classList.replace('border-beige', 'border-gold');
-                e.currentTarget.classList.replace('text-ink/70', 'text-forest');
-
-                const font = e.currentTarget.dataset.font;
-                activeStyling.fontFamily = font;
-
-                const body = document.getElementById('letter-body');
-                if (font === 'handwriting') {
-                    body.classList.remove('font-serif');
-                    body.classList.add('font-handwriting');
-                } else {
-                    body.classList.remove('font-handwriting');
-                    body.classList.add('font-serif');
-                }
+                e.currentTarget.classList.replace('border-beige', 'border-gold'); e.currentTarget.classList.replace('text-ink/70', 'text-forest');
+                const font = e.currentTarget.dataset.font; activeStyling.fontFamily = font; const body = document.getElementById('letter-body');
+                Object.values(fontClassMap).forEach(cls => body.classList.remove(cls));
+                body.classList.add(fontClassMap[font] || 'font-serif');
             });
         });
 
-        // Recipient search (Debounced autocomplete)
+        // Postcard Upload Listener
+        document.getElementById('postcard-upload-zone').addEventListener('click', () => document.getElementById('postcard-file-input').click());
+        document.getElementById('postcard-file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            if (file.size > 5242880) { await showAppConfirm('File Too Large', 'Postcard image must be smaller than 5MB.'); return; }
+            try {
+                const fileExt = file.name.split('.').pop();
+                const filePath = `${currentUser.id}/postcard_${Date.now()}.${fileExt}`;
+                const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, { cacheControl: '3600', upsert: true });
+                if (uploadError) throw uploadError;
+                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                pendingPostcardUrl = publicUrl;
+                document.getElementById('postcard-preview-img').src = publicUrl;
+                document.getElementById('postcard-preview-container').classList.remove('hidden');
+                triggerAutosaveProcess();
+            } catch (err) { await showAppConfirm('Upload Error', `Failed to upload postcard: ${err.message}`); }
+        });
+
+        document.getElementById('btn-remove-postcard').addEventListener('click', () => {
+            pendingPostcardUrl = null;
+            document.getElementById('postcard-preview-container').classList.add('hidden');
+            document.getElementById('postcard-file-input').value = '';
+            triggerAutosaveProcess();
+        });
+
         document.getElementById('recipient-search').addEventListener('input', (e) => {
             clearTimeout(debounceTimer);
-            const val = e.target.value.trim();
-            const results = document.getElementById('recipient-results');
-            
-            if (val.length < 2) {
-                results.classList.add('hidden');
-                return;
-            }
-
+            const val = e.target.value.trim(); const results = document.getElementById('recipient-results');
+            if (val.length < 2) { results.classList.add('hidden'); return; }
             debounceTimer = setTimeout(async () => {
-                const { data: users, error } = await supabase
-                    .from('profiles')
-                    .select('id, username, display_name')
-                    .ilike('username', `%${val}%`)
-                    .neq('id', currentUser.id)
-                    .limit(5);
-
-                if (error || users.length === 0) {
-                    results.classList.add('hidden');
-                    return;
-                }
-
-                results.innerHTML = '';
-                results.classList.remove('hidden');
-
+                const { data: users, error } = await supabase.from('profiles').select('id, username, display_name').ilike('username', `%${val}%`).neq('id', currentUser.id).limit(5);
+                if (error || users.length === 0) { results.classList.add('hidden'); return; }
+                results.innerHTML = ''; results.classList.remove('hidden');
                 users.forEach(user => {
                     const btn = document.createElement('button');
                     btn.className = "w-full text-left px-3 py-2 text-xs hover:bg-beige/40 block border-b border-beige/40 last:border-b-0";
                     btn.innerHTML = `<span class="font-bold">${user.display_name}</span> <span class="text-ink/50">@${user.username}</span>`;
-                    
                     btn.addEventListener('click', () => {
                         document.getElementById('recipient-id').value = user.id;
                         const lbl = document.getElementById('selected-recipient-label');
-                        lbl.textContent = `Address to: ${user.display_name} (@${user.username})`;
-                        lbl.classList.remove('hidden');
-                        document.getElementById('recipient-search').value = '';
-                        results.classList.add('hidden');
-                        triggerAutosaveProcess();
+                        lbl.textContent = `Address to: ${user.display_name} (@${user.username})`; lbl.classList.remove('hidden');
+                        document.getElementById('recipient-search').value = ''; results.classList.add('hidden'); triggerAutosaveProcess();
                     });
                     results.appendChild(btn);
                 });
             }, 400);
         });
 
-        // Autosave Logic triggers
         async function triggerAutosaveProcess() {
             const autosaveText = document.getElementById('autosave-badge');
             if (autosaveText) autosaveText.textContent = "Sealing thoughts...";
-            
+            let contentToSave = document.getElementById('letter-body').value;
+            // If we are drafting and have a postcard, persist it in the content string
+            if (pendingPostcardUrl) {
+                contentToSave = `[POSTCARD:${pendingPostcardUrl}]\n${contentToSave}`;
+            }
             const payload = {
                 sender_id: currentUser.id,
                 recipient_id: document.getElementById('recipient-id').value || null,
                 subject: document.getElementById('letter-subject').value.trim(),
-                content: document.getElementById('letter-body').value,
+                content: contentToSave,
                 ink_color: activeStyling.inkColor,
                 paper_style: activeStyling.paperStyle,
                 font_family: activeStyling.fontFamily,
                 status: 'draft'
             };
-
             if (activeDraftId) {
                 await supabase.from('letters').update(payload).eq('id', activeDraftId);
             } else {
                 const { data, error } = await supabase.from('letters').insert(payload).select().single();
-                if (!error && data) {
-                    activeDraftId = data.id;
-                }
+                if (!error && data) activeDraftId = data.id;
             }
             if (autosaveText) autosaveText.textContent = "Parchment draft saved";
         }
 
-        document.getElementById('letter-subject').addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(triggerAutosaveProcess, 1500);
-        });
+        document.getElementById('letter-subject').addEventListener('input', () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(triggerAutosaveProcess, 1500); });
+        document.getElementById('letter-body').addEventListener('input', () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(triggerAutosaveProcess, 1500); });
 
-        document.getElementById('letter-body').addEventListener('input', () => {
-            clearTimeout(debounceTimer);
-            debounceTimer = setTimeout(triggerAutosaveProcess, 1500);
-        });
-
-        // Manual Save Draft
         document.getElementById('btn-save-draft').addEventListener('click', async () => {
-            await triggerAutosaveProcess();
-            routeTo('view-dashboard');
+            const btn = document.getElementById('btn-save-draft'); setButtonLoading(btn, true, 'Saving...');
+            await triggerAutosaveProcess(); setButtonLoading(btn, false); routeTo('view-dashboard');
         });
 
-        // Process Deliveries Delay
         function calculateDeliveryDelay() {
-            const speed = document.getElementById('delivery-speed').value;
-            const now = new Date();
-
+            const speed = document.getElementById('delivery-speed').value; const now = new Date();
             if (speed === '1h') now.setHours(now.getHours() + 1);
             else if (speed === '12h') now.setHours(now.getHours() + 12);
             else if (speed === '1d') now.setDate(now.getDate() + 1);
             else if (speed === '7d') now.setDate(now.getDate() + 7);
             else return null;
-
             return now.toISOString();
         }
 
-        // Action: Seal and Send with automatic username fallback resolver
         async function executeLetterSendProcess() {
+            const btnHeader = document.getElementById('btn-seal-envelope-header');
+            const btnSidebar = document.getElementById('btn-seal-envelope');
             let recipientId = document.getElementById('recipient-id').value;
             const typedUsername = document.getElementById('recipient-search').value.trim().replace(/^@/, '');
             const subject = document.getElementById('letter-subject').value.trim();
-            const content = document.getElementById('letter-body').value.trim();
+            let rawContent = document.getElementById('letter-body').value.trim();
 
-            if (!subject || !content) {
-                alert('Ensure both a title and contents are scripted before delivery.');
-                return;
-            }
-
-            // Fallback username profile lookup
+            if (!subject || !rawContent) { await showAppConfirm('Incomplete Manuscript', 'Ensure both a title and contents are scripted before delivery.'); return; }
             if (!recipientId && typedUsername) {
-                const { data: profile, error } = await supabase
-                    .from('profiles')
-                    .select('id')
-                    .eq('username', typedUsername.toLowerCase())
-                    .single();
-
-                if (profile) {
-                    recipientId = profile.id;
-                } else {
-                    alert(`We couldn't find a companion with the pen name "${typedUsername}". Please verify the spelling or select a profile from the dropdown.`);
-                    return;
-                }
+                const { data: profile, error } = await supabase.from('profiles').select('id').eq('username', typedUsername.toLowerCase()).single();
+                if (profile) recipientId = profile.id;
+                else { await showAppConfirm('Companion Missing', `We couldn't find a companion with the pen name "${typedUsername}". Please verify the spelling or select a profile from the dropdown.`); return; }
             }
+            if (!recipientId) { await showAppConfirm('Routing Required', 'An envelope requires a valid recipient pen name to route delivery.'); return; }
 
-            if (!recipientId) {
-                alert('An envelope requires a valid recipient pen name to route delivery.');
-                return;
+            setButtonLoading(btnHeader, true, 'Sealing...'); setButtonLoading(btnSidebar, true, 'Sealing...');
+
+            // Prepend postcard tag to actual DB content
+            let finalContent = rawContent;
+            if (pendingPostcardUrl) {
+                finalContent = `[POSTCARD:${pendingPostcardUrl}]\n${rawContent}`;
             }
 
             const deliveryAt = calculateDeliveryDelay();
             const isScheduled = deliveryAt !== null;
-
             const payload = {
-                sender_id: currentUser.id,
-                recipient_id: recipientId,
-                subject,
-                content,
-                ink_color: activeStyling.inkColor,
-                paper_style: activeStyling.paperStyle,
-                font_family: activeStyling.fontFamily,
-                status: isScheduled ? 'scheduled' : 'delivered',
-                delivery_at: deliveryAt,
-                sent_at: isScheduled ? null : new Date().toISOString()
+                sender_id: currentUser.id, recipient_id: recipientId, subject, content: finalContent,
+                ink_color: activeStyling.inkColor, paper_style: activeStyling.paperStyle, font_family: activeStyling.fontFamily,
+                status: isScheduled ? 'scheduled' : 'delivered', delivery_at: deliveryAt, sent_at: isScheduled ? null : new Date().toISOString()
             };
 
             let result;
-            if (activeDraftId) {
-                result = await supabase.from('letters').update(payload).eq('id', activeDraftId);
-            } else {
-                result = await supabase.from('letters').insert(payload).select().single();
-                if (!result.error && result.data) {
-                    activeDraftId = result.data.id;
-                }
-            }
+            if (activeDraftId) { result = await supabase.from('letters').update(payload).eq('id', activeDraftId); } 
+            else { result = await supabase.from('letters').insert(payload).select().single(); if (!result.error && result.data) activeDraftId = result.data.id; }
 
-            if (result.error) {
-                alert(`Error executing transit dispatch: ${result.error.message}`);
-                return;
-            }
-
-            // Sync with scheduler queue table
-            if (isScheduled && activeDraftId) {
-                await supabase.from('scheduled_letters').insert({
-                    letter_id: activeDraftId,
-                    delivery_at: deliveryAt
-                });
-            }
-
+            if (result.error) { await showAppConfirm('Dispatch Error', `Error executing transit dispatch: ${result.error.message}`); setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false); return; }
+            if (isScheduled && activeDraftId) { await supabase.from('scheduled_letters').insert({ letter_id: activeDraftId, delivery_at: deliveryAt }); }
             routeTo('view-dashboard');
         }
 
-        // Bind both Send Actions (Sidebar & Header)
         document.getElementById('btn-seal-envelope').addEventListener('click', executeLetterSendProcess);
         document.getElementById('btn-seal-envelope-header').addEventListener('click', executeLetterSendProcess);
 
-
         // ==========================================
-        // DYNAMIC READING DESK DISPLAY (PHYSICAL UNFOLD IN RIGHT PANE)
+        // DYNAMIC READING DESK & ENVELOPE UNFOLD
         // ==========================================
-
         async function openLetterDetails(letter) {
-            // Hide alternative desk displays
             document.getElementById('right-col-empty').classList.add('hidden');
             document.getElementById('right-col-profile').classList.add('hidden');
             document.getElementById('right-col-friend-profile').classList.add('hidden');
-            
             const board = document.getElementById('active-letter-board');
             board.classList.remove('hidden');
+            activeLetterOnDesk = letter; 
 
-            activeLetterOnDesk = letter; // Cache active selection
+            const { url: postcardUrl, text: parsedText } = parsePostcardFromContent(letter.content);
 
             document.getElementById('desk-letter-title').textContent = letter.subject || '(Untitled Scroll)';
-            document.getElementById('desk-letter-subtitle').textContent = letter.sender_id === currentUser.id 
-                ? `To: ${letter.recipient?.display_name || 'Future Self'}` 
-                : `From: ${letter.sender?.display_name || 'Anonymous'}`;
-            
+            document.getElementById('desk-letter-subtitle').textContent = letter.sender_id === currentUser.id ? `To: ${letter.recipient?.display_name || 'Future Self'}` : `From: ${letter.sender?.display_name || 'Anonymous'}`;
             document.getElementById('desk-letter-date').textContent = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
             
             const textContent = document.getElementById('desk-letter-content');
-            textContent.textContent = letter.content || '';
-
-            // Handle Text Sizing preferences
+            textContent.textContent = parsedText;
             const sizeSetting = document.getElementById('settings-font-size').value;
             if (sizeSetting === 'small') textContent.style.fontSize = '14px';
             else if (sizeSetting === 'large') textContent.style.fontSize = '22px';
             else textContent.style.fontSize = '18px';
-
-            // Render dynamic typography styles on canvas
             textContent.style.color = letter.ink_color || '#3A2F28';
-            if (letter.font_family === 'handwriting') {
-                textContent.className = "max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-handwriting select-text";
+            const fontClass = fontClassMap[letter.font_family] || 'font-serif';
+            textContent.className = `max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap ${fontClass} select-text`;
+
+            // Handle Postcard Image rendering
+            const postcardContainer = document.getElementById('desk-postcard-container');
+            if (postcardUrl) {
+                document.getElementById('desk-postcard-img').src = postcardUrl;
+                postcardContainer.classList.remove('hidden');
             } else {
-                textContent.className = "max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-serif select-text";
+                postcardContainer.classList.add('hidden');
             }
 
-            // Check unread condition (If delivered & sender is NOT you, show wax-seal) [1]
+            const replyBtn = document.getElementById('btn-reply-letter');
+            if (letter.sender_id !== currentUser.id) {
+                replyBtn.classList.remove('hidden');
+                replyBtn.onclick = () => {
+                    activeDraftId = null; pendingPostcardUrl = null; routeTo('view-composer');
+                    document.getElementById('recipient-id').value = letter.sender_id;
+                    const lbl = document.getElementById('selected-recipient-label');
+                    lbl.textContent = `Address to: ${letter.sender?.display_name} (@${letter.sender?.username})`; lbl.classList.remove('hidden');
+                    document.getElementById('letter-subject').value = `Re: ${letter.subject || ''}`; document.getElementById('letter-subject').focus();
+                };
+            } else { replyBtn.classList.add('hidden'); }
+
             const isDeliveredAndUnread = letter.status === 'delivered' && letter.sender_id !== currentUser.id;
 
             if (isDeliveredAndUnread) {
-                // Trigger physical sealed envelope overlay [1]
                 activeTargetLetterToUnseal = letter;
-                
                 document.getElementById('env-letter-title').textContent = letter.subject || '(Untitled Scroll)';
                 document.getElementById('env-letter-author').textContent = `From: ${letter.sender?.display_name || 'Anonymous'}`;
                 document.getElementById('env-letter-date').textContent = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
-                
                 const contentText = document.getElementById('env-letter-content');
-                contentText.textContent = letter.content || '';
-                contentText.style.color = letter.ink_color || '#3A2F28';
-                contentText.className = letter.font_family === 'handwriting' 
-                    ? "text-base leading-relaxed whitespace-pre-wrap font-handwriting select-text" 
-                    : "text-base leading-relaxed whitespace-pre-wrap font-serif select-text";
+                contentText.textContent = parsedText; contentText.style.color = letter.ink_color || '#3A2F28';
+                const envFontClass = fontClassMap[letter.font_family] || 'font-serif';
+                contentText.className = `text-base leading-relaxed whitespace-pre-wrap ${envFontClass} select-text`;
+
+                // Envelope Postcard
+                const envPostcardContainer = document.getElementById('env-postcard-container');
+                if (postcardUrl) {
+                    document.getElementById('env-postcard-img').src = postcardUrl;
+                    envPostcardContainer.classList.remove('hidden');
+                } else {
+                    envPostcardContainer.classList.add('hidden');
+                }
+
+                // Default wax seal to sender's first initial
+                const senderInitial = letter.sender?.display_name ? letter.sender.display_name.charAt(0).toUpperCase() : 'D';
+                document.getElementById('wax-seal-bg').style.backgroundColor = '#801818'; // Crimson for received
+                document.getElementById('wax-seal-text').textContent = senderInitial;
 
                 document.getElementById('envelope-address').textContent = `To: ${currentUser.user_metadata?.display_name || 'Dear Companion'}`;
-
-                // Reset animation elements states before presentation
                 gsap.killTweensOf(['#wax-seal', '#envelope-flap', '#envelope-letter-sheet']);
                 gsap.set('#wax-seal', { scale: 1, opacity: 1, rotation: 0, y: 0 });
                 gsap.set('#envelope-flap', { rotationX: 0, transformOrigin: 'top center' });
                 gsap.set('#envelope-letter-sheet', { y: 20, scale: 0.9, opacity: 0, zIndex: 10 });
                 document.getElementById('btn-close-envelope-modal').classList.add('hidden');
-
                 document.getElementById('envelope-modal').classList.remove('hidden');
             } else {
-                // Already read/authored letters: direct layout desk presentation [1]
+                // If previewing our own sent letter, use our custom wax seal
+                if (letter.sender_id === currentUser.id) {
+                    document.getElementById('wax-seal-bg').style.backgroundColor = activeWaxColor;
+                    document.getElementById('wax-seal-text').textContent = activeMonogram;
+                }
                 renderDeskReadingPanel(letter);
             }
         }
 
-        let activeTargetLetterToUnseal = null;
-
-        // Custom crack & peel physical sound FX synthesizer (Web Audio API)
         function playWaxPeelAudio() {
             const audioEnabled = document.getElementById('settings-audio-enabled').checked;
             if (!audioEnabled) return;
-
             try {
-                const ctx = new (window.AudioContext || window.webkitAudioContext)();
-                
-                // Low crack noise
-                const bufferSize = ctx.sampleRate * 0.15;
-                const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+                initAudioCtx();
+                const bufferSize = audioCtx.sampleRate * 0.15;
+                const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
                 const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                const noise = ctx.createBufferSource();
-                noise.buffer = buffer;
-                
-                const filter = ctx.createBiquadFilter();
-                filter.type = 'bandpass';
-                filter.frequency.value = 900;
-                
-                const gain = ctx.createGain();
-                gain.gain.setValueAtTime(0.08, ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.005, ctx.currentTime + 0.12);
-                
-                noise.connect(filter);
-                filter.connect(gain);
-                gain.connect(ctx.destination);
-                noise.start();
-                
-                // Paper slide rustle sweep
-                const osc = ctx.createOscillator();
-                const oscGain = ctx.createGain();
-                osc.frequency.setValueAtTime(140, ctx.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(45, ctx.currentTime + 0.25);
-                oscGain.gain.setValueAtTime(0.08, ctx.currentTime);
-                oscGain.gain.exponentialRampToValueAtTime(0.005, ctx.currentTime + 0.25);
-                
-                osc.connect(oscGain);
-                oscGain.connect(ctx.destination);
-                osc.start();
-                osc.stop(ctx.currentTime + 0.25);
+                for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+                const noise = audioCtx.createBufferSource(); noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 900;
+                const gain = audioCtx.createGain(); gain.gain.setValueAtTime(0.08, audioCtx.currentTime); gain.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.12);
+                noise.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); noise.start();
+                const osc = audioCtx.createOscillator(); const oscGain = audioCtx.createGain();
+                osc.frequency.setValueAtTime(140, audioCtx.currentTime); osc.frequency.exponentialRampToValueAtTime(45, audioCtx.currentTime + 0.25);
+                oscGain.gain.setValueAtTime(0.08, audioCtx.currentTime); oscGain.gain.exponentialRampToValueAtTime(0.005, audioCtx.currentTime + 0.25);
+                osc.connect(oscGain); oscGain.connect(audioCtx.destination); osc.start(); osc.stop(audioCtx.currentTime + 0.25);
             } catch (err) {}
         }
 
-        // Handle Wax Seal interaction [1]
         document.getElementById('wax-seal').addEventListener('click', async () => {
-            playWaxPeelAudio();
-            if (navigator.vibrate) navigator.vibrate([20]); // Soft haptic pulse
-
-            // Splitting Timeline sequence
+            playWaxPeelAudio(); if (navigator.vibrate) navigator.vibrate([20]);
             const tl = gsap.timeline();
-
-            // 1. Shatter/split the wax seal stamp [1]
             tl.to('#wax-seal', { duration: 0.4, scale: 1.2, opacity: 0, ease: 'power2.in' });
-
-            // 2. Fold the envelope flap upward [1]
             tl.to('#envelope-flap', { duration: 0.5, rotationX: -180, ease: 'power2.out' }, "-=0.2");
-
-            // 3. Slide out the warm parchment document and present it [1]
-            tl.to('#envelope-letter-sheet', { 
-                duration: 0.6, 
-                y: -30, 
-                scale: 1, 
-                opacity: 1, 
-                zIndex: 40,
-                ease: 'back.out(1.2)',
-                onComplete: async () => {
-                    // Reveal overlay dismiss button [1]
-                    document.getElementById('btn-close-envelope-modal').classList.remove('hidden');
-                    
-                    // Mark read in database silently [1]
-                    if (activeTargetLetterToUnseal && activeTargetLetterToUnseal.status === 'delivered') {
-                        await supabase.from('letters').update({ status: 'read' }).eq('id', activeTargetLetterToUnseal.id);
-                        updateUnreadInboxBadge();
-                    }
+            tl.to('#envelope-letter-sheet', { duration: 0.6, y: -30, scale: 1, opacity: 1, zIndex: 40, ease: 'back.out(1.2)', onComplete: async () => {
+                document.getElementById('btn-close-envelope-modal').classList.remove('hidden');
+                if (activeTargetLetterToUnseal && activeTargetLetterToUnseal.status === 'delivered') {
+                    await supabase.from('letters').update({ status: 'read' }).eq('id', activeTargetLetterToUnseal.id);
+                    updateUnreadInboxBadge();
                 }
-            });
+            }});
         });
 
-        // Close Envelope Modal overlay [1]
         document.getElementById('btn-close-envelope-modal').addEventListener('click', () => {
             document.getElementById('envelope-modal').classList.add('hidden');
-            if (activeTargetLetterToUnseal) {
-                // Render directly on reading desk once open overlay is closed [1]
-                renderDeskReadingPanel(activeTargetLetterToUnseal);
-                activeTargetLetterToUnseal = null;
-                fetchInboxFeed(); // Refresh feed statuses
-            }
+            if (activeTargetLetterToUnseal) { renderDeskReadingPanel(activeTargetLetterToUnseal); activeTargetLetterToUnseal = null; fetchInboxFeed(); }
         });
 
-        // Render Desk Reading Panel (Direct presentation) [1]
         function renderDeskReadingPanel(letter) {
             document.getElementById('right-col-empty').classList.add('hidden');
             document.getElementById('right-col-profile').classList.add('hidden');
             document.getElementById('right-col-friend-profile').classList.add('hidden');
+            const board = document.getElementById('active-letter-board'); board.classList.remove('hidden');
+            activeLetterOnDesk = letter; 
             
-            const board = document.getElementById('active-letter-board');
-            board.classList.remove('hidden');
-
-            activeLetterOnDesk = letter; // Cache active selection
+            const { url: postcardUrl, text: parsedText } = parsePostcardFromContent(letter.content);
 
             document.getElementById('desk-letter-title').textContent = letter.subject || '(Untitled Scroll)';
-            document.getElementById('desk-letter-subtitle').textContent = letter.sender_id === currentUser.id 
-                ? `To: ${letter.recipient?.display_name || 'Future Self'}` 
-                : `From: ${letter.sender?.display_name || 'Anonymous'}`;
-            
+            document.getElementById('desk-letter-subtitle').textContent = letter.sender_id === currentUser.id ? `To: ${letter.recipient?.display_name || 'Future Self'}` : `From: ${letter.sender?.display_name || 'Anonymous'}`;
             document.getElementById('desk-letter-date').textContent = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
             
             const textContent = document.getElementById('desk-letter-content');
-            textContent.textContent = letter.content || '';
-
-            // Handle Text Sizing preferences
+            textContent.textContent = parsedText;
             const sizeSetting = document.getElementById('settings-font-size').value;
             if (sizeSetting === 'small') textContent.style.fontSize = '14px';
             else if (sizeSetting === 'large') textContent.style.fontSize = '22px';
             else textContent.style.fontSize = '18px';
-
-            // Render dynamic typography styles on canvas
             textContent.style.color = letter.ink_color || '#3A2F28';
-            if (letter.font_family === 'handwriting') {
-                textContent.className = "max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-handwriting select-text";
+            const fontClass = fontClassMap[letter.font_family] || 'font-serif';
+            textContent.className = `max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap ${fontClass} select-text`;
+
+            // Render Postcard
+            const postcardContainer = document.getElementById('desk-postcard-container');
+            if (postcardUrl) {
+                document.getElementById('desk-postcard-img').src = postcardUrl;
+                postcardContainer.classList.remove('hidden');
             } else {
-                textContent.className = "max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-serif select-text";
+                postcardContainer.classList.add('hidden');
             }
 
-            // Handle Mobile Pane slide-in
             showMobileRightPane(true);
-
-            // GSAP physical unfolding transition on inner text elements
             gsap.killTweensOf(textContent);
             gsap.set(textContent, { opacity: 0, y: 15 });
             gsap.to(textContent, { duration: 0.5, opacity: 1, y: 0, ease: 'power2.out' });
         }
 
-
         // ==========================================
-        // PROFILE DESK DISPLAY MODULE & PHOTO UPLOADER
+        // PROFILE DESK, WAX SEAL & BACKGROUND
         // ==========================================
-
         async function showProfilePane() {
             document.getElementById('right-col-empty').classList.add('hidden');
             document.getElementById('active-letter-board').classList.add('hidden');
             document.getElementById('right-col-friend-profile').classList.add('hidden');
-
             const profileView = document.getElementById('right-col-profile');
             profileView.classList.remove('hidden');
+            showMobileRightPane(true); clearProfileStatus();
 
-            showMobileRightPane(true);
-            clearProfileStatus();
-
-            // Fetch profile metrics details from database
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', currentUser.id)
-                .single();
-
+            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
             if (profile && !error) {
                 document.getElementById('profile-display-name').textContent = profile.display_name || 'Dear Companion';
                 document.getElementById('profile-username').textContent = `@${profile.username || 'username'}`;
-                
-                // Toggle Fallback vs Avatar URL Image [1]
                 updateAvatarUI(profile.avatar_url, profile.display_name);
-                
-                // Populating editable fields
                 document.getElementById('edit-display-name').value = profile.display_name || '';
                 document.getElementById('edit-bio').value = profile.bio || '';
                 document.getElementById('edit-country').value = profile.country || '';
                 document.getElementById('profile-email-input').value = currentUser.email || '';
                 document.getElementById('profile-joined-text').textContent = `Joined: ${new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+                await fetchAndRenderProfileStats();
+
+                // Load Custom BG and Wax Seal from user_metadata
+                const meta = currentUser.user_metadata || {};
+                activeWaxColor = meta.wax_color || '#801818';
+                activeMonogram = meta.monogram || (profile.display_name ? profile.display_name.charAt(0).toUpperCase() : 'D');
+                
+                // Apply BG
+                if (meta.background_url) {
+                    document.getElementById('profile-bg-layer').style.backgroundImage = `url(${meta.background_url})`;
+                } else {
+                    document.getElementById('profile-bg-layer').style.backgroundImage = 'none';
+                }
+
+                // Apply Wax UI
+                document.querySelectorAll('#wax-color-palette button').forEach(b => b.classList.replace('border-forest', 'border-transparent'));
+                document.querySelector(`#wax-color-palette button[data-wax="${activeWaxColor}"]`)?.classList.replace('border-transparent', 'border-forest');
+                document.getElementById('edit-monogram').value = activeMonogram;
             }
         }
 
-        // Toggle Avatar fallback and image visibility safely [1]
+        // Wax Color Selection
+        document.querySelectorAll('#wax-color-palette button').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('#wax-color-palette button').forEach(b => b.classList.replace('border-forest', 'border-transparent'));
+                e.currentTarget.classList.replace('border-transparent', 'border-forest');
+                activeWaxColor = e.currentTarget.dataset.wax;
+            });
+        });
+
+        // Custom Background Upload
+        document.getElementById('btn-upload-bg').addEventListener('click', () => document.getElementById('bg-file-input').click());
+        document.getElementById('bg-file-input').addEventListener('change', async (e) => {
+            const file = e.target.files[0]; if (!file) return;
+            if (file.size > 5242880) { showProfileStatus('Background image must be smaller than 5MB.', 'error'); return; }
+            try {
+                showProfileStatus('Uploading background...', 'info');
+                const fileExt = file.name.split('.').pop();
+                const filePath = `${currentUser.id}/bg_${Date.now()}.${fileExt}`;
+                const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, { cacheControl: '3600', upsert: true });
+                if (uploadError) throw uploadError;
+                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                
+                // Save to auth user_metadata
+                const { error: metaError } = await supabase.auth.updateUser({ data: { background_url: publicUrl } });
+                if (metaError) throw metaError;
+                
+                document.getElementById('profile-bg-layer').style.backgroundImage = `url(${publicUrl})`;
+                showProfileStatus('Background updated.', 'success');
+            } catch (err) { showProfileStatus(`Upload failed: ${err.message}`, 'error'); }
+        });
+
+        async function fetchAndRenderProfileStats() {
+            try {
+                const { count: sentCount } = await supabase.from('letters').select('*', { count: 'exact', head: true }).eq('sender_id', currentUser.id).neq('status', 'draft');
+                const { count: receivedCount } = await supabase.from('letters').select('*', { count: 'exact', head: true }).eq('recipient_id', currentUser.id).neq('status', 'draft');
+                const { count: pendingCount } = await supabase.from('letters').select('*', { count: 'exact', head: true }).eq('sender_id', currentUser.id).eq('status', 'scheduled');
+                document.getElementById('stat-sent').textContent = sentCount || 0;
+                document.getElementById('stat-received').textContent = receivedCount || 0;
+                document.getElementById('stat-pending').textContent = pendingCount || 0;
+            } catch (err) { console.error("Error fetching stats:", err); }
+        }
+
         function updateAvatarUI(url, displayName) {
             const img = document.getElementById('profile-avatar-img');
             const fallback = document.getElementById('profile-avatar-fallback');
-            if (url) {
-                img.src = url;
-                img.classList.remove('hidden');
-                fallback.classList.add('hidden');
-            } else {
-                img.classList.add('hidden');
-                fallback.classList.remove('hidden');
-                fallback.textContent = (displayName || 'D').charAt(0).toUpperCase();
-            }
+            if (url) { img.src = url; img.classList.remove('hidden'); fallback.classList.add('hidden'); } 
+            else { img.classList.add('hidden'); fallback.classList.remove('hidden'); fallback.textContent = (displayName || 'D').charAt(0).toUpperCase(); }
         }
 
-        // Event: File uploader click triggers [1]
-        document.getElementById('avatar-container').addEventListener('click', () => {
-            document.getElementById('avatar-file-input').click();
-        });
-
-        // Event: File selection change upload pipeline [1]
+        document.getElementById('avatar-container').addEventListener('click', () => document.getElementById('avatar-file-input').click());
         document.getElementById('avatar-file-input').addEventListener('change', async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            // Validate image files size limit (5MB constraint)
-            if (file.size > 5242880) {
-                showProfileStatus('Profile image must be smaller than 5MB.', 'error');
-                return;
-            }
-
+            const file = e.target.files[0]; if (!file) return;
+            if (file.size > 5242880) { showProfileStatus('Profile image must be smaller than 5MB.', 'error'); return; }
             try {
                 showProfileStatus('Sealing photo to archive...', 'info');
-
                 const fileExt = file.name.split('.').pop();
                 const filePath = `${currentUser.id}/avatar_${Date.now()}.${fileExt}`;
-
-                // Upload selected image straight to Storage bucket [1]
-                const { data: uploadData, error: uploadError } = await supabase.storage
-                    .from('avatars')
-                    .upload(filePath, file, { cacheControl: '3600', upsert: true });
-
+                const { data: uploadData, error: uploadError } = await supabase.storage.from('avatars').upload(filePath, file, { cacheControl: '3600', upsert: true });
                 if (uploadError) throw uploadError;
-
-                // Grab secure Public URL matching public configuration [1]
-                const { data: { publicUrl } } = supabase.storage
-                    .from('avatars')
-                    .getPublicUrl(filePath);
-
-                // Update profiles row mapping [1]
-                const { error: updateError } = await supabase
-                    .from('profiles')
-                    .update({ avatar_url: publicUrl })
-                    .eq('id', currentUser.id);
-
+                const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
+                const { error: updateError } = await supabase.from('profiles').update({ avatar_url: publicUrl }).eq('id', currentUser.id);
                 if (updateError) throw updateError;
-
                 showProfileStatus('Profile photo updated.', 'success');
-
                 const currentName = document.getElementById('edit-display-name').value || 'Dear Companion';
                 updateAvatarUI(publicUrl, currentName);
-            } catch (err) {
-                showProfileStatus(`Photo upload failed: ${err.message}`, 'error');
-            }
+            } catch (err) { showProfileStatus(`Photo upload failed: ${err.message}`, 'error'); }
         });
 
-        // Action: Save Profile configuration edits to database
         document.getElementById('form-edit-profile').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            clearProfileStatus();
-
+            e.preventDefault(); clearProfileStatus();
             const displayName = document.getElementById('edit-display-name').value.trim();
             const bio = document.getElementById('edit-bio').value.trim();
             const country = document.getElementById('edit-country').value.trim();
-
-            if (!displayName) {
-                showProfileStatus('A display name is required.', 'error');
-                return;
-            }
-
+            const monogram = document.getElementById('edit-monogram').value.trim().toUpperCase() || 'D';
+            if (!displayName) { showProfileStatus('A display name is required.', 'error'); return; }
             try {
                 showProfileStatus('Updating database records...', 'info');
-                const { error } = await supabase
-                    .from('profiles')
-                    .update({
-                        display_name: displayName,
-                        bio: bio,
-                        country: country
-                    })
-                    .eq('id', currentUser.id);
-
+                const { error } = await supabase.from('profiles').update({ display_name: displayName, bio: bio, country: country }).eq('id', currentUser.id);
                 if (error) throw error;
                 
+                // Save wax color and monogram to user_metadata
+                const { error: metaError } = await supabase.auth.updateUser({ data: { wax_color: activeWaxColor, monogram: monogram } });
+                if (metaError) throw metaError;
+                activeMonogram = monogram;
+
                 showProfileStatus('Profile configuration updated successfully.', 'success');
-                
-                // Immediately refresh view cards values
                 document.getElementById('profile-display-name').textContent = displayName;
-                // Re-evaluate photo falling back to initials if necessary
                 const img = document.getElementById('profile-avatar-img');
-                if (img.classList.contains('hidden')) {
-                    document.getElementById('profile-avatar-fallback').textContent = displayName.charAt(0).toUpperCase();
-                }
-            } catch (err) {
-                showProfileStatus(err.message, 'error');
-            }
+                if (img.classList.contains('hidden')) { document.getElementById('profile-avatar-fallback').textContent = displayName.charAt(0).toUpperCase(); }
+            } catch (err) { showProfileStatus(err.message, 'error'); }
         });
 
         function showProfileStatus(message, type) {
@@ -2068,131 +1673,70 @@
             if (!box) return;
             box.classList.remove('hidden', 'bg-red-50', 'text-red-800', 'border-red-200', 'bg-emerald-50', 'text-emerald-800', 'border-emerald-200', 'bg-blue-50', 'text-blue-800', 'border-blue-200');
             box.textContent = message;
-
-            if (type === 'error') {
-                box.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
-            } else if (type === 'success') {
-                box.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
-            } else {
-                box.classList.add('bg-blue-50', 'text-blue-800', 'border', 'border-blue-200');
-            }
+            if (type === 'error') box.classList.add('bg-red-50', 'text-red-800', 'border', 'border-red-200');
+            else if (type === 'success') box.classList.add('bg-emerald-50', 'text-emerald-800', 'border', 'border-emerald-200');
+            else box.classList.add('bg-blue-50', 'text-blue-800', 'border', 'border-blue-200');
         }
-
-        function clearProfileStatus() {
-            const box = document.getElementById('profile-status-box');
-            if (box) box.classList.add('hidden');
-        }
-
+        function clearProfileStatus() { const box = document.getElementById('profile-status-box'); if (box) box.classList.add('hidden'); }
 
         // ==========================================
-        // DYNAMIC COMPANIONS PROFILE DESK WRAPPER [1]
+        // DYNAMIC COMPANIONS PROFILE DESK
         // ==========================================
-
         async function showCompanionProfilePane(friend) {
-            // Hide alternate right panels
             document.getElementById('right-col-empty').classList.add('hidden');
             document.getElementById('right-col-profile').classList.add('hidden');
             document.getElementById('active-letter-board').classList.add('hidden');
-
             const friendProfileView = document.getElementById('right-col-friend-profile');
             friendProfileView.classList.remove('hidden');
-
             showMobileRightPane(true);
-
-            // Fetch absolute details of target companion profile [1]
-            const { data: profile, error } = await supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', friend.friend_id)
-                .single();
-
+            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', friend.friend_id).single();
             if (!error && profile) {
                 document.getElementById('friend-display-name').textContent = profile.display_name;
                 document.getElementById('friend-username').textContent = `@${profile.username}`;
-                document.getElementById('friend-country').textContent = profile.country || 'Unknown sanctuary';
+                document.getElementById('friend-country').textContent = profile.country || 'Unknown';
                 document.getElementById('friend-joined').textContent = new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
                 document.getElementById('friend-bio').textContent = profile.bio || 'No shared musings compiled yet...';
-
-                // Handle companion pfp image [1]
                 const img = document.getElementById('friend-profile-img');
                 const fallback = document.getElementById('friend-profile-fallback');
-                if (profile.avatar_url) {
-                    img.src = profile.avatar_url;
-                    img.classList.remove('hidden');
-                    fallback.classList.add('hidden');
-                } else {
-                    img.classList.add('hidden');
-                    fallback.classList.remove('hidden');
-                    fallback.textContent = (profile.display_name || 'F').charAt(0).toUpperCase();
-                }
-
-                // Fetch logs of letters exchanged between you and this companion [1]
+                if (profile.avatar_url) { img.src = profile.avatar_url; img.classList.remove('hidden'); fallback.classList.add('hidden'); } 
+                else { img.classList.add('hidden'); fallback.classList.remove('hidden'); fallback.textContent = (profile.display_name || 'F').charAt(0).toUpperCase(); }
+                const writeBtn = document.getElementById('btn-write-from-friend-profile');
+                writeBtn.onclick = () => {
+                    activeDraftId = null; pendingPostcardUrl = null; routeTo('view-composer');
+                    document.getElementById('recipient-id').value = friend.friend_id;
+                    const lbl = document.getElementById('selected-recipient-label');
+                    lbl.textContent = `Address to: ${friend.display_name} (@${friend.username})`; lbl.classList.remove('hidden');
+                };
                 await fetchFriendLettersHistory(friend.friend_id);
             }
         }
 
-        // Fetch Log of Letters between user and target companion [1]
         async function fetchFriendLettersHistory(friendId) {
             const container = document.getElementById('friend-letters-list');
             container.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-forest mx-auto"></div>`;
-
-            // Pull letters where sender is you and recipient is friend OR sender is friend and recipient is you [1]
-            const { data: letters, error } = await supabase
-                .from('letters')
-                .select('*')
-                .or(`and(sender_id.eq.${currentUser.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${currentUser.id})`)
-                .neq('status', 'draft') // Do not expose private drafts
-                .order('created_at', { ascending: false });
-
+            const { data: letters, error } = await supabase.from('letters').select('*').or(`and(sender_id.eq.${currentUser.id},recipient_id.eq.${friendId}),and(sender_id.eq.${friendId},recipient_id.eq.${currentUser.id})`).neq('status', 'draft').order('created_at', { ascending: false });
             container.innerHTML = '';
-
-            if (error || !letters || letters.length === 0) {
-                container.innerHTML = `<p class="text-xs italic text-ink/40">No past envelopes found between your sanctuaries.</p>`;
-                return;
-            }
-
+            if (error || !letters || letters.length === 0) { container.innerHTML = `<p class="text-xs italic text-ink/40">No past envelopes found between your sanctuaries.</p>`; return; }
             letters.forEach(letter => {
                 const isSentByYou = letter.sender_id === currentUser.id;
                 const dateStr = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
                 const bubble = document.createElement('div');
-                
-                // Align left/right based on sender identity to mock a minimal log [1]
                 bubble.className = `p-3 rounded-lg border border-beige/60 text-xs flex justify-between items-center ${isSentByYou ? 'bg-ivory' : 'bg-[#FCFBF9]'}`;
-                bubble.innerHTML = `
-                    <div class="min-w-0 mr-2 cursor-pointer btn-open-historic-letter">
-                        <span class="font-serif font-semibold text-forest text-sm block truncate hover:text-gold">${letter.subject || '(Untitled Scroll)'}</span>
-                        <span class="text-[10px] text-ink/40 block mt-0.5">${isSentByYou ? 'Sent by you' : 'Received from companion'}</span>
-                    </div>
-                    <span class="text-[10px] text-ink/40 flex-shrink-0">${dateStr}</span>
-                `;
-
-                bubble.querySelector('.btn-open-historic-letter').addEventListener('click', () => {
-                    // Open the historic letter straight onto your desk
-                    openLetterDetails(letter);
-                });
-
+                bubble.innerHTML = `<div class="min-w-0 mr-2 cursor-pointer btn-open-historic-letter"><span class="font-serif font-semibold text-forest text-sm block truncate hover:text-gold">${letter.subject || '(Untitled Scroll)'}</span><span class="text-[10px] text-ink/40 block mt-0.5">${isSentByYou ? 'Sent by you' : 'Received from companion'}</span></div><span class="text-[10px] text-ink/40 flex-shrink-0">${dateStr}</span>`;
+                bubble.querySelector('.btn-open-historic-letter').addEventListener('click', () => openLetterDetails(letter));
                 container.appendChild(bubble);
             });
         }
 
-
         // ==========================================
-        // SYSTEM SESSION INITIALIZER
+        // SYSTEM INIT
         // ==========================================
-
         async function initAppSession() {
             const { data: { user }, error } = await supabase.auth.getUser();
-            if (!error && user) {
-                currentUser = user;
-                routeTo('view-dashboard');
-            } else {
-                routeTo('view-auth');
-                toggleAuthView('signin');
-            }
+            if (!error && user) { currentUser = user; routeTo('view-dashboard'); } 
+            else { routeTo('view-auth'); toggleAuthView('signin'); }
         }
-
         initAppSession();
-
     </script>
 </body>
-                            </html>
+    </html>

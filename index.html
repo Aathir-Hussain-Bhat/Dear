@@ -10,6 +10,8 @@
     <meta name="theme-color" content="#1F4D3A">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="./icon.svg">
+    <link rel="icon" type="image/svg+xml" href="./icon.svg">
 
     <!-- Design System Web Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -51,7 +53,6 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E1DA; border-radius: 2px; }
         
-        /* Vintage Postcard Styling */
         .vintage-postcard {
             border: 8px solid #FFFDF8;
             box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
@@ -61,47 +62,39 @@
         }
         .vintage-postcard:hover { transform: rotate(0deg) scale(1.02); }
 
-        /* Ink Bleed SVG Filter Application */
-        .ink-text {
-            filter: url(#ink-bleed-filter);
-        }
+        .ink-text { filter: url(#ink-bleed-filter); }
 
-        /* Zen Mode Spotlight */
         .zen-mode-active #paper-canvas {
             box-shadow: 0 0 0 9999px rgba(58, 47, 40, 0.85);
-            z-index: 50;
-            border-radius: 0;
+            z-index: 50; border-radius: 0;
             transition: box-shadow 0.5s ease;
         }
         .zen-mode-active .composer-header,
         .zen-mode-active .composer-aside,
         .zen-mode-active .zen-toggle-btn {
-            opacity: 0;
-            pointer-events: none;
+            opacity: 0; pointer-events: none;
             transition: opacity 0.3s ease;
         }
         .zen-exit-btn { display: none; }
         .zen-mode-active .zen-exit-btn { display: flex; }
 
-        /* Realistic Parchment Paper Styling */
         #paper-canvas {
             background-color: #FFFDF8;
             background-image: linear-gradient(#e5e1da10 1px, transparent 1px);
-            background-size: 100% 32px; /* Ruled lines matching line-height */
-            background-position: 0 15px;
+            background-size: 100% 32px; background-position: 0 15px;
             box-shadow: 0 4px 6px -1px rgba(58, 47, 40, 0.05), 0 10px 20px -5px rgba(58, 47, 40, 0.1);
-            border: 1px solid #E5E1DA;
-            position: relative;
+            border: 1px solid #E5E1DA; position: relative;
         }
-        #letter-body {
-            line-height: 32px; /* Match the ruled lines */
-            letter-spacing: 0.02em;
+        #letter-body { line-height: 32px; letter-spacing: 0.02em; }
+
+        .creator-glow {
+            box-shadow: 0 0 15px rgba(200, 169, 106, 0.4);
+            border: 2px solid #C8A96A;
         }
     </style>
 </head>
 <body class="h-full font-sans text-ink selection:bg-gold selection:text-forest overflow-hidden">
 
-    <!-- SVG Filter for Ink Bleed Effect -->
     <svg style="position: absolute; width: 0; height: 0;">
         <filter id="ink-bleed-filter">
             <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise"/>
@@ -109,13 +102,11 @@
         </filter>
     </svg>
 
-    <!-- Real-time Inbox Toast Notification -->
     <div id="toast-notification" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 bg-forest border border-gold rounded-full px-6 py-3 shadow-2xl flex items-center space-x-3 z-[100] transition-all duration-300">
         <i data-lucide="mail-open" class="h-4 w-4 text-gold animate-bounce"></i>
         <span id="toast-message" class="text-xs font-serif italic text-ivory">A new sealed envelope has arrived</span>
     </div>
 
-    <!-- Global App Confirmation Modal -->
     <div id="app-confirm-modal" class="hidden fixed inset-0 bg-ink/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
         <div class="bg-ivory border border-beige rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center space-y-4 transform scale-95 opacity-0 transition-all duration-300" id="app-confirm-box">
             <div class="flex justify-center">
@@ -125,14 +116,14 @@
             </div>
             <h3 class="font-serif text-2xl text-forest" id="app-confirm-title">Confirm Action</h3>
             <p class="text-sm text-ink/70 leading-relaxed" id="app-confirm-message">Are you sure you want to proceed?</p>
-            <div class="flex justify-center space-x-3 pt-2">
+            <div class="flex justify-between items-center pt-2">
                 <button id="app-confirm-cancel" class="px-5 py-2 text-xs font-semibold text-ink/60 border border-beige rounded-lg hover:bg-beige/40 transition-colors">Cancel</button>
                 <button id="app-confirm-ok" class="px-5 py-2 text-xs font-semibold text-ivory bg-red-500 rounded-lg hover:bg-red-600 transition-colors">Confirm</button>
             </div>
         </div>
     </div>
 
-    <!-- VIEW 1: AUTHENTICATION GATEWAY -->
+    <!-- VIEW 1: AUTH -->
     <div id="view-auth" class="hidden h-full flex items-center justify-center p-4 overflow-y-auto">
         <div class="w-full max-w-md bg-ivory border border-beige rounded-2xl shadow-xl p-8 md:p-10 relative overflow-hidden">
             <div class="text-center mb-8">
@@ -140,7 +131,6 @@
                 <p class="font-sans text-sm text-ink/70 tracking-wide">Intentional writing. Delayed delivery.</p>
             </div>
             <div id="auth-status-box" class="hidden mb-6 p-4 rounded-lg text-sm transition-all" role="alert"></div>
-            
             <div id="auth-signin" class="space-y-6">
                 <form id="form-signin" class="space-y-4">
                     <div>
@@ -174,7 +164,6 @@
                     <p class="text-xs text-ink/70">A newcomer? <button id="btn-goto-signup" class="text-gold hover:text-forest font-semibold underline underline-offset-4 ml-1">Create an envelope</button></p>
                 </div>
             </div>
-
             <div id="auth-signup" class="hidden space-y-6">
                 <form id="form-signup" class="space-y-4">
                     <div>
@@ -199,7 +188,6 @@
                     <p class="text-xs text-ink/70">Already registered? <button id="btn-goto-signin" class="text-gold hover:text-forest font-semibold underline underline-offset-4 ml-1">Step inside</button></p>
                 </div>
             </div>
-
             <div id="auth-forgot" class="hidden space-y-6">
                 <div class="text-center">
                     <p class="text-xs text-ink/80 leading-relaxed">Enter your registered email address, and we will dispatch a secure recovery link.</p>
@@ -220,7 +208,7 @@
         </div>
     </div>
 
-    <!-- VIEW 2: CENTRAL SANCTUARY DASHBOARD -->
+    <!-- VIEW 2: DASHBOARD -->
     <div id="view-dashboard" class="hidden h-full flex flex-col bg-[#F5EFE6]">
         <header class="bg-forest px-6 py-4 flex justify-between items-center shadow-md select-none z-10 flex-shrink-0">
             <div class="flex items-center space-x-3">
@@ -228,11 +216,6 @@
             </div>
             <div class="flex items-center space-x-6 text-ivory/80">
                 <button id="nav-search-btn" class="hover:text-gold transition-colors focus:outline-none" title="Search Letters"><i data-lucide="search" class="h-5 w-5"></i></button>
-                <button id="nav-inbox-btn" class="hover:text-gold transition-colors focus:outline-none relative" title="Inbox Mailboxes">
-                    <i data-lucide="inbox" class="h-5 w-5"></i>
-                    <span id="badge-inbox" class="hidden absolute -top-1.5 -right-1.5 text-[9px] bg-gold text-forest font-bold px-1.5 py-0.5 rounded-full">0</span>
-                </button>
-                <button id="nav-friends-btn" class="hover:text-gold transition-colors focus:outline-none" title="Companions Directory"><i data-lucide="users" class="h-5 w-5"></i></button>
                 <button id="nav-profile-btn" class="hover:text-gold transition-colors focus:outline-none" title="My Profile Settings"><i data-lucide="user" class="h-5 w-5"></i></button>
                 <button id="btn-open-composer" class="bg-gold text-forest px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-ivory hover:text-forest transition-all flex items-center space-x-1 shadow-sm" title="Write a New Letter">
                     <i data-lucide="feather" class="h-3.5 w-3.5"></i><span>Compose</span>
@@ -241,12 +224,23 @@
             </div>
         </header>
 
-        <main class="flex-grow flex w-full overflow-hidden relative">
+        <main class="flex-grow flex w-full overflow-hidden relative pb-16 md:pb-0">
             <section id="dashboard-left-col" class="w-full md:w-96 flex flex-col bg-ivory border-r border-beige flex-shrink-0">
                 <div class="px-4 py-3 border-b border-beige bg-[#FAF8F5] flex justify-between items-center flex-shrink-0 select-none">
                     <h2 id="mailbox-title" class="font-serif text-lg font-semibold text-forest">Inbox</h2>
                     <span id="letter-count" class="text-[10px] font-semibold text-ink/40 uppercase tracking-wider">0 Letters</span>
                 </div>
+                
+                <div id="atrium-composer" class="hidden p-4 border-b border-beige bg-[#F8F6F2] flex-shrink-0">
+                    <textarea id="atrium-input" rows="3" class="w-full bg-ivory border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink resize-none custom-scrollbar" placeholder="Share a brief thought, quote, or poem with the sanctuary..."></textarea>
+                    <div class="flex justify-between items-center mt-2">
+                        <span id="atrium-char-count" class="text-[10px] text-ink/40">0 / 200</span>
+                        <button id="btn-post-atrium" class="bg-forest text-ivory px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-forest/90 transition-all shadow-sm flex items-center gap-1">
+                            <i data-lucide="send" class="h-3 w-3"></i> Post
+                        </button>
+                    </div>
+                </div>
+
                 <div id="filter-search-container" class="hidden p-3 border-b border-beige bg-[#F8F6F2] flex-shrink-0">
                     <div class="relative flex items-center">
                         <i data-lucide="search" class="absolute left-3 text-ink/40 h-4 w-4"></i>
@@ -259,7 +253,7 @@
                     <button data-folder="sent" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Sent</button>
                     <button data-folder="draft" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Drafts</button>
                 </div>
-                <div class="flex-grow overflow-y-auto custom-scrollbar relative p-4 bg-ivory">
+                <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar relative p-4 bg-ivory">
                     <div id="dashboard-loader" class="flex flex-col items-center justify-center py-20 space-y-3">
                         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-forest"></div>
                         <p class="font-serif italic text-xs text-ink/60">Reading letter catalog...</p>
@@ -269,7 +263,12 @@
                         <p class="font-serif italic text-sm text-ink/60">Your envelopes list is currently clear.</p>
                     </div>
                     <div id="letters-list" class="hidden space-y-3"></div>
-                    <div id="friends-panel" class="hidden space-y-6">
+                    
+                    <div id="atrium-panel" class="hidden space-y-4">
+                        <div id="atrium-list" class="space-y-4"></div>
+                    </div>
+
+                    <div id="friends-panel" class="hidden space-y-4">
                         <div class="bg-[#FCFBF9] border border-beige rounded-xl p-4">
                             <label for="companion-search-input" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-1.5">Search Directory</label>
                             <div class="flex gap-2">
@@ -282,9 +281,9 @@
                             <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">Pending Requests</h3>
                             <div id="incoming-requests-list" class="space-y-2"></div>
                         </div>
-                        <div class="space-y-2">
+                        <div class="space-y-6 pt-4">
                             <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">My Active Companions</h3>
-                            <div id="companions-list" class="space-y-2"></div>
+                            <div id="companions-list" class="space-y-6"></div>
                         </div>
                     </div>
                     <div id="settings-panel" class="hidden space-y-6">
@@ -316,7 +315,6 @@
                     </div>
                 </div>
 
-                <!-- Profile View -->
                 <div id="right-col-profile" class="hidden flex-col h-full overflow-hidden bg-[#F8F6F2] relative">
                     <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none relative z-10">
                         <div class="flex items-center space-x-3">
@@ -324,6 +322,10 @@
                             <h3 class="font-serif text-xl font-semibold text-forest">My Sanctuary Profile</h3>
                         </div>
                         <div class="flex items-center gap-4">
+                            <div id="profile-tabs" class="hidden md:flex space-x-2 text-xs font-semibold text-ink/50">
+                                <button id="tab-profile" class="px-3 py-1 border-b-2 border-forest text-forest transition-colors">Profile</button>
+                                <button id="tab-scrapbook" class="px-3 py-1 border-b-2 border-transparent hover:text-forest transition-colors">Commonplace Book</button>
+                            </div>
                             <button id="btn-upload-bg" class="hidden sm:flex text-xs text-forest hover:text-gold items-center gap-1">
                                 <i data-lucide="image" class="h-4 w-4"></i> Custom BG
                             </button>
@@ -337,15 +339,15 @@
                     <div id="profile-bg-layer" class="absolute inset-0 bg-cover bg-center pointer-events-none" style="background-image: none;"></div>
                     <div class="absolute inset-0 bg-ivory/80 pointer-events-none"></div>
 
-                    <div class="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center relative z-10">
-                        <div class="max-w-md w-full bg-ivory/90 backdrop-blur-sm border border-beige rounded-2xl shadow-xl overflow-hidden mb-8">
-                            <div class="bg-forest p-6 flex flex-col items-center relative">
+                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center relative z-10">
+                        <div id="profile-details-pane" class="max-w-md w-full bg-ivory/90 backdrop-blur-sm border border-beige rounded-2xl shadow-xl overflow-hidden mb-8">
+                            <div id="profile-header-bg" class="bg-forest p-6 flex flex-col items-center relative">
                                 <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[5deg]">
                                     <span class="text-[8px] block font-bold tracking-widest">SANCTUARY</span>
                                     <span class="text-[6px] block">EST. 1840</span>
                                 </div>
                                 <div class="relative group cursor-pointer mb-4" id="avatar-container" title="Update Profile Photo">
-                                    <div class="p-1 bg-gold rounded-full shadow-lg">
+                                    <div id="profile-avatar-ring" class="p-1 bg-gold rounded-full shadow-lg">
                                         <img id="profile-avatar-img" class="h-24 w-24 rounded-full object-cover hidden" src="" alt="Avatar">
                                         <div id="profile-avatar-fallback" class="h-24 w-24 rounded-full bg-ivory text-forest flex items-center justify-center font-serif font-bold text-4xl">C</div>
                                     </div>
@@ -354,7 +356,12 @@
                                     </div>
                                     <input type="file" id="avatar-file-input" class="hidden" accept="image/*">
                                 </div>
-                                <h3 id="profile-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Dear Companion</h3>
+                                <div class="flex items-center gap-2">
+                                    <h3 id="profile-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Dear Companion</h3>
+                                    <span id="creator-badge-profile" class="hidden px-2 py-0.5 bg-gold text-forest text-[10px] font-bold rounded-full flex items-center gap-1">
+                                        <i data-lucide="award" class="h-3 w-3"></i> Creator
+                                    </span>
+                                </div>
                                 <p id="profile-username" class="text-sm text-gold tracking-wide">@username</p>
                             </div>
                             <div class="grid grid-cols-3 border-b border-beige divide-x divide-beige">
@@ -373,6 +380,12 @@
                             </div>
                             <div class="p-6 space-y-5">
                                 <div id="profile-status-box" class="hidden p-3 rounded-lg text-xs" role="alert"></div>
+                                
+                                <div class="pt-2 border-t border-beige">
+                                    <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold mb-2">Wax Seal Collection</h4>
+                                    <div id="seal-collection-grid" class="flex flex-wrap gap-2"></div>
+                                </div>
+
                                 <form id="form-edit-profile" class="space-y-5">
                                     <div>
                                         <label for="edit-display-name" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Signature Name</label>
@@ -413,10 +426,11 @@
                                 </form>
                             </div>
                         </div>
+
+                        <div id="profile-scrapbook-pane" class="hidden max-w-md w-full space-y-4"></div>
                     </div>
                 </div>
 
-                <!-- Active Letter Board -->
                 <div id="active-letter-board" class="hidden flex-col h-full overflow-hidden bg-ivory">
                     <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none">
                         <div class="flex items-center space-x-3">
@@ -432,7 +446,7 @@
                             <button id="btn-delete-letter" class="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded transition-colors" title="Burn Letter Permanently"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
                         </div>
                     </div>
-                    <div class="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-12 bg-ivory relative">
+                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-8 md:p-12 bg-ivory relative">
                         <div id="desk-postcard-container" class="hidden max-w-xs mx-auto mb-8">
                             <img id="desk-postcard-img" src="" alt="Postcard" class="w-full h-auto vintage-postcard">
                         </div>
@@ -440,23 +454,32 @@
                     </div>
                 </div>
 
-                <!-- Friend Profile View -->
                 <div id="right-col-friend-profile" class="hidden flex-col h-full overflow-hidden bg-[#F8F6F2]">
                     <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none">
                         <div class="flex items-center space-x-3">
                             <button id="btn-back-to-list-friend-profile" class="md:hidden text-forest hover:text-gold mr-2 transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
                             <h3 class="font-serif text-xl font-semibold text-forest">Companion Profile</h3>
                         </div>
+                        <div id="friend-profile-tabs" class="hidden md:flex space-x-2 text-xs font-semibold text-ink/50">
+                            <button id="tab-friend-profile" class="px-3 py-1 border-b-2 border-forest text-forest transition-colors">Profile</button>
+                            <button id="tab-friend-scrapbook" class="px-3 py-1 border-b-2 border-transparent hover:text-forest transition-colors">Commonplace Book</button>
+                        </div>
                     </div>
-                    <div class="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center">
-                        <div class="max-w-md w-full bg-ivory border border-beige rounded-2xl shadow-xl overflow-hidden">
-                            <div class="bg-forest p-6 flex flex-col items-center relative">
+                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center">
+                        
+                        <div id="friend-details-pane" class="max-w-md w-full bg-ivory border border-beige rounded-2xl shadow-xl overflow-hidden mb-8">
+                            <div id="friend-header-bg" class="bg-forest p-6 flex flex-col items-center relative">
                                 <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[-5deg]"><span class="text-[8px] block font-bold tracking-widest">FRIEND</span></div>
-                                <div class="mb-4 p-1 bg-gold rounded-full shadow-lg">
+                                <div id="friend-avatar-ring" class="mb-4 p-1 bg-gold rounded-full shadow-lg">
                                     <img id="friend-profile-img" class="h-24 w-24 rounded-full object-cover hidden" src="" alt="Avatar">
                                     <div id="friend-profile-fallback" class="h-24 w-24 rounded-full bg-ivory text-forest flex items-center justify-center font-serif font-bold text-4xl">F</div>
                                 </div>
-                                <h4 id="friend-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Companion Name</h4>
+                                <div class="flex items-center gap-2">
+                                    <h4 id="friend-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Companion Name</h4>
+                                    <span id="creator-badge-friend" class="hidden px-2 py-0.5 bg-gold text-forest text-[10px] font-bold rounded-full flex items-center gap-1">
+                                        <i data-lucide="award" class="h-3 w-3"></i> Creator
+                                    </span>
+                                </div>
                                 <p id="friend-username" class="text-sm text-gold tracking-wide">@username</p>
                             </div>
                             <div class="p-6 space-y-4">
@@ -465,8 +488,8 @@
                                     <div class="flex justify-between items-center border-b border-linen pb-2"><span class="text-ink/50 text-xs uppercase tracking-widest">Joined</span><strong id="friend-joined" class="text-ink font-serif">---</strong></div>
                                     <div class="flex flex-col gap-1 border-b border-linen pb-3 pt-1"><span class="text-ink/50 text-xs uppercase tracking-widest mb-1">Pen Musings</span><span id="friend-bio" class="italic text-ink/70 leading-relaxed font-serif text-sm">No shared musings compiled yet...</span></div>
                                 </div>
-                                <button id="btn-write-from-friend-profile" class="w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm">
-                                    <i data-lucide="feather" class="h-4 w-4"></i><span>Address a Letter</span>
+                                <button id="btn-friend-action" class="w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm">
+                                    <i data-lucide="feather" class="h-4 w-4"></i><span id="friend-action-text">Address a Letter</span>
                                 </button>
                                 <div class="space-y-3 pt-2">
                                     <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold flex items-center gap-1 select-none"><i data-lucide="mail" class="h-3.5 w-3.5"></i><span>Sanctuary Correspondence Log</span></h4>
@@ -474,13 +497,28 @@
                                 </div>
                             </div>
                         </div>
+
+                        <div id="friend-scrapbook-pane" class="hidden max-w-md w-full space-y-4"></div>
+
                     </div>
                 </div>
             </section>
         </main>
+
+        <nav id="bottom-nav" class="absolute bottom-0 left-0 right-0 bg-forest border-t border-gold/20 flex justify-around py-2 z-40 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
+            <button id="bottom-inbox" class="flex flex-col items-center text-ivory text-[10px] font-semibold p-2 border-t-2 border-gold transition-colors">
+                <i data-lucide="inbox" class="h-5 w-5 mb-1"></i> Inbox
+            </button>
+            <button id="bottom-atrium" class="flex flex-col items-center text-ivory/60 text-[10px] font-semibold p-2 border-t-2 border-transparent hover:text-ivory transition-colors">
+                <i data-lucide="globe" class="h-5 w-5 mb-1"></i> Atrium
+            </button>
+            <button id="bottom-friends" class="flex flex-col items-center text-ivory/60 text-[10px] font-semibold p-2 border-t-2 border-transparent hover:text-ivory transition-colors">
+                <i data-lucide="users" class="h-5 w-5 mb-1"></i> Friends
+            </button>
+        </nav>
     </div>
 
-    <!-- VIEW 3: STATIONERY & COMPOSER SUITE -->
+    <!-- VIEW 3: COMPOSER -->
     <div id="view-composer" class="hidden h-full flex flex-col bg-goldbrown overflow-hidden">
         <header class="composer-header bg-beige border-b border-beige px-6 py-4 flex justify-between items-center flex-shrink-0 transition-opacity">
             <div class="flex items-center space-x-4">
@@ -544,28 +582,29 @@
                     </div>
 
                     <div>
-                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Ink Pigment</span>
-                        <div class="flex space-x-3" id="ink-palette">
-                            <button data-color="#3A2F28" class="h-6 w-6 rounded-full border-2 border-forest" style="background-color: #3A2F28;"></button>
-                            <button data-color="#1F4D3A" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1F4D3A;"></button>
-                            <button data-color="#1E293B" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1E293B;"></button>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Ink Pigment <span class="text-gold text-[10px] normal-case font-normal">(Unlocks as you write)</span></span>
+                        <div class="flex space-x-3 relative" id="ink-palette">
+                            <button data-color="#3A2F28" data-req="0" class="h-6 w-6 rounded-full border-2 border-forest" style="background-color: #3A2F28;"></button>
+                            <button data-color="#1F4D3A" data-req="5" class="h-6 w-6 rounded-full border-2 border-transparent relative" style="background-color: #1F4D3A;"></button>
+                            <button data-color="#1E293B" data-req="10" class="h-6 w-6 rounded-full border-2 border-transparent relative" style="background-color: #1E293B;"></button>
+                            <button data-color="#801818" data-req="25" class="h-6 w-6 rounded-full border-2 border-transparent relative" style="background-color: #801818;"></button>
                         </div>
                     </div>
 
                     <div>
-                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Paper Quality</span>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Paper Quality <span class="text-gold text-[10px] normal-case font-normal">(Unlocks as you write)</span></span>
                         <div class="grid grid-cols-2 gap-2" id="paper-styles">
-                            <button data-paper="linen" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-medium text-forest">Antique Linen</button>
-                            <button data-paper="parchment" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-medium text-ink/70">Parchment</button>
+                            <button data-paper="linen" data-req="0" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-medium text-forest">Antique Linen</button>
+                            <button data-paper="parchment" data-req="10" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-medium text-ink/70 relative">Parchment</button>
                         </div>
                     </div>
 
                     <div>
-                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Writing Hand</span>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Writing Hand <span class="text-gold text-[10px] normal-case font-normal">(Unlocks as you write)</span></span>
                         <div class="grid grid-cols-3 gap-2" id="typeface-styles">
-                            <button data-font="serif" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-serif text-forest">Serif</button>
-                            <button data-font="handwriting" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting text-ink/70">Caveat</button>
-                            <button data-font="handwriting2" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting2 text-ink/70">Dancing</button>
+                            <button data-font="serif" data-req="0" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-serif text-forest">Serif</button>
+                            <button data-font="handwriting" data-req="15" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting text-ink/70 relative">Caveat</button>
+                            <button data-font="handwriting2" data-req="30" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting2 text-ink/70 relative">Dancing</button>
                         </div>
                     </div>
 
@@ -597,7 +636,6 @@
         </main>
     </div>
 
-    <!-- More Options Dropdown -->
     <div id="more-dropdown-modal" class="hidden fixed inset-0 z-30" aria-haspopup="true">
         <div class="absolute inset-0 bg-transparent"></div>
         <div class="absolute right-6 top-16 w-48 bg-ivory border border-beige rounded-xl shadow-xl py-2 z-40">
@@ -606,7 +644,6 @@
         </div>
     </div>
 
-    <!-- Tactile Interactive Physical Envelope Modal -->
     <div id="envelope-modal" class="hidden fixed inset-0 bg-[#2C231E]/90 backdrop-blur-md z-50 flex items-center justify-center p-4">
         <button id="btn-close-envelope-modal" class="hidden absolute top-6 right-6 text-ivory/60 hover:text-ivory bg-forest p-2 rounded-full border border-beige/20 shadow-lg transition-all z-[60]"><i data-lucide="x" class="h-5 w-5"></i></button>
         <div id="envelope-container" class="relative w-full max-w-lg h-[400px] flex items-center justify-center select-none" style="perspective: 1200px;">
@@ -644,7 +681,6 @@
         </div>
     </div>
 
-    <!-- APPLICATION CORE DRIVER -->
     <script type="module">
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
@@ -652,18 +688,25 @@
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxubXZ0eHhmZWlyZXB0cXVycG9qIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNjYxMzgsImV4cCI6MjA5OTc0MjEzOH0.tZeRHYv5NSV1COfRQtfeEkb6qVQX8PSJM46JTL6PZWc"; 
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        const CREATOR_EMAIL = "aathirhussain019@gmail.com";
+        const CREATOR_USERNAME = "bhat"; // Updated to match your pen name
+
         let currentUser = null;
         let activeDraftId = null;
         let currentFolder = 'delivered';
+        let currentViewMode = 'inbox';
         let debounceTimer = null;
         let activeStyling = { inkColor: '#3A2F28', paperStyle: 'linen', fontFamily: 'serif' };
         let activeLetterOnDesk = null; 
         let isRealtimeSubscribed = false;
         let inboxChannel = null; 
+        let atriumChannel = null;
         let activeTargetLetterToUnseal = null;
         let countdownInterval = null; 
         let pendingPostcardUrl = null; 
         let clientCronInterval = null;
+        let userSentCount = 0;
+        let activeViewingUserId = null; // Added to track profile views
 
         let activeWaxColor = '#801818';
         let activeMonogram = 'D';
@@ -675,19 +718,25 @@
             handwriting3: 'font-handwriting3'
         };
 
+        // Safe Service Worker Registration
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registered successfully:', reg.scope))
-                    .catch(err => console.log('Service Worker registration failed:', err));
+                try {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(reg => console.log('Service Worker registered successfully:', reg.scope))
+                        .catch(err => console.log('Service Worker registration skipped:', err.message));
+                } catch (e) {
+                    console.log('SW Registration Error Ignored');
+                }
             });
         }
 
         lucide.createIcons();
 
-        // ==========================================
-        // GLOBAL UI UTILITIES
-        // ==========================================
+        function isCreator(user) {
+            return user?.email?.toLowerCase() === CREATOR_EMAIL || user?.user_metadata?.username?.toLowerCase() === CREATOR_USERNAME;
+        }
+
         function showAppConfirm(title, message) {
             return new Promise((resolve) => {
                 const modal = document.getElementById('app-confirm-modal');
@@ -724,7 +773,6 @@
             const hours = Math.floor((total % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const mins = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
             const secs = Math.floor((total % (1000 * 60)) / 1000);
-            
             let str = 'Arrives in ';
             if (days > 0) str += `${days}d `;
             if (hours > 0 || days > 0) str += `${hours}h `;
@@ -738,17 +786,10 @@
             let text = rawContent;
             let url = null;
             let ephemeral = false;
-
             const ephMatch = text.match(/^\[EPHEMERAL\]\n?/);
-            if (ephMatch) {
-                ephemeral = true;
-                text = text.replace(ephMatch[0], '');
-            }
+            if (ephMatch) { ephemeral = true; text = text.replace(ephMatch[0], ''); }
             const pcMatch = text.match(/^\[POSTCARD:(.*?)\]\n?/);
-            if (pcMatch && pcMatch[1]) {
-                url = pcMatch[1];
-                text = text.replace(pcMatch[0], '');
-            }
+            if (pcMatch && pcMatch[1]) { url = pcMatch[1]; text = text.replace(pcMatch[0], ''); }
             return { url, text, ephemeral };
         }
 
@@ -766,9 +807,6 @@
             });
         }
 
-        // ==========================================
-        // AMBIENCE & SOUNDSCAPE ENGINE
-        // ==========================================
         let audioCtx = null;
         let ambienceSource = null;
         let ambienceGain = null;
@@ -809,9 +847,6 @@
 
         function stopAmbience() { if (ambienceSource) { try { ambienceSource.stop(); } catch(e){} ambienceSource = null; } }
 
-        // ==========================================
-        // ROUTER & AUTH
-        // ==========================================
         function routeTo(viewId) {
             const authView = document.getElementById('view-auth');
             const dashboardView = document.getElementById('view-dashboard');
@@ -909,6 +944,7 @@
 
         async function logoutSession() {
             if (inboxChannel) { await supabase.removeChannel(inboxChannel); inboxChannel = null; isRealtimeSubscribed = false; }
+            if (atriumChannel) { await supabase.removeChannel(atriumChannel); atriumChannel = null; }
             if (countdownInterval) clearInterval(countdownInterval);
             if (clientCronInterval) clearInterval(clientCronInterval);
             stopAmbience();
@@ -923,22 +959,13 @@
             catch (err) { showAuthStatus(err.message, 'error'); }
         });
 
-        // ==========================================
-        // DASHBOARD & LIST ENGINE
-        // ==========================================
         document.getElementById('nav-search-btn').addEventListener('click', () => {
+            if (currentViewMode !== 'inbox') return;
             const searchBar = document.getElementById('filter-search-container');
             searchBar.classList.toggle('hidden');
             if (!searchBar.classList.contains('hidden')) document.getElementById('filter-search-input').focus();
         });
 
-        document.getElementById('nav-inbox-btn').addEventListener('click', () => {
-            switchToCompanionsMode('inbox');
-            const deliveredBtn = document.querySelector('[data-folder="delivered"]');
-            if (deliveredBtn) deliveredBtn.click();
-        });
-
-        document.getElementById('nav-friends-btn').addEventListener('click', () => switchToCompanionsMode('friends'));
         document.getElementById('nav-profile-btn').addEventListener('click', async () => await showProfilePane());
         document.getElementById('nav-more-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('more-dropdown-modal').classList.toggle('hidden'); });
         document.getElementById('btn-open-composer').addEventListener('click', () => { activeDraftId = null; routeTo('view-composer'); });
@@ -946,13 +973,58 @@
         document.getElementById('btn-dropdown-logout').addEventListener('click', async () => { document.getElementById('more-dropdown-modal').classList.add('hidden'); await logoutSession(); });
         window.addEventListener('click', () => { document.getElementById('more-dropdown-modal').classList.add('hidden'); });
 
+        document.getElementById('bottom-inbox').addEventListener('click', () => {
+            switchToCompanionsMode('inbox');
+            const deliveredBtn = document.querySelector('[data-folder="delivered"]');
+            if (deliveredBtn) deliveredBtn.click();
+            updateBottomNavActive('inbox');
+        });
+        document.getElementById('bottom-atrium').addEventListener('click', () => {
+            switchToCompanionsMode('atrium');
+            updateBottomNavActive('atrium');
+        });
+        document.getElementById('bottom-friends').addEventListener('click', () => {
+            switchToCompanionsMode('friends');
+            updateBottomNavActive('friends');
+        });
+
+        function updateBottomNavActive(tab) {
+            const tabs = ['inbox', 'atrium', 'friends'];
+            tabs.forEach(t => {
+                const btn = document.getElementById(`bottom-${t}`);
+                if (t === tab) {
+                    btn.classList.remove('text-ivory/60', 'border-transparent');
+                    btn.classList.add('text-ivory', 'border-gold');
+                } else {
+                    btn.classList.remove('text-ivory', 'border-gold');
+                    btn.classList.add('text-ivory/60', 'border-transparent');
+                }
+            });
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && currentUser) {
+                const dash = document.getElementById('view-dashboard');
+                if (dash && !dash.classList.contains('hidden')) {
+                    fetchInboxFeed();
+                    updateUnreadInboxBadge();
+                    if (currentViewMode === 'atrium') fetchAtriumPosts();
+                }
+            }
+        });
+
         function switchToCompanionsMode(targetMode) {
+            currentViewMode = targetMode;
             const folderTabs = document.getElementById('mailbox-folder-tabs');
             const searchBar = document.getElementById('filter-search-container');
             const lettersList = document.getElementById('letters-list');
             const companionsPanel = document.getElementById('friends-panel');
             const settingsPanel = document.getElementById('settings-panel');
-            folderTabs.classList.add('hidden'); searchBar.classList.add('hidden'); lettersList.classList.add('hidden'); companionsPanel.classList.add('hidden'); settingsPanel.classList.add('hidden');
+            const atriumPanel = document.getElementById('atrium-panel');
+            const atriumComposer = document.getElementById('atrium-composer');
+            
+            folderTabs.classList.add('hidden'); searchBar.classList.add('hidden'); lettersList.classList.add('hidden'); companionsPanel.classList.add('hidden'); settingsPanel.classList.add('hidden'); atriumPanel.classList.add('hidden'); atriumComposer.classList.add('hidden');
+            
             if (targetMode === 'friends') {
                 companionsPanel.classList.remove('hidden');
                 document.getElementById('mailbox-title').textContent = 'Companions Directory';
@@ -963,9 +1035,20 @@
                 document.getElementById('mailbox-title').textContent = 'Sanctuary Settings';
                 document.getElementById('letter-count').textContent = 'Preferences';
                 toggleDashboardState('list'); showMobileRightPane(false);
+            } else if (targetMode === 'atrium') {
+                atriumPanel.classList.remove('hidden');
+                atriumComposer.classList.remove('hidden');
+                document.getElementById('mailbox-title').textContent = 'The A true ';
+                document.getElementById('letter-count').textContent = 'Public Board';
+                toggleDashboardState('list'); 
+                showMobileRightPane(false);
+                fetchAtriumPosts();
+                setupRealtimeAtriumChannel();
             } else {
                 folderTabs.classList.remove('hidden');
                 lettersList.classList.remove('hidden');
+                document.getElementById('mailbox-title').textContent = 'Inbox';
+                fetchInboxFeed();
                 showMobileRightPane(false);
             }
         }
@@ -1018,14 +1101,15 @@
         async function initDashboard() {
             try { await supabase.rpc('process_scheduled_letters'); } catch (err) { console.warn('Silent processing request handled:', err); }
             currentFolder = 'delivered';
+            currentViewMode = 'inbox';
             showViewRightPane('right-col-empty');
             showMobileRightPane(false);
             document.querySelectorAll('.folder-tab-btn').forEach(b => b.classList.remove('border-forest', 'text-forest', 'font-semibold'));
             const inboxTab = document.querySelector('[data-folder="delivered"]');
             if (inboxTab) inboxTab.classList.add('border-forest', 'text-forest', 'font-semibold');
             document.getElementById('mailbox-title').textContent = 'Inbox';
-            switchToCompanionsMode(false);
-            await fetchInboxFeed();
+            switchToCompanionsMode('inbox');
+            updateBottomNavActive('inbox');
             updateUnreadInboxBadge();
             setupRealtimeInboxChannel(); 
             
@@ -1046,19 +1130,34 @@
                     if (letter.status === 'delivered') {
                         triggerToastNotification(`A new envelope has been delivered: "${letter.subject || 'Correspondence'}"`);
                         updateUnreadInboxBadge();
-                        if (currentFolder === 'delivered') fetchInboxFeed();
+                        fetchInboxFeed();
                     } else if (letter.status === 'scheduled') {
                         triggerToastNotification(`A letter is en route. It will arrive in ${getTimeRemaining(letter.delivery_at)}.`);
-                        if (currentFolder === 'delivered') fetchInboxFeed();
+                        fetchInboxFeed();
                     }
                 })
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'letters', filter: `recipient_id=eq.${currentUser.id}` }, (payload) => {
                     if (payload.new.status === 'delivered' && payload.old.status === 'scheduled') {
                         triggerToastNotification(`A scheduled envelope has arrived: "${payload.new.subject || 'Correspondence'}"`);
                         updateUnreadInboxBadge();
-                        if (currentFolder === 'delivered') fetchInboxFeed();
+                        fetchInboxFeed();
                     }
                 })
+                .subscribe();
+        }
+
+        function setupRealtimeAtriumChannel() {
+            if (atriumChannel) return;
+            atriumChannel = supabase
+                .channel('realtime-atrium')
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_posts' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'community_posts' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'community_posts' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_likes' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'community_likes' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_replies' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_pins' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'community_pins' }, () => fetchAtriumPosts())
                 .subscribe();
         }
 
@@ -1074,13 +1173,7 @@
         }
 
         async function fetchInboxFeed() {
-            toggleDashboardState('loader');
-            const list = document.getElementById('letters-list');
-            if (!list) return;
-            list.innerHTML = '';
-            if (countdownInterval) clearInterval(countdownInterval);
-            
-            let query = supabase.from('letters').select('*, sender:profiles!letters_sender_id_fkey(display_name, username), recipient:profiles!letters_recipient_id_fkey(display_name)');
+            let query = supabase.from('letters').select('*, sender:profiles!letters_sender_id_fkey(display_name, username, avatar_url), recipient:profiles!letters_recipient_id_fkey(display_name, avatar_url)');
             
             if (currentFolder === 'delivered') {
                 query = query.eq('recipient_id', currentUser.id).in('status', ['delivered', 'read', 'scheduled']);
@@ -1093,9 +1186,22 @@
             }
 
             const { data: letters, error } = await query.order('created_at', { ascending: false });
-            if (error || !letters || letters.length === 0) { toggleDashboardState('empty'); document.getElementById('letter-count').textContent = '0 Letters'; return; }
+            
+            if (error || !letters || letters.length === 0) {
+                if (currentViewMode === 'inbox') toggleDashboardState('empty');
+                document.getElementById('letter-count').textContent = '0 Letters';
+                return;
+            }
+            
             document.getElementById('letter-count').textContent = `${letters.length} Letter${letters.length === 1 ? '' : 's'}`;
+            
+            if (currentViewMode !== 'inbox') return;
+
             toggleDashboardState('list');
+            const list = document.getElementById('letters-list');
+            if (!list) return;
+            list.innerHTML = '';
+            if (countdownInterval) clearInterval(countdownInterval);
 
             letters.forEach(letter => {
                 const card = document.createElement('div');
@@ -1107,11 +1213,26 @@
                 const isUnread = currentFolder === 'delivered' && letter.status === 'delivered';
                 
                 let dot = '';
-                if (isUnread) {
-                    dot = `<span class="h-2 w-2 rounded-full bg-gold mr-3 inline-block flex-shrink-0"></span>`;
-                } else if (isScheduledTransit) {
-                    dot = `<i data-lucide="clock" class="h-4 w-4 text-gold mr-3 flex-shrink-0"></i>`;
+                if (isUnread) dot = `<span class="h-2 w-2 rounded-full bg-gold mr-3 inline-block flex-shrink-0"></span>`;
+                else if (isScheduledTransit) dot = `<i data-lucide="clock" class="h-4 w-4 text-gold mr-3 flex-shrink-0"></i>`;
+
+                let profile, displayName;
+                if (currentFolder === 'delivered') {
+                    profile = letter.sender;
+                    displayName = profile?.display_name || 'Anonymous';
+                } else {
+                    profile = letter.recipient;
+                    displayName = profile?.display_name || 'Future Self';
                 }
+
+                const isCreatorLetter = profile?.username?.toLowerCase() === CREATOR_USERNAME;
+                if (isCreatorLetter) {
+                    card.classList.add('border-gold/60', 'shadow-md');
+                }
+
+                const avatarHtml = profile?.avatar_url 
+                    ? `<img src="${profile.avatar_url}" class="h-8 w-8 rounded-full object-cover border border-beige flex-shrink-0 mr-3">` 
+                    : `<div class="h-8 w-8 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-xs mr-3 border border-beige">${displayName.charAt(0).toUpperCase()}</div>`;
                 
                 const dateStr = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 let metaContent = `<span class="text-[10px] text-ink/40">${dateStr}</span>`;
@@ -1126,12 +1247,11 @@
                     metaContent = `<span class="text-[10px] text-red-500 flex items-center gap-1 justify-end"><i data-lucide="flame" class="h-3 w-3"></i> Fragile</span>`;
                 }
                 
-                const nameLabel = currentFolder === 'delivered' ? `From: ${letter.sender?.display_name || 'Anonymous'}` : `To: ${letter.recipient?.display_name || 'Future Self'}`;
-                card.innerHTML = `<div class="flex items-center overflow-hidden min-w-0 mr-2">${dot}<div class="min-w-0"><h4 class="font-serif text-base font-semibold text-forest group-hover:text-gold transition-colors truncate">${letter.subject || '(Untitled Scroll)'}</h4><p class="text-[11px] text-ink/50 mt-0.5 truncate">${nameLabel}</p></div></div><div class="text-right flex-shrink-0">${metaContent}</div>`;
+                const nameLabel = currentFolder === 'delivered' ? `From: ${displayName}` : `To: ${displayName}`;
+                const creatorTagHtml = isCreatorLetter ? '<span class="ml-1 px-1 py-0.5 bg-gold/20 text-gold text-[9px] font-bold rounded">CREATOR</span>' : '';
+                card.innerHTML = `<div class="flex items-center overflow-hidden min-w-0 mr-2">${avatarHtml}${dot}<div class="min-w-0"><h4 class="font-serif text-base font-semibold text-forest group-hover:text-gold transition-colors truncate">${letter.subject || '(Untitled Scroll)'}</h4><p class="text-[11px] text-ink/50 mt-0.5 truncate">${nameLabel} ${creatorTagHtml}</p></div></div><div class="text-right flex-shrink-0">${metaContent}</div>`;
                 
-                if (isScheduledTransit && currentFolder === 'delivered') {
-                    card.classList.add('opacity-70', 'border-dashed', 'border-gold');
-                }
+                if (isScheduledTransit && currentFolder === 'delivered') card.classList.add('opacity-70', 'border-dashed', 'border-gold');
                 
                 card.addEventListener('click', () => {
                     if (currentFolder === 'delivered' && letter.status === 'scheduled') {
@@ -1146,17 +1266,15 @@
             
             if (document.querySelector('.countdown-meta')) {
                 countdownInterval = setInterval(() => { 
-                    document.querySelectorAll('.countdown-meta').forEach(el => { 
-                        el.textContent = getTimeRemaining(el.dataset.delivery); 
-                    }); 
+                    document.querySelectorAll('.countdown-meta').forEach(el => { el.textContent = getTimeRemaining(el.dataset.delivery); }); 
                 }, 1000);
             }
-            
             const cards = list.querySelectorAll('.letter-card');
             gsap.fromTo(cards, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out' });
         }
 
         function toggleDashboardState(state) {
+            if (currentViewMode !== 'inbox') return;
             const list = document.getElementById('letters-list');
             const loader = document.getElementById('dashboard-loader');
             const empty = document.getElementById('dashboard-empty');
@@ -1178,8 +1296,16 @@
         function showMobileRightPane(show) {
             const leftCol = document.getElementById('dashboard-left-col');
             const rightCol = document.getElementById('dashboard-right-col');
-            if (show) { leftCol.classList.add('hidden'); leftCol.classList.remove('md:flex'); rightCol.classList.remove('hidden'); rightCol.classList.add('flex'); } 
-            else { leftCol.classList.remove('hidden'); leftCol.classList.add('md:flex'); rightCol.classList.add('hidden'); rightCol.classList.remove('flex'); }
+            const bottomNav = document.getElementById('bottom-nav');
+            if (show) { 
+                leftCol.classList.add('hidden'); leftCol.classList.remove('md:flex'); 
+                rightCol.classList.remove('hidden'); rightCol.classList.add('flex'); 
+                if (window.innerWidth < 768 && bottomNav) bottomNav.style.display = 'none'; 
+            } else { 
+                leftCol.classList.remove('hidden'); leftCol.classList.add('md:flex'); 
+                rightCol.classList.add('hidden'); rightCol.classList.remove('flex'); 
+                if (bottomNav) bottomNav.style.display = 'flex'; 
+            }
         }
 
         document.getElementById('btn-back-to-list').addEventListener('click', () => showMobileRightPane(false));
@@ -1188,39 +1314,384 @@
         document.getElementById('btn-back-to-list-friend-profile').addEventListener('click', () => showMobileRightPane(false));
 
         // ==========================================
+        // ATRIUM (COMMUNITY) ENGINE
+        // ==========================================
+        async function fetchAtriumPosts() {
+            const list = document.getElementById('atrium-list');
+            if (!list) return;
+            list.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-forest mx-auto"></div>`;
+            
+            const { data: posts, error } = await supabase.from('community_posts').select('*').order('created_at', { ascending: false });
+            if (error || !posts) {
+                list.innerHTML = `<p class="text-xs italic text-red-500 text-center py-4">Failed to load posts. ${error?.message || ''}</p>`;
+                return;
+            }
+            if (posts.length === 0) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-10 text-center space-y-3">
+                        <i data-lucide="globe" class="h-8 w-8 text-gold"></i>
+                        <p class="font-serif italic text-sm text-ink/60">The atrium is quiet. Be the first to share a thought.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const postIds = posts.map(p => p.id);
+            const [
+                { data: likes }, 
+                { data: replies }, 
+                { data: postProfiles },
+                { data: pins }
+            ] = await Promise.all([
+                supabase.from('community_likes').select('post_id, user_id').in('post_id', postIds),
+                supabase.from('community_replies').select('*').in('post_id', postIds),
+                supabase.from('profiles').select('id, display_name, avatar_url, username').in('id', [...new Set(posts.map(p => p.user_id))]),
+                supabase.from('community_pins').select('post_id').eq('user_id', currentUser.id)
+            ]);
+
+            const replyUserIds = [...new Set((replies || []).map(r => r.user_id))];
+            const { data: replyProfiles } = await supabase.from('profiles').select('id, display_name, username').in('id', replyUserIds);
+
+            const profileMap = {};
+            [...(postProfiles || []), ...(replyProfiles || [])].forEach(p => profileMap[p.id] = p);
+
+            const likesMap = {}; 
+            if (likes) likes.forEach(l => { if (!likesMap[l.post_id]) likesMap[l.post_id] = []; likesMap[l.post_id].push(l.user_id); });
+            
+            const repliesMap = {}; 
+            if (replies) replies.forEach(r => { if (!repliesMap[r.post_id]) repliesMap[r.post_id] = []; repliesMap[r.post_id].push(r); });
+
+            const pinnedIds = new Set((pins || []).map(p => p.post_id));
+
+            list.innerHTML = '';
+            
+            const myPosts = posts.filter(p => p.user_id === currentUser.id);
+            const globalPosts = posts.filter(p => p.user_id !== currentUser.id);
+
+            const renderPost = (post) => {
+                const profile = profileMap[post.user_id] || {};
+                const displayName = profile.display_name || 'Anonymous';
+                const avatarUrl = profile.avatar_url;
+                const dateStr = new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                const postLikes = likesMap[post.id] || [];
+                const postReplies = repliesMap[post.id] || [];
+                const isLiked = postLikes.includes(currentUser.id);
+                const isPinned = pinnedIds.has(post.id);
+                const isCreatorPost = profile.username?.toLowerCase() === CREATOR_USERNAME;
+
+                const repliesHtml = postReplies.map(r => {
+                    const rProfile = profileMap[r.user_id] || {};
+                    const rDisplayName = rProfile.display_name || 'Anonymous';
+                    const rDateStr = new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    return `
+                    <div class="flex items-start space-x-2 mt-2">
+                        <div class="h-6 w-6 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-[10px] overflow-hidden border border-beige">
+                            ${rProfile.avatar_url ? `<img src="${rProfile.avatar_url}" class="h-full w-full object-cover">` : rDisplayName.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-1 bg-beige/30 rounded-lg p-2">
+                            <div class="flex items-baseline gap-2">
+                                <span class="text-[11px] font-semibold text-forest">${rDisplayName}</span>
+                                <span class="text-[9px] text-ink/40">${rDateStr}</span>
+                            </div>
+                            <p class="text-xs text-ink/80 mt-0.5 whitespace-pre-wrap">${r.content}</p>
+                        </div>
+                    </div>`;
+                }).join('');
+
+                let actionButtons = '';
+                if (post.user_id === currentUser.id) {
+                    actionButtons = `
+                        <div class="flex items-center gap-3 ml-auto">
+                            <button class="edit-post-btn text-ink/40 hover:text-forest transition-colors" data-post-id="${post.id}"><i data-lucide="pencil" class="h-3.5 w-3.5"></i></button>
+                            <button class="delete-post-btn text-ink/40 hover:text-red-500 transition-colors" data-post-id="${post.id}"><i data-lucide="trash-2" class="h-3.5 w-3.5"></i></button>
+                        </div>
+                    `;
+                }
+
+                const item = document.createElement('div');
+                item.className = `bg-ivory border ${isCreatorPost ? 'border-gold/60 shadow-md' : 'border-beige shadow-sm'} rounded-xl p-4 transition-all hover:shadow-md`;
+                item.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="view-user-profile h-10 w-10 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-sm overflow-hidden border border-beige cursor-pointer hover:ring-2 hover:ring-gold transition-all" data-user-id="${post.user_id}">
+                            ${avatarUrl ? `<img src="${avatarUrl}" class="h-full w-full object-cover">` : displayName.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-baseline gap-2">
+                                    <h4 class="view-user-profile text-sm font-semibold text-forest truncate cursor-pointer hover:text-gold" data-user-id="${post.user_id}">${displayName}</h4>
+                                    <span class="text-[10px] text-ink/40">${dateStr}</span>
+                                    ${isCreatorPost ? '<span class="hidden sm:inline-block px-1.5 py-0.5 bg-gold/20 text-gold text-[9px] font-bold rounded">CREATOR</span>' : ''}
+                                </div>
+                                ${actionButtons}
+                            </div>
+                            <p class="post-content text-sm font-serif text-ink leading-relaxed mt-1 whitespace-pre-wrap" data-post-id="${post.id}">${post.content}</p>
+                            
+                            <div class="flex items-center gap-6 mt-3 text-ink/50">
+                                <button class="like-btn flex items-center gap-1.5 text-xs hover:text-red-500 transition-colors ${isLiked ? 'is-liked' : ''}" data-post-id="${post.id}">
+                                    <i data-lucide="heart" class="h-4 w-4"></i>
+                                    <span class="like-count">${postLikes.length}</span>
+                                </button>
+                                <button class="reply-btn flex items-center gap-1.5 text-xs hover:text-forest transition-colors" data-post-id="${post.id}">
+                                    <i data-lucide="message-circle" class="h-4 w-4"></i>
+                                    <span>${postReplies.length}</span>
+                                </button>
+                                <button class="pin-btn flex items-center gap-1.5 text-xs hover:text-gold transition-colors ${isPinned ? 'is-pinned' : ''}" data-post-id="${post.id}">
+                                    <i data-lucide="bookmark" class="h-4 w-4"></i>
+                                </button>
+                            </div>
+                            
+                            <div class="replies-container mt-3 pt-3 border-t border-linen hidden" data-post-id="${post.id}">
+                                ${repliesHtml}
+                                <div class="flex items-center space-x-2 mt-3">
+                                    <input type="text" class="reply-input flex-grow bg-[#FCFBF9] border border-beige rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-forest text-ink" placeholder="Write a reply..." data-post-id="${post.id}">
+                                    <button class="btn-submit-reply bg-forest text-ivory px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-forest/90 transition-colors" data-post-id="${post.id}">Reply</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                return item;
+            };
+
+            if (myPosts.length > 0) {
+                const myHeader = document.createElement('div');
+                myHeader.className = 'text-[10px] uppercase tracking-widest text-ink/40 font-bold pt-2';
+                myHeader.textContent = 'My Posts';
+                list.appendChild(myHeader);
+                myPosts.forEach(p => list.appendChild(renderPost(p)));
+                const spacer = document.createElement('div');
+                spacer.className = 'h-4';
+                list.appendChild(spacer);
+            }
+
+            if (globalPosts.length > 0) {
+                const globalHeader = document.createElement('div');
+                globalHeader.className = 'text-[10px] uppercase tracking-widest text-ink/40 font-bold pt-2';
+                globalHeader.textContent = 'Global Posts';
+                list.appendChild(globalHeader);
+                globalPosts.forEach(p => list.appendChild(renderPost(p)));
+            }
+
+            lucide.createIcons();
+
+            list.querySelectorAll('.view-user-profile').forEach(el => {
+                el.addEventListener('click', () => viewUserProfile(el.dataset.userId));
+            });
+
+            list.querySelectorAll('.like-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const postId = e.currentTarget.dataset.postId;
+                    const isCurrentlyLiked = e.currentTarget.classList.contains('is-liked');
+                    if (isCurrentlyLiked) {
+                        e.currentTarget.classList.remove('is-liked');
+                        e.currentTarget.querySelector('svg').classList.remove('fill-current', 'text-red-500');
+                        e.currentTarget.querySelector('.like-count').textContent = parseInt(e.currentTarget.querySelector('.like-count').textContent) - 1;
+                        await supabase.from('community_likes').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+                    } else {
+                        e.currentTarget.classList.add('is-liked');
+                        e.currentTarget.querySelector('svg').classList.add('fill-current', 'text-red-500');
+                        e.currentTarget.querySelector('.like-count').textContent = parseInt(e.currentTarget.querySelector('.like-count').textContent) + 1;
+                        await supabase.from('community_likes').insert({ post_id: postId, user_id: currentUser.id });
+                    }
+                });
+            });
+
+            list.querySelectorAll('.pin-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const postId = e.currentTarget.dataset.postId;
+                    const isCurrentlyPinned = e.currentTarget.classList.contains('is-pinned');
+                    if (isCurrentlyPinned) {
+                        e.currentTarget.classList.remove('is-pinned');
+                        e.currentTarget.querySelector('svg').classList.remove('fill-current', 'text-gold');
+                        await supabase.from('community_pins').delete().eq('post_id', postId).eq('user_id', currentUser.id);
+                    } else {
+                        e.currentTarget.classList.add('is-pinned');
+                        e.currentTarget.querySelector('svg').classList.add('fill-current', 'text-gold');
+                        await supabase.from('community_pins').insert({ post_id: postId, user_id: currentUser.id });
+                    }
+                });
+            });
+
+            list.querySelectorAll('.reply-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const postId = e.currentTarget.dataset.postId;
+                    const container = list.querySelector(`.replies-container[data-post-id="${postId}"]`);
+                    if (container) {
+                        container.classList.toggle('hidden');
+                        if (!container.classList.contains('hidden')) container.querySelector('.reply-input').focus();
+                    }
+                });
+            });
+
+            list.querySelectorAll('.btn-submit-reply').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const postId = e.currentTarget.dataset.postId;
+                    const input = list.querySelector(`.reply-input[data-post-id="${postId}"]`);
+                    const text = input.value.trim();
+                    if (!text) return;
+                    await supabase.from('community_replies').insert({ post_id: postId, user_id: currentUser.id, content: text });
+                    input.value = '';
+                    fetchAtriumPosts(); 
+                });
+            });
+
+            list.querySelectorAll('.edit-post-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const postId = e.currentTarget.dataset.postId;
+                    const pEl = list.querySelector(`.post-content[data-post-id="${postId}"]`);
+                    if (pEl) {
+                        if (pEl.contentEditable === 'true') {
+                            pEl.contentEditable = 'false';
+                            pEl.classList.remove('bg-beige/40', 'p-2', 'rounded');
+                            const newText = pEl.innerText.trim();
+                            if (newText) await supabase.from('community_posts').update({ content: newText }).eq('id', postId);
+                            fetchAtriumPosts();
+                        } else {
+                            pEl.contentEditable = 'true';
+                            pEl.classList.add('bg-beige/40', 'p-2', 'rounded');
+                            pEl.focus();
+                            e.currentTarget.innerHTML = `<i data-lucide="check" class="h-3.5 w-3.5"></i>`;
+                            lucide.createIcons();
+                        }
+                    }
+                });
+            });
+
+            list.querySelectorAll('.delete-post-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const postId = e.currentTarget.dataset.postId;
+                    const confirmed = await showAppConfirm('Delete Post', 'Are you sure you want to permanently delete this post? All likes and replies will be lost.');
+                    if (confirmed) {
+                        await supabase.from('community_posts').delete().eq('id', postId);
+                        fetchAtriumPosts();
+                    }
+                });
+            });
+        }
+
+        document.getElementById('atrium-input').addEventListener('input', (e) => {
+            const len = e.target.value.length;
+            document.getElementById('atrium-char-count').textContent = `${len} / 200`;
+            if (len > 200) e.target.value = e.target.value.substring(0, 200);
+        });
+
+        document.getElementById('btn-post-atrium').addEventListener('click', async () => {
+            const input = document.getElementById('atrium-input');
+            const text = input.value.trim();
+            if (!text) return;
+            const btn = document.getElementById('btn-post-atrium');
+            setButtonLoading(btn, true, 'Posting...');
+            const { error } = await supabase.from('community_posts').insert({ user_id: currentUser.id, content: text });
+            setButtonLoading(btn, false);
+            if (!error) {
+                input.value = '';
+                document.getElementById('atrium-char-count').textContent = '0 / 200';
+                fetchAtriumPosts(); 
+            } else {
+                await showAppConfirm('Error', error.message);
+            }
+        });
+
+        // ==========================================
         // COMPANIONS SUB-SYSTEM
         // ==========================================
         async function initCompanionsEngine() {
-            await fetchMyCompanions();
+            const { data: friends } = await supabase.from('user_friends').select('*');
+            const { data: letters } = await supabase.from('letters')
+                .select('*, sender:profiles!letters_sender_id_fkey(display_name), recipient:profiles!letters_recipient_id_fkey(display_name)')
+                .or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`)
+                .neq('status', 'draft')
+                .order('created_at', { ascending: false });
+
+            const lettersByFriend = {};
+            if (letters) {
+                letters.forEach(l => {
+                    const friendId = l.sender_id === currentUser.id ? l.recipient_id : l.sender_id;
+                    if (!lettersByFriend[friendId]) lettersByFriend[friendId] = [];
+                    lettersByFriend[friendId].push(l);
+                });
+            }
+
+            const list = document.getElementById('companions-list');
+            list.innerHTML = '';
+            if (!friends || friends.length === 0) { 
+                list.innerHTML = `<p class="text-xs italic text-ink/40">You have not recorded any active companions yet.</p>`; 
+            } else {
+                friends.forEach(friend => {
+                    const friendLetters = lettersByFriend[friend.friend_id] || [];
+                    const item = document.createElement('div');
+                    item.className = "friend-group";
+                    let lettersHtml = '';
+                    if (friendLetters.length > 0) {
+                        lettersHtml = '<div class="mt-2 space-y-2 pl-2 border-l-2 border-beige">';
+                        friendLetters.forEach(l => {
+                            const isSentByYou = l.sender_id === currentUser.id;
+                            const dateStr = new Date(l.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                            lettersHtml += `
+                                <div class="flex justify-between items-center text-xs p-2 bg-[#FCFBF9] rounded-lg cursor-pointer hover:bg-beige/40" data-letter-id="${l.id}">
+                                    <div class="min-w-0 mr-2">
+                                        <span class="font-serif font-semibold text-forest text-[13px] block truncate hover:text-gold">${l.subject || '(Untitled Scroll)'}</span>
+                                        <span class="text-[10px] text-ink/40 block mt-0.5">${isSentByYou ? 'Sent by you' : 'Received'}</span>
+                                    </div>
+                                    <span class="text-[10px] text-ink/40 flex-shrink-0">${dateStr}</span>
+                                </div>
+                            `;
+                        });
+                        lettersHtml += '</div>';
+                    }
+
+                    item.innerHTML = `
+                        <div class="flex items-center justify-between p-3 bg-ivory border border-beige rounded-xl">
+                            <div class="flex items-center space-x-3 overflow-hidden min-w-0 mr-2">
+                                <div class="btn-view-friend-pfp h-10 w-10 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest cursor-pointer hover:bg-gold/20 border border-beige transition-all" data-id="${friend.friend_id}">
+                                    ${friend.avatar_url ? `<img src="${friend.avatar_url}" class="h-10 w-10 rounded-full object-cover">` : friend.display_name.charAt(0).toUpperCase()}
+                                </div>
+                                <div class="min-w-0">
+                                    <h4 class="text-sm font-semibold truncate">${friend.display_name}</h4>
+                                    <p class="text-xs text-ink/50 truncate">@${friend.username}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-1.5 flex-shrink-0">
+                                <button class="btn-write-friend bg-forest text-ivory text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-forest/90 font-semibold" data-id="${friend.friend_id}" data-name="${friend.display_name}" data-user="${friend.username}">Compose</button>
+                                <button class="btn-remove-friend text-red-600 hover:bg-red-50 p-1.5 rounded-lg" data-friendship="${friend.friendship_id}" title="Remove Companion"><i data-lucide="user-minus" class="h-3.5 w-3.5"></i></button>
+                            </div>
+                        </div>
+                        ${lettersHtml}
+                    `;
+
+                    item.querySelector('.btn-view-friend-pfp').addEventListener('click', async () => await viewUserProfile(friend.friend_id));
+                    item.querySelector('.btn-write-friend').addEventListener('click', (e) => {
+                        activeDraftId = null; routeTo('view-composer'); const btn = e.currentTarget;
+                        document.getElementById('recipient-id').value = btn.dataset.id;
+                        const lbl = document.getElementById('selected-recipient-label');
+                        lbl.textContent = `Address to: ${btn.dataset.name} (@${btn.dataset.user})`; lbl.classList.remove('hidden');
+                    });
+                    item.querySelector('.btn-remove-friend').addEventListener('click', async (e) => {
+                        const friendshipId = e.currentTarget.dataset.friendship;
+                        const confirmed = await showAppConfirm('Remove Companion', 'Are you sure you want to remove this companion connection?');
+                        if (confirmed) { await supabase.from('friendships').delete().eq('id', friendshipId); await initCompanionsEngine(); }
+                    });
+                    item.querySelectorAll('[data-letter-id]').forEach(el => {
+                        el.addEventListener('click', () => {
+                            const letter = friendLetters.find(l => l.id === el.dataset.letterId);
+                            if (letter) openLetterDetails(letter);
+                        });
+                    });
+                    list.appendChild(item);
+                });
+            }
+
             await fetchIncomingRequests();
             document.getElementById('companion-search-results').innerHTML = '';
             document.getElementById('companion-search-results').classList.add('hidden');
             document.getElementById('companion-search-input').value = '';
-        }
-
-        async function fetchMyCompanions() {
-            const list = document.getElementById('companions-list');
-            list.innerHTML = '';
-            const { data: friends, error } = await supabase.from('user_friends').select('*');
-            if (error || !friends || friends.length === 0) { list.innerHTML = `<p class="text-xs italic text-ink/40">You have not recorded any active companions yet.</p>`; return; }
-            friends.forEach(friend => {
-                const item = document.createElement('div');
-                item.className = "flex items-center justify-between p-3 bg-ivory border border-beige rounded-xl";
-                item.innerHTML = `<div class="flex items-center space-x-3 overflow-hidden min-w-0 mr-2"><div class="btn-view-friend-pfp h-10 w-10 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest cursor-pointer hover:bg-gold/20 border border-beige transition-all" data-id="${friend.friend_id}">${friend.avatar_url ? `<img src="${friend.avatar_url}" class="h-10 w-10 rounded-full object-cover">` : friend.display_name.charAt(0).toUpperCase()}</div><div class="min-w-0"><h4 class="text-sm font-semibold truncate">${friend.display_name}</h4><p class="text-xs text-ink/50 truncate">@${friend.username}</p></div></div><div class="flex items-center space-x-1.5 flex-shrink-0"><button class="btn-write-friend bg-forest text-ivory text-[10px] px-2.5 py-1.5 rounded-lg hover:bg-forest/90 font-semibold" data-id="${friend.friend_id}" data-name="${friend.display_name}" data-user="${friend.username}">Compose</button><button class="btn-remove-friend text-red-600 hover:bg-red-50 p-1.5 rounded-lg" data-friendship="${friend.friendship_id}" title="Remove Companion"><i data-lucide="user-minus" class="h-3.5 w-3.5"></i></button></div>`;
-                item.querySelector('.btn-view-friend-pfp').addEventListener('click', async () => await showCompanionProfilePane(friend));
-                item.querySelector('.btn-write-friend').addEventListener('click', (e) => {
-                    activeDraftId = null; routeTo('view-composer'); const btn = e.currentTarget;
-                    document.getElementById('recipient-id').value = btn.dataset.id;
-                    const lbl = document.getElementById('selected-recipient-label');
-                    lbl.textContent = `Address to: ${btn.dataset.name} (@${btn.dataset.user})`; lbl.classList.remove('hidden');
-                });
-                item.querySelector('.btn-remove-friend').addEventListener('click', async (e) => {
-                    const friendshipId = e.currentTarget.dataset.friendship;
-                    const confirmed = await showAppConfirm('Remove Companion', 'Are you sure you want to remove this companion connection?');
-                    if (confirmed) { await supabase.from('friendships').delete().eq('id', friendshipId); await initCompanionsEngine(); }
-                });
-                list.appendChild(item);
-            });
             lucide.createIcons();
         }
 
@@ -1262,7 +1733,7 @@
         });
 
         // ==========================================
-        // COMPOSER MODULE, ZEN MODE & CHRONOTHERAPY
+        // COMPOSER MODULE
         // ==========================================
         document.getElementById('btn-close-composer').addEventListener('click', () => routeTo('view-dashboard'));
 
@@ -1282,29 +1753,54 @@
             document.getElementById('btn-ambience-fire').classList.add('bg-beige/40', 'text-forest', 'font-semibold');
         });
 
-        document.getElementById('letter-body').addEventListener('input', () => {
-            initAudioCtx(); clearTimeout(penScratchTimeout); playPenScratch();
-        });
-
+        document.getElementById('letter-body').addEventListener('input', () => { initAudioCtx(); clearTimeout(penScratchTimeout); playPenScratch(); });
         document.getElementById('btn-toggle-zen').addEventListener('click', () => document.body.classList.add('zen-mode-active'));
         document.getElementById('btn-exit-zen').addEventListener('click', () => document.body.classList.remove('zen-mode-active'));
 
         function applyChronotherapy() {
             const hour = new Date().getHours();
             const canvas = document.getElementById('paper-canvas');
-            let bg, textInput;
-            if (hour >= 5 && hour < 12) { 
-                bg = 'linear-gradient(to bottom, #FFFDF8, #FFFCF4)'; textInput = '#3A2F28'; 
-            } else if (hour >= 12 && hour < 18) { 
-                bg = '#FFFDF8'; textInput = '#3A2F28'; 
-            } else if (hour >= 18 && hour < 21) { 
-                bg = 'linear-gradient(to bottom, #FFFDF8, #F5EFE6)'; textInput = '#3A2F28'; 
-            } else { 
-                bg = 'linear-gradient(to bottom, #FFFDF8, #E6D8C3)'; textInput = '#3A2F28'; 
-            }
+            let bg, textInput = '#3A2F28';
+            if (hour >= 5 && hour < 12) bg = 'linear-gradient(to bottom, #FFFDF8, #FFFCF4)'; 
+            else if (hour >= 12 && hour < 18) bg = '#FFFDF8'; 
+            else if (hour >= 18 && hour < 21) bg = 'linear-gradient(to bottom, #FFFDF8, #F5EFE6)'; 
+            else bg = 'linear-gradient(to bottom, #FFFDF8, #E6D8C3)'; 
             canvas.style.backgroundImage = bg;
             document.getElementById('letter-body').style.color = textInput;
             document.getElementById('letter-subject').style.color = textInput;
+        }
+
+        function updateComposerUnlocks() {
+            document.querySelectorAll('#ink-palette button').forEach(btn => {
+                const req = parseInt(btn.dataset.req);
+                if (userSentCount >= req) {
+                    btn.classList.remove('opacity-30', 'cursor-not-allowed');
+                    btn.disabled = false;
+                } else {
+                    btn.classList.add('opacity-30', 'cursor-not-allowed');
+                    btn.disabled = true;
+                }
+            });
+            document.querySelectorAll('#paper-styles button').forEach(btn => {
+                const req = parseInt(btn.dataset.req);
+                if (userSentCount >= req) {
+                    btn.classList.remove('opacity-30', 'cursor-not-allowed');
+                    btn.disabled = false;
+                } else {
+                    btn.classList.add('opacity-30', 'cursor-not-allowed');
+                    btn.disabled = true;
+                }
+            });
+            document.querySelectorAll('#typeface-styles button').forEach(btn => {
+                const req = parseInt(btn.dataset.req);
+                if (userSentCount >= req) {
+                    btn.classList.remove('opacity-30', 'cursor-not-allowed');
+                    btn.disabled = false;
+                } else {
+                    btn.classList.add('opacity-30', 'cursor-not-allowed');
+                    btn.disabled = true;
+                }
+            });
         }
 
         function initComposer() {
@@ -1323,10 +1819,12 @@
             document.getElementById('postcard-file-input').value = '';
             document.getElementById('ephemeral-toggle').checked = false;
             document.body.classList.remove('zen-mode-active');
+            updateComposerUnlocks();
         }
 
         document.querySelectorAll('#ink-palette button').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                if (e.currentTarget.disabled) return;
                 document.querySelectorAll('#ink-palette button').forEach(b => b.classList.replace('border-forest', 'border-transparent'));
                 const color = e.currentTarget.dataset.color; e.currentTarget.classList.replace('border-transparent', 'border-forest'); activeStyling.inkColor = color; document.getElementById('letter-body').style.color = color;
             });
@@ -1334,6 +1832,7 @@
 
         document.querySelectorAll('#paper-styles button').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                if (e.currentTarget.disabled) return;
                 document.querySelectorAll('#paper-styles button').forEach(b => b.classList.replace('border-gold', 'border-beige'));
                 document.querySelectorAll('#paper-styles button').forEach(b => b.classList.replace('text-forest', 'text-ink/70'));
                 e.currentTarget.classList.replace('border-beige', 'border-gold'); e.currentTarget.classList.replace('text-ink/70', 'text-forest'); activeStyling.paperStyle = e.currentTarget.dataset.paper;
@@ -1342,6 +1841,7 @@
 
         document.querySelectorAll('#typeface-styles button').forEach(btn => {
             btn.addEventListener('click', (e) => {
+                if (e.currentTarget.disabled) return;
                 document.querySelectorAll('#typeface-styles button').forEach(b => b.classList.replace('border-gold', 'border-beige'));
                 document.querySelectorAll('#typeface-styles button').forEach(b => b.classList.replace('text-forest', 'text-ink/70'));
                 e.currentTarget.classList.replace('border-beige', 'border-gold'); e.currentTarget.classList.replace('text-ink/70', 'text-forest');
@@ -1404,7 +1904,6 @@
             let contentToSave = document.getElementById('letter-body').value;
             if (document.getElementById('ephemeral-toggle').checked) contentToSave = `[EPHEMERAL]\n${contentToSave}`;
             if (pendingPostcardUrl) contentToSave = `[POSTCARD:${pendingPostcardUrl}]\n${contentToSave}`;
-            
             const payload = {
                 sender_id: currentUser.id,
                 recipient_id: document.getElementById('recipient-id').value || null,
@@ -1452,13 +1951,25 @@
             const subject = document.getElementById('letter-subject').value.trim();
             let rawContent = document.getElementById('letter-body').value.trim();
 
-            if (!subject || !rawContent) { await showAppConfirm('Incomplete Manuscript', 'Ensure both a title and contents are scripted before delivery.'); return; }
+            if (!subject || !rawContent) { 
+                await showAppConfirm('Incomplete Manuscript', 'Ensure both a title and contents are scripted before delivery.'); 
+                setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false);
+                return; 
+            }
             if (!recipientId && typedUsername) {
                 const { data: profile, error } = await supabase.from('profiles').select('id').eq('username', typedUsername.toLowerCase()).single();
                 if (profile) recipientId = profile.id;
-                else { await showAppConfirm('Companion Missing', `We couldn't find a companion with the pen name "${typedUsername}". Please verify the spelling or select a profile from the dropdown.`); return; }
+                else { 
+                    await showAppConfirm('Companion Missing', `We couldn't find a companion with the pen name "${typedUsername}". Please verify the spelling or select a profile from the dropdown.`); 
+                    setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false);
+                    return; 
+                }
             }
-            if (!recipientId) { await showAppConfirm('Routing Required', 'An envelope requires a valid recipient pen name to route delivery.'); return; }
+            if (!recipientId) { 
+                await showAppConfirm('Routing Required', 'An envelope requires a valid recipient pen name to route delivery.'); 
+                setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false);
+                return; 
+            }
 
             setButtonLoading(btnHeader, true, 'Sealing...'); setButtonLoading(btnSidebar, true, 'Sealing...');
 
@@ -1478,7 +1989,13 @@
             if (activeDraftId) { result = await supabase.from('letters').update(payload).eq('id', activeDraftId); } 
             else { result = await supabase.from('letters').insert(payload).select().single(); if (!result.error && result.data) activeDraftId = result.data.id; }
 
-            if (result.error) { await showAppConfirm('Dispatch Error', `Error executing transit dispatch: ${result.error.message}`); setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false); return; }
+            if (result.error) { 
+                await showAppConfirm('Dispatch Error', `Error executing transit dispatch: ${result.error.message}`); 
+                setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false); 
+                return; 
+            }
+            
+            setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false);
             routeTo('view-dashboard');
         }
 
@@ -1535,10 +2052,7 @@
                 
                 if (ephemeral) {
                     const proceed = await showAppConfirm('Fragile Letter', 'This letter is fragile. It will permanently burn away when you close it. Do you wish to unfold it?');
-                    if (!proceed) { 
-                        showViewRightPane('right-col-empty'); 
-                        return; 
-                    }
+                    if (!proceed) { showViewRightPane('right-col-empty'); return; }
                 }
 
                 document.getElementById('env-letter-title').textContent = letter.subject || '(Untitled Scroll)';
@@ -1669,6 +2183,14 @@
         // ==========================================
         async function showProfilePane() {
             showViewRightPane('right-col-profile');
+            document.getElementById('profile-tabs').classList.remove('hidden');
+            document.getElementById('profile-details-pane').classList.remove('hidden');
+            document.getElementById('profile-scrapbook-pane').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('border-forest', 'text-forest');
+            document.getElementById('tab-profile').classList.remove('border-transparent', 'text-ink/50');
+            document.getElementById('tab-scrapbook').classList.remove('border-forest', 'text-forest');
+            document.getElementById('tab-scrapbook').classList.add('border-transparent', 'text-ink/50');
+
             showMobileRightPane(true); clearProfileStatus();
 
             const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
@@ -1683,21 +2205,130 @@
                 document.getElementById('profile-joined-text').textContent = `Joined: ${new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
                 await fetchAndRenderProfileStats();
 
+                // Wax Seal Collection
+                const { data: senders } = await supabase.from('letters')
+                    .select('sender:profiles!letters_sender_id_fkey(display_name, username, avatar_url)')
+                    .eq('recipient_id', currentUser.id).neq('status', 'draft');
+                
+                const uniqueSenders = [];
+                const senderIds = new Set();
+                if (senders) {
+                    senders.forEach(s => {
+                        if (s.sender && !senderIds.has(s.sender.id)) {
+                            senderIds.add(s.sender.id);
+                            uniqueSenders.push(s.sender);
+                        }
+                    });
+                }
+
+                const sealGrid = document.getElementById('seal-collection-grid');
+                sealGrid.innerHTML = '';
+                if (uniqueSenders.length === 0) {
+                    sealGrid.innerHTML = `<p class="text-[10px] italic text-ink/40">Receive a letter to collect your first seal.</p>`;
+                } else {
+                    uniqueSenders.forEach(s => {
+                        const initial = (s.display_name || 'A').charAt(0).toUpperCase();
+                        const seal = document.createElement('div');
+                        seal.className = "w-10 h-10 rounded-full bg-[#801818] border border-[#601010] flex items-center justify-center text-ivory font-serif font-bold text-sm shadow-sm";
+                        seal.innerHTML = `<span>${initial}</span>`;
+                        seal.title = `From ${s.display_name} (@${s.username})`;
+                        sealGrid.appendChild(seal);
+                    });
+                }
+
+                // Creator Theme Logic
+                if (isCreator(currentUser)) {
+                    document.getElementById('creator-badge-profile').classList.remove('hidden');
+                    document.getElementById('profile-header-bg').classList.remove('bg-forest');
+                    document.getElementById('profile-header-bg').classList.add('bg-gradient-to-r', 'from-amber-700', 'to-yellow-600');
+                    document.getElementById('profile-avatar-ring').classList.add('creator-glow');
+                } else {
+                    document.getElementById('creator-badge-profile').classList.add('hidden');
+                    document.getElementById('profile-header-bg').classList.remove('bg-gradient-to-r', 'from-amber-700', 'to-yellow-600');
+                    document.getElementById('profile-header-bg').classList.add('bg-forest');
+                    document.getElementById('profile-avatar-ring').classList.remove('creator-glow');
+                }
+
                 const meta = currentUser.user_metadata || {};
                 activeWaxColor = meta.wax_color || '#801818';
                 activeMonogram = meta.monogram || (profile.display_name ? profile.display_name.charAt(0).toUpperCase() : 'D');
                 
-                if (meta.background_url) {
-                    document.getElementById('profile-bg-layer').style.backgroundImage = `url(${meta.background_url})`;
-                } else {
-                    document.getElementById('profile-bg-layer').style.backgroundImage = 'none';
-                }
+                if (meta.background_url) document.getElementById('profile-bg-layer').style.backgroundImage = `url(${meta.background_url})`;
+                else document.getElementById('profile-bg-layer').style.backgroundImage = 'none';
 
                 document.querySelectorAll('#wax-color-palette button').forEach(b => b.classList.replace('border-forest', 'border-transparent'));
                 document.querySelector(`#wax-color-palette button[data-wax="${activeWaxColor}"]`)?.classList.replace('border-transparent', 'border-forest');
                 document.getElementById('edit-monogram').value = activeMonogram;
             }
         }
+
+        document.getElementById('tab-profile').addEventListener('click', () => {
+            document.getElementById('profile-details-pane').classList.remove('hidden');
+            document.getElementById('profile-scrapbook-pane').classList.add('hidden');
+            document.getElementById('tab-profile').classList.add('border-forest', 'text-forest');
+            document.getElementById('tab-profile').classList.remove('border-transparent', 'text-ink/50');
+            document.getElementById('tab-scrapbook').classList.remove('border-forest', 'text-forest');
+            document.getElementById('tab-scrapbook').classList.add('border-transparent', 'text-ink/50');
+        });
+
+        document.getElementById('tab-scrapbook').addEventListener('click', async () => {
+            document.getElementById('profile-details-pane').classList.add('hidden');
+            document.getElementById('profile-scrapbook-pane').classList.remove('hidden');
+            document.getElementById('tab-scrapbook').classList.add('border-forest', 'text-forest');
+            document.getElementById('tab-scrapbook').classList.remove('border-transparent', 'text-ink/50');
+            document.getElementById('tab-profile').classList.remove('border-forest', 'text-forest');
+            document.getElementById('tab-profile').classList.add('border-transparent', 'text-ink/50');
+
+            const pane = document.getElementById('profile-scrapbook-pane');
+            pane.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-forest mx-auto"></div>`;
+            
+            const { data: pins } = await supabase.from('community_pins').select('post_id').eq('user_id', currentUser.id);
+            const pinnedIds = (pins || []).map(p => p.post_id);
+            
+            if (pinnedIds.length === 0) {
+                pane.innerHTML = `
+                    <div class="bg-ivory border border-beige rounded-2xl p-8 text-center">
+                        <i data-lucide="bookmark" class="h-8 w-8 text-gold mx-auto mb-2"></i>
+                        <p class="font-serif italic text-sm text-ink/60">Your Commonplace Book is empty.</p>
+                        <p class="text-[10px] text-ink/40 mt-1">Pin posts from the Atrium to save them here.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const { data: posts } = await supabase.from('community_posts').select('*').in('id', pinnedIds).order('created_at', { ascending: false });
+            const { data: profiles } = await supabase.from('profiles').select('id, display_name, avatar_url').in('id', [...new Set(posts.map(p => p.user_id))]);
+            
+            const profileMap = {};
+            if (profiles) profiles.forEach(p => profileMap[p.id] = p);
+
+            pane.innerHTML = '';
+            posts.forEach(post => {
+                const profile = profileMap[post.user_id] || {};
+                const displayName = profile.display_name || 'Anonymous';
+                const avatarUrl = profile.avatar_url;
+                const dateStr = new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                
+                const item = document.createElement('div');
+                item.className = `bg-ivory border border-beige rounded-xl p-4 shadow-sm transition-all hover:shadow-md relative transform rotate-[-1deg]`;
+                item.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="h-8 w-8 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-xs overflow-hidden border border-beige">
+                            ${avatarUrl ? `<img src="${avatarUrl}" class="h-full w-full object-cover">` : displayName.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-baseline gap-2">
+                                <h4 class="text-xs font-semibold text-forest truncate">${displayName}</h4>
+                                <span class="text-[9px] text-ink/40">${dateStr}</span>
+                            </div>
+                            <p class="text-sm font-serif text-ink leading-relaxed mt-1 whitespace-pre-wrap">${post.content}</p>
+                        </div>
+                    </div>
+                `;
+                pane.appendChild(item);
+            });
+        });
 
         document.querySelectorAll('#wax-color-palette button').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -1739,6 +2370,9 @@
                 document.getElementById('stat-sent').textContent = sentCount || 0;
                 document.getElementById('stat-received').textContent = receivedCount || 0;
                 document.getElementById('stat-pending').textContent = pendingCount || 0;
+                
+                userSentCount = sentCount || 0;
+                updateComposerUnlocks();
             } catch (err) { console.error("Error fetching stats:", err); }
         }
 
@@ -1805,32 +2439,180 @@
         function clearProfileStatus() { const box = document.getElementById('profile-status-box'); if (box) box.classList.add('hidden'); }
 
         // ==========================================
-        // DYNAMIC COMPANIONS PROFILE DESK
+        // DYNAMIC USER PROFILE DESK (Handles Friends, Non-Friends, and Requests)
         // ==========================================
-        async function showCompanionProfilePane(friend) {
+        async function viewUserProfile(userId) {
+            if (userId === currentUser.id) {
+                showProfilePane();
+                return;
+            }
+
+            activeViewingUserId = userId; // Track who we are looking at
+
             showViewRightPane('right-col-friend-profile');
             showMobileRightPane(true);
-            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', friend.friend_id).single();
-            if (!error && profile) {
-                document.getElementById('friend-display-name').textContent = profile.display_name;
-                document.getElementById('friend-username').textContent = `@${profile.username}`;
-                document.getElementById('friend-country').textContent = profile.country || 'Unknown';
-                document.getElementById('friend-joined').textContent = new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                document.getElementById('friend-bio').textContent = profile.bio || 'No shared musings compiled yet...';
-                const img = document.getElementById('friend-profile-img');
-                const fallback = document.getElementById('friend-profile-fallback');
-                if (profile.avatar_url) { img.src = profile.avatar_url; img.classList.remove('hidden'); fallback.classList.add('hidden'); } 
-                else { img.classList.add('hidden'); fallback.classList.remove('hidden'); fallback.textContent = (profile.display_name || 'F').charAt(0).toUpperCase(); }
-                const writeBtn = document.getElementById('btn-write-from-friend-profile');
-                writeBtn.onclick = () => {
-                    activeDraftId = null; pendingPostcardUrl = null; routeTo('view-composer');
-                    document.getElementById('recipient-id').value = friend.friend_id;
-                    const lbl = document.getElementById('selected-recipient-label');
-                    lbl.textContent = `Address to: ${friend.display_name} (@${friend.username})`; lbl.classList.remove('hidden');
-                };
-                await fetchFriendLettersHistory(friend.friend_id);
+
+            // Reset Friend Tabs
+            document.getElementById('friend-profile-tabs').classList.remove('hidden');
+            document.getElementById('friend-details-pane').classList.remove('hidden');
+            document.getElementById('friend-scrapbook-pane').classList.add('hidden');
+            document.getElementById('tab-friend-profile').classList.add('border-forest', 'text-forest');
+            document.getElementById('tab-friend-profile').classList.remove('border-transparent', 'text-ink/50');
+            document.getElementById('tab-friend-scrapbook').classList.remove('border-forest', 'text-forest');
+            document.getElementById('tab-friend-scrapbook').classList.add('border-transparent', 'text-ink/50');
+
+            const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
+            if (error || !profile) return;
+
+            document.getElementById('friend-display-name').textContent = profile.display_name;
+            document.getElementById('friend-username').textContent = `@${profile.username}`;
+            document.getElementById('friend-country').textContent = profile.country || 'Unknown';
+            document.getElementById('friend-joined').textContent = new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+            document.getElementById('friend-bio').textContent = profile.bio || 'No shared musings compiled yet...';
+            
+            const img = document.getElementById('friend-profile-img');
+            const fallback = document.getElementById('friend-profile-fallback');
+            if (profile.avatar_url) { img.src = profile.avatar_url; img.classList.remove('hidden'); fallback.classList.add('hidden'); } 
+            else { img.classList.add('hidden'); fallback.classList.remove('hidden'); fallback.textContent = (profile.display_name || 'F').charAt(0).toUpperCase(); }
+
+            // Creator Theme Logic for Friend Profile
+            const isCreatorProfile = profile.username?.toLowerCase() === CREATOR_USERNAME;
+            const friendHeader = document.getElementById('friend-header-bg');
+            const friendAvatarRing = document.getElementById('friend-avatar-ring');
+            const friendCreatorBadge = document.getElementById('creator-badge-friend');
+
+            if (isCreatorProfile) {
+                friendHeader.classList.remove('bg-forest');
+                friendHeader.classList.add('bg-gradient-to-r', 'from-amber-700', 'to-yellow-600');
+                friendAvatarRing.classList.add('creator-glow');
+                friendCreatorBadge.classList.remove('hidden');
+            } else {
+                friendHeader.classList.add('bg-forest');
+                friendHeader.classList.remove('bg-gradient-to-r', 'from-amber-700', 'to-yellow-600');
+                friendAvatarRing.classList.remove('creator-glow');
+                friendCreatorBadge.classList.add('hidden');
             }
+
+            const actionBtn = document.getElementById('btn-friend-action');
+            
+            // Check if friends using user_friends view
+            const { data: isFriend } = await supabase.from('user_friends').select('friend_id').eq('friend_id', userId).maybeSingle();
+            
+            if (isFriend) {
+                actionBtn.className = "w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm";
+                actionBtn.disabled = false;
+                actionBtn.innerHTML = `<i data-lucide="feather" class="h-4 w-4"></i><span id="friend-action-text">Address a Letter</span>`;
+                actionBtn.onclick = () => {
+                    activeDraftId = null; pendingPostcardUrl = null; routeTo('view-composer');
+                    document.getElementById('recipient-id').value = userId;
+                    const lbl = document.getElementById('selected-recipient-label');
+                    lbl.textContent = `Address to: ${profile.display_name} (@${profile.username})`; lbl.classList.remove('hidden');
+                };
+                await fetchFriendLettersHistory(userId);
+            } else {
+                // Check if request already sent/received
+                const { data: req } = await supabase.from('friend_requests')
+                    .select('*').or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).eq('status', 'pending').maybeSingle();
+                
+                if (req) {
+                    if (req.sender_id === currentUser.id) {
+                        actionBtn.className = "w-full bg-beige text-ink/40 text-xs py-3 rounded-lg font-semibold cursor-not-allowed flex items-center justify-center space-x-2 shadow-sm";
+                        actionBtn.disabled = true;
+                        actionBtn.innerHTML = `<i data-lucide="clock" class="h-4 w-4"></i><span id="friend-action-text">Request Pending</span>`;
+                        actionBtn.onclick = null;
+                    } else {
+                        actionBtn.className = "w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm";
+                        actionBtn.disabled = false;
+                        actionBtn.innerHTML = `<i data-lucide="user-check" class="h-4 w-4"></i><span id="friend-action-text">Accept Request</span>`;
+                        actionBtn.onclick = async () => {
+                            await supabase.from('friend_requests').update({ status: 'accepted' }).eq('id', req.id);
+                            viewUserProfile(userId); 
+                        };
+                    }
+                } else {
+                    actionBtn.className = "w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm";
+                    actionBtn.disabled = false;
+                    actionBtn.innerHTML = `<i data-lucide="user-plus" class="h-4 w-4"></i><span id="friend-action-text">Send Friend Request</span>`;
+                    actionBtn.onclick = async () => {
+                        const { error } = await supabase.from('friend_requests').insert({ sender_id: currentUser.id, receiver_id: userId, status: 'pending' });
+                        if (!error) viewUserProfile(userId);
+                    };
+                }
+                document.getElementById('friend-letters-list').innerHTML = `<p class="text-xs italic text-ink/40">Become companions to view your correspondence log.</p>`;
+            }
+            lucide.createIcons();
         }
+
+        // Friend Profile Tab Listeners
+        document.getElementById('tab-friend-profile').addEventListener('click', () => {
+            document.getElementById('friend-details-pane').classList.remove('hidden');
+            document.getElementById('friend-scrapbook-pane').classList.add('hidden');
+            document.getElementById('tab-friend-profile').classList.add('border-forest', 'text-forest');
+            document.getElementById('tab-friend-profile').classList.remove('border-transparent', 'text-ink/50');
+            document.getElementById('tab-friend-scrapbook').classList.remove('border-forest', 'text-forest');
+            document.getElementById('tab-friend-scrapbook').classList.add('border-transparent', 'text-ink/50');
+        });
+
+        document.getElementById('tab-friend-scrapbook').addEventListener('click', async (e) => {
+            const userId = activeViewingUserId; // Use tracked ID
+            if (!userId) return;
+
+            document.getElementById('friend-details-pane').classList.add('hidden');
+            document.getElementById('friend-scrapbook-pane').classList.remove('hidden');
+            document.getElementById('tab-friend-scrapbook').classList.add('border-forest', 'text-forest');
+            document.getElementById('tab-friend-scrapbook').classList.remove('border-transparent', 'text-ink/50');
+            document.getElementById('tab-friend-profile').classList.remove('border-forest', 'text-forest');
+            document.getElementById('tab-friend-profile').classList.add('border-transparent', 'text-ink/50');
+
+            const pane = document.getElementById('friend-scrapbook-pane');
+            pane.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-forest mx-auto"></div>`;
+
+            const { data: pins } = await supabase.from('community_pins').select('post_id').eq('user_id', userId);
+            const pinnedIds = (pins || []).map(p => p.post_id);
+
+            if (pinnedIds.length === 0) {
+                pane.innerHTML = `
+                    <div class="bg-ivory border border-beige rounded-2xl p-8 text-center">
+                        <i data-lucide="bookmark" class="h-8 w-8 text-gold mx-auto mb-2"></i>
+                        <p class="font-serif italic text-sm text-ink/60">This Commonplace Book is empty.</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const { data: posts } = await supabase.from('community_posts').select('*').in('id', pinnedIds).order('created_at', { ascending: false });
+            const { data: profiles } = await supabase.from('profiles').select('id, display_name, avatar_url').in('id', [...new Set(posts.map(p => p.user_id))]);
+
+            const profileMap = {};
+            if (profiles) profiles.forEach(p => profileMap[p.id] = p);
+
+            pane.innerHTML = '';
+            posts.forEach(post => {
+                const profile = profileMap[post.user_id] || {};
+                const displayName = profile.display_name || 'Anonymous';
+                const avatarUrl = profile.avatar_url;
+                const dateStr = new Date(post.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                const item = document.createElement('div');
+                item.className = `bg-ivory border border-beige rounded-xl p-4 shadow-sm transition-all hover:shadow-md relative transform rotate-[-1deg]`;
+                item.innerHTML = `
+                    <div class="flex items-start space-x-3">
+                        <div class="h-8 w-8 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-xs overflow-hidden border border-beige">
+                            ${avatarUrl ? `<img src="${avatarUrl}" class="h-full w-full object-cover">` : displayName.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-baseline gap-2">
+                                <h4 class="text-xs font-semibold text-forest truncate">${displayName}</h4>
+                                <span class="text-[9px] text-ink/40">${dateStr}</span>
+                            </div>
+                            <p class="text-sm font-serif text-ink leading-relaxed mt-1 whitespace-pre-wrap">${post.content}</p>
+                        </div>
+                    </div>
+                `;
+                pane.appendChild(item);
+            });
+        });
 
         async function fetchFriendLettersHistory(friendId) {
             const container = document.getElementById('friend-letters-list');
@@ -1860,4 +2642,4 @@
         initAppSession();
     </script>
 </body>
-    </html>
+                    </html>

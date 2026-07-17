@@ -32,7 +32,8 @@
                         gold: '#C8A96A',
                         ivory: '#FFFDF8',
                         ink: '#3A2F28',
-                        linen: '#F8F6F2'
+                        linen: '#F8F6F2',
+                        goldbrown: '#DECBB0'
                     },
                     fontFamily: {
                         serif: ['"Cormorant Garamond"', 'serif'],
@@ -58,12 +59,55 @@
             filter: sepia(0.4) contrast(1.1) brightness(0.95);
             transition: transform 0.3s ease;
         }
-        .vintage-postcard:hover {
-            transform: rotate(0deg) scale(1.02);
+        .vintage-postcard:hover { transform: rotate(0deg) scale(1.02); }
+
+        /* Ink Bleed SVG Filter Application */
+        .ink-text {
+            filter: url(#ink-bleed-filter);
+        }
+
+        /* Zen Mode Spotlight */
+        .zen-mode-active #paper-canvas {
+            box-shadow: 0 0 0 9999px rgba(58, 47, 40, 0.85);
+            z-index: 50;
+            border-radius: 0;
+            transition: box-shadow 0.5s ease;
+        }
+        .zen-mode-active .composer-header,
+        .zen-mode-active .composer-aside,
+        .zen-mode-active .zen-toggle-btn {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .zen-exit-btn { display: none; }
+        .zen-mode-active .zen-exit-btn { display: flex; }
+
+        /* Realistic Parchment Paper Styling */
+        #paper-canvas {
+            background-color: #FFFDF8;
+            background-image: linear-gradient(#e5e1da10 1px, transparent 1px);
+            background-size: 100% 32px; /* Ruled lines matching line-height */
+            background-position: 0 15px;
+            box-shadow: 0 4px 6px -1px rgba(58, 47, 40, 0.05), 0 10px 20px -5px rgba(58, 47, 40, 0.1);
+            border: 1px solid #E5E1DA;
+            position: relative;
+        }
+        #letter-body {
+            line-height: 32px; /* Match the ruled lines */
+            letter-spacing: 0.02em;
         }
     </style>
 </head>
 <body class="h-full font-sans text-ink selection:bg-gold selection:text-forest overflow-hidden">
+
+    <!-- SVG Filter for Ink Bleed Effect -->
+    <svg style="position: absolute; width: 0; height: 0;">
+        <filter id="ink-bleed-filter">
+            <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise"/>
+            <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.5" xChannelSelector="R" yChannelSelector="G"/>
+        </filter>
+    </svg>
 
     <!-- Real-time Inbox Toast Notification -->
     <div id="toast-notification" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 bg-forest border border-gold rounded-full px-6 py-3 shadow-2xl flex items-center space-x-3 z-[100] transition-all duration-300">
@@ -264,7 +308,7 @@
             </section>
 
             <section id="dashboard-right-col" class="hidden md:flex flex-grow flex-col bg-[#F8F6F2] relative overflow-hidden">
-                <div id="right-col-empty" class="flex flex-col items-center justify-center flex-grow p-8 text-center bg-[#F8F6F2]">
+                <div id="right-col-empty" class="hidden flex-col items-center justify-center flex-grow p-8 text-center bg-[#F8F6F2]">
                     <div class="max-w-xs space-y-4">
                         <i data-lucide="feather" class="h-12 w-12 text-gold/60 mx-auto"></i>
                         <h3 class="font-serif text-2xl text-forest italic">Your Sanctuary Reading Desk</h3>
@@ -279,18 +323,22 @@
                             <button id="btn-back-to-list-profile" class="md:hidden text-forest hover:text-gold transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
                             <h3 class="font-serif text-xl font-semibold text-forest">My Sanctuary Profile</h3>
                         </div>
-                        <button id="btn-upload-bg" class="text-xs text-forest hover:text-gold flex items-center gap-1">
-                            <i data-lucide="image" class="h-4 w-4"></i> Custom BG
-                        </button>
+                        <div class="flex items-center gap-4">
+                            <button id="btn-upload-bg" class="hidden sm:flex text-xs text-forest hover:text-gold items-center gap-1">
+                                <i data-lucide="image" class="h-4 w-4"></i> Custom BG
+                            </button>
+                            <button id="btn-save-profile-top" class="bg-forest text-ivory text-xs px-4 py-2 rounded-lg font-semibold hover:bg-gold hover:text-forest shadow-sm transition-all flex items-center space-x-1">
+                                <i data-lucide="save" class="h-3 w-3"></i> Save Profile
+                            </button>
+                        </div>
                         <input type="file" id="bg-file-input" class="hidden" accept="image/*">
                     </div>
 
-                    <!-- Custom Background Image Layer -->
                     <div id="profile-bg-layer" class="absolute inset-0 bg-cover bg-center pointer-events-none" style="background-image: none;"></div>
                     <div class="absolute inset-0 bg-ivory/80 pointer-events-none"></div>
 
                     <div class="flex-grow overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center relative z-10">
-                        <div class="max-w-md w-full bg-ivory/90 backdrop-blur-sm border border-beige rounded-2xl shadow-xl overflow-hidden">
+                        <div class="max-w-md w-full bg-ivory/90 backdrop-blur-sm border border-beige rounded-2xl shadow-xl overflow-hidden mb-8">
                             <div class="bg-forest p-6 flex flex-col items-center relative">
                                 <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[5deg]">
                                     <span class="text-[8px] block font-bold tracking-widest">SANCTUARY</span>
@@ -345,7 +393,6 @@
                                         </div>
                                     </div>
                                     
-                                    <!-- Custom Wax Seal Settings -->
                                     <div class="pt-4 border-t border-beige">
                                         <label class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-2">Signet Ring (Wax Seal)</label>
                                         <div class="flex gap-2 mb-3" id="wax-color-palette">
@@ -359,8 +406,8 @@
 
                                     <div class="pt-4 flex justify-between items-center">
                                         <span id="profile-joined-text" class="text-[10px] text-ink/40 italic">Joined: ---</span>
-                                        <button type="submit" class="bg-forest text-ivory text-xs px-5 py-2.5 rounded-lg font-semibold hover:bg-gold hover:text-forest shadow-sm transition-all flex items-center space-x-1">
-                                            <i data-lucide="save" class="h-3 w-3"></i><span>Update Profile</span>
+                                        <button type="button" id="btn-upload-bg-mobile" class="sm:hidden text-xs text-forest hover:text-gold flex items-center gap-1">
+                                            <i data-lucide="image" class="h-4 w-4"></i> Change BG
                                         </button>
                                     </div>
                                 </form>
@@ -386,11 +433,10 @@
                         </div>
                     </div>
                     <div class="flex-grow overflow-y-auto custom-scrollbar p-8 md:p-12 bg-ivory relative">
-                        <!-- Vintage Postcard Container -->
                         <div id="desk-postcard-container" class="hidden max-w-xs mx-auto mb-8">
                             <img id="desk-postcard-img" src="" alt="Postcard" class="w-full h-auto vintage-postcard">
                         </div>
-                        <div id="desk-letter-content" class="max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-serif text-ink"></div>
+                        <div id="desk-letter-content" class="max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap font-serif text-ink ink-text"></div>
                     </div>
                 </div>
 
@@ -435,13 +481,12 @@
     </div>
 
     <!-- VIEW 3: STATIONERY & COMPOSER SUITE -->
-    <div id="view-composer" class="hidden h-full flex flex-col bg-linen overflow-hidden">
-        <header class="bg-ivory border-b border-beige px-6 py-4 flex justify-between items-center flex-shrink-0">
+    <div id="view-composer" class="hidden h-full flex flex-col bg-goldbrown overflow-hidden">
+        <header class="composer-header bg-beige border-b border-beige px-6 py-4 flex justify-between items-center flex-shrink-0 transition-opacity">
             <div class="flex items-center space-x-4">
                 <button id="btn-close-composer" class="text-ink/60 hover:text-ink transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
                 <span class="font-serif text-2xl italic text-forest select-none">Write Letter</span>
                 
-                <!-- Ambience Toggle -->
                 <div class="hidden md:flex items-center space-x-2 ml-6 border-l border-beige pl-6">
                     <span class="text-xs text-ink/50 uppercase tracking-wider">Ambience:</span>
                     <button id="btn-ambience-none" class="text-xs px-2 py-1 rounded bg-beige/40 text-forest font-semibold">Off</button>
@@ -450,6 +495,9 @@
                 </div>
             </div>
             <div class="flex items-center space-x-3">
+                <button id="btn-toggle-zen" class="zen-toggle-btn text-xs font-semibold text-ink/60 border border-beige px-3 py-2 rounded-lg hover:bg-beige/40 transition-colors flex items-center gap-1">
+                    <i data-lucide="eye-off" class="h-3.5 w-3.5"></i> Zen Mode
+                </button>
                 <span id="autosave-badge" class="text-xs text-ink/40 italic hidden sm:inline">Parchment draft saved</span>
                 <button id="btn-save-draft" class="text-xs font-semibold text-forest border border-forest px-3 py-2 rounded-lg hover:bg-beige/20 transition-colors">Save Draft</button>
                 <button id="btn-seal-envelope-header" class="bg-forest text-ivory text-xs px-3 py-2 rounded-lg font-semibold hover:bg-forest/90 shadow-sm transition-all flex items-center space-x-1">
@@ -458,13 +506,17 @@
             </div>
         </header>
 
+        <button id="btn-exit-zen" class="zen-exit-btn hidden fixed top-6 right-6 z-50 text-ink/60 hover:text-ink bg-ivory/80 backdrop-blur px-3 py-2 rounded-lg text-xs font-semibold border border-beige flex items-center gap-1">
+            <i data-lucide="eye" class="h-3.5 w-3.5"></i> Exit Zen
+        </button>
+
         <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8 overflow-y-auto custom-scrollbar">
-            <section class="flex-grow bg-ivory border border-beige rounded-2xl shadow-sm p-8 md:p-12 flex flex-col relative transition-colors duration-300" id="paper-canvas">
-                <input type="text" id="letter-subject" placeholder="Title of your letter" class="bg-transparent border-b border-beige pb-3 text-3xl font-serif text-forest placeholder-forest/30 focus:outline-none focus:border-gold transition-colors w-full mb-8">
-                <textarea id="letter-body" placeholder="Write with calm intention. There are no instant reactions here..." class="bg-transparent flex-grow text-lg leading-relaxed focus:outline-none resize-none font-serif placeholder-ink/20 text-[#3A2F28] min-h-[350px] w-full"></textarea>
+            <section class="flex-grow bg-ivory border border-beige rounded-2xl shadow-sm p-8 md:p-12 flex flex-col relative transition-all duration-500" id="paper-canvas">
+                <input type="text" id="letter-subject" placeholder="Title of your letter" class="bg-transparent border-b border-beige pb-3 mb-8 text-3xl font-serif text-forest placeholder-forest/30 focus:outline-none focus:border-gold transition-colors w-full ink-text">
+                <textarea id="letter-body" placeholder="Write with calm intention. There are no instant reactions here..." class="bg-transparent flex-grow text-lg focus:outline-none resize-none font-serif placeholder-ink/20 min-h-[350px] w-full ink-text"></textarea>
             </section>
 
-            <aside class="w-full md:w-80 space-y-6">
+            <aside class="composer-aside w-full md:w-80 space-y-6 transition-opacity">
                 <div class="bg-ivory border border-beige rounded-2xl p-6 shadow-sm space-y-6">
                     <h3 class="font-serif text-xl font-semibold text-forest pb-3 border-b border-beige">Stationery Settings</h3>
                     
@@ -478,7 +530,6 @@
                         <p id="selected-recipient-label" class="text-xs italic text-gold mt-2 hidden"></p>
                     </div>
 
-                    <!-- Postcard Image Upload -->
                     <div>
                         <label class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Enclose Postcard (Optional)</label>
                         <div id="postcard-upload-zone" class="border-2 border-dashed border-beige rounded-lg p-4 text-center hover:border-gold cursor-pointer transition-colors">
@@ -522,11 +573,20 @@
                         <label for="delivery-speed" class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Delivery Transit</label>
                         <select id="delivery-speed" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink">
                             <option value="immediate" selected>Immediate Delivery</option>
+                            <option value="1m">1 Minute (Test)</option>
                             <option value="1h">1 Hour (Deliberate delay)</option>
                             <option value="12h">12 Hours (Overnight)</option>
                             <option value="1d">1 Day (Standard carriage)</option>
                             <option value="7d">7 Days (Cross country)</option>
                         </select>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-2 border-t border-beige">
+                        <div>
+                            <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70">Fragile Letter</span>
+                            <span class="text-[10px] text-ink/40 italic">Burns when closed by reader</span>
+                        </div>
+                        <input type="checkbox" id="ephemeral-toggle" class="w-4 h-4 accent-forest">
                     </div>
 
                     <button id="btn-seal-envelope" class="w-full bg-forest text-ivory hover:bg-forest/90 font-medium py-3 rounded-lg shadow-sm hover:shadow transition-all text-sm flex items-center justify-center space-x-2">
@@ -569,7 +629,7 @@
                 <div id="env-postcard-container" class="hidden max-w-[200px] mx-auto mb-6">
                     <img id="env-postcard-img" src="" alt="Postcard" class="w-full h-auto vintage-postcard">
                 </div>
-                <div id="env-letter-content" class="text-base leading-relaxed whitespace-pre-wrap font-serif text-ink select-text"></div>
+                <div id="env-letter-content" class="text-base leading-relaxed whitespace-pre-wrap font-serif text-ink select-text ink-text"></div>
             </div>
             <div id="envelope-back" class="absolute w-full h-[280px] pointer-events-none z-20">
                 <div id="envelope-flap" class="absolute top-0 left-0 right-0 h-[140px] bg-[#DFCBB7] origin-top border-b border-[#CBB3A1] shadow-md flex items-end justify-center pb-2 cursor-pointer pointer-events-auto" style="clip-path: polygon(0 0, 100% 0, 50% 100%);"></div>
@@ -602,9 +662,9 @@
         let inboxChannel = null; 
         let activeTargetLetterToUnseal = null;
         let countdownInterval = null; 
-        let pendingPostcardUrl = null; // Holds the URL for the postcard before sending
+        let pendingPostcardUrl = null; 
+        let clientCronInterval = null;
 
-        // State for custom user metadata
         let activeWaxColor = '#801818';
         let activeMonogram = 'D';
 
@@ -663,25 +723,51 @@
             const days = Math.floor(total / (1000 * 60 * 60 * 24));
             const hours = Math.floor((total % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const mins = Math.floor((total % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((total % (1000 * 60)) / 1000);
+            
             let str = 'Arrives in ';
-            if (days > 0) str += `${days} day${days > 1 ? 's' : ''}, `;
-            if (hours > 0 || days > 0) str += `${hours} hr${hours > 1 ? 's' : ''}`;
-            else str += `${mins} min${mins > 1 ? 's' : ''}`;
-            return str;
+            if (days > 0) str += `${days}d `;
+            if (hours > 0 || days > 0) str += `${hours}h `;
+            if (mins > 0 || hours > 0 || days > 0) str += `${mins}m `;
+            if (days === 0 && hours === 0) str += `${secs}s`;
+            return str.trim();
         }
 
-        // Parses the [POSTCARD:url] tag from letter content safely
         function parsePostcardFromContent(rawContent) {
-            if (!rawContent) return { url: null, text: '' };
-            const match = rawContent.match(/^\[POSTCARD:(.*?)\]\n?/);
-            if (match && match[1]) {
-                return { url: match[1], text: rawContent.replace(match[0], '') };
+            if (!rawContent) return { url: null, text: '', ephemeral: false };
+            let text = rawContent;
+            let url = null;
+            let ephemeral = false;
+
+            const ephMatch = text.match(/^\[EPHEMERAL\]\n?/);
+            if (ephMatch) {
+                ephemeral = true;
+                text = text.replace(ephMatch[0], '');
             }
-            return { url: null, text: rawContent };
+            const pcMatch = text.match(/^\[POSTCARD:(.*?)\]\n?/);
+            if (pcMatch && pcMatch[1]) {
+                url = pcMatch[1];
+                text = text.replace(pcMatch[0], '');
+            }
+            return { url, text, ephemeral };
+        }
+
+        function showViewRightPane(elementId) {
+            const panes = ['right-col-empty', 'right-col-profile', 'active-letter-board', 'right-col-friend-profile'];
+            panes.forEach(id => {
+                const el = document.getElementById(id);
+                if (id === elementId) {
+                    el.classList.remove('hidden');
+                    el.classList.add('flex');
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                }
+            });
         }
 
         // ==========================================
-        // AMBIENCE & SOUNDSCAPE ENGINE (Web Audio API)
+        // AMBIENCE & SOUNDSCAPE ENGINE
         // ==========================================
         let audioCtx = null;
         let ambienceSource = null;
@@ -694,65 +780,34 @@
 
         function playPenScratch() {
             if (!audioCtx) return;
-            const bufferSize = audioCtx.sampleRate * 0.05; // 50ms scratch
+            const bufferSize = audioCtx.sampleRate * 0.05;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
-            for (let i = 0; i < bufferSize; i++) {
-                data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2); // Fade out
-            }
-            const src = audioCtx.createBufferSource();
-            src.buffer = buffer;
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'bandpass';
-            filter.frequency.value = 2500 + Math.random() * 1000; // Randomize pitch slightly
-            const gain = audioCtx.createGain();
-            gain.gain.value = 0.04; // Very subtle
-            src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination);
-            src.start();
+            for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 2);
+            const src = audioCtx.createBufferSource(); src.buffer = buffer;
+            const filter = audioCtx.createBiquadFilter(); filter.type = 'bandpass'; filter.frequency.value = 2500 + Math.random() * 1000;
+            const gain = audioCtx.createGain(); gain.gain.value = 0.04;
+            src.connect(filter); filter.connect(gain); gain.connect(audioCtx.destination); src.start();
         }
 
         function startAmbience(type) {
-            stopAmbience();
-            initAudioCtx();
+            stopAmbience(); initAudioCtx();
             const bufferSize = 2 * audioCtx.sampleRate;
             const noiseBuffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const output = noiseBuffer.getChannelData(0);
-
             if (type === 'fire') {
                 let lastOut = 0;
-                for (let i = 0; i < bufferSize; i++) {
-                    const white = Math.random() * 2 - 1;
-                    output[i] = (lastOut + (0.02 * white)) / 1.02;
-                    lastOut = output[i];
-                    output[i] *= 3.5;
-                }
+                for (let i = 0; i < bufferSize; i++) { const white = Math.random() * 2 - 1; output[i] = (lastOut + (0.02 * white)) / 1.02; lastOut = output[i]; output[i] *= 3.5; }
             } else {
                 for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
             }
-
-            ambienceSource = audioCtx.createBufferSource();
-            ambienceSource.buffer = noiseBuffer;
-            ambienceSource.loop = true;
-
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.value = type === 'fire' ? 400 : 1200;
-
-            ambienceGain = audioCtx.createGain();
-            ambienceGain.gain.value = 0.08;
-
-            ambienceSource.connect(filter);
-            filter.connect(ambienceGain);
-            ambienceGain.connect(audioCtx.destination);
-            ambienceSource.start();
+            ambienceSource = audioCtx.createBufferSource(); ambienceSource.buffer = noiseBuffer; ambienceSource.loop = true;
+            const filter = audioCtx.createBiquadFilter(); filter.type = 'lowpass'; filter.frequency.value = type === 'fire' ? 400 : 1200;
+            ambienceGain = audioCtx.createGain(); ambienceGain.gain.value = 0.08;
+            ambienceSource.connect(filter); filter.connect(ambienceGain); ambienceGain.connect(audioCtx.destination); ambienceSource.start();
         }
 
-        function stopAmbience() {
-            if (ambienceSource) {
-                try { ambienceSource.stop(); } catch(e){}
-                ambienceSource = null;
-            }
-        }
+        function stopAmbience() { if (ambienceSource) { try { ambienceSource.stop(); } catch(e){} ambienceSource = null; } }
 
         // ==========================================
         // ROUTER & AUTH
@@ -772,6 +827,12 @@
             else if (viewId === 'view-composer') initComposer();
             
             if (viewId !== 'view-composer') stopAmbience();
+            document.body.classList.remove('zen-mode-active');
+            
+            if (viewId !== 'view-dashboard' && clientCronInterval) {
+                clearInterval(clientCronInterval);
+                clientCronInterval = null;
+            }
         }
 
         function toggleAuthView(subview) {
@@ -849,6 +910,7 @@
         async function logoutSession() {
             if (inboxChannel) { await supabase.removeChannel(inboxChannel); inboxChannel = null; isRealtimeSubscribed = false; }
             if (countdownInterval) clearInterval(countdownInterval);
+            if (clientCronInterval) clearInterval(clientCronInterval);
             stopAmbience();
             await supabase.auth.signOut();
             currentUser = null;
@@ -921,7 +983,7 @@
                 document.querySelectorAll('.folder-tab-btn').forEach(b => b.classList.remove('border-forest', 'text-forest', 'font-semibold'));
                 e.currentTarget.classList.add('border-forest', 'text-forest', 'font-semibold');
                 currentFolder = e.currentTarget.dataset.folder;
-                const displayTitles = { delivered: 'Inbox', scheduled: 'Scheduled Transit', sent: 'Sent Records', draft: 'Saved Drafts' };
+                const displayTitles = { delivered: 'Inbox', scheduled: 'Pending', sent: 'Sent Records', draft: 'Saved Drafts' };
                 document.getElementById('mailbox-title').textContent = displayTitles[currentFolder];
                 await fetchInboxFeed();
             });
@@ -947,8 +1009,7 @@
                 try {
                     const { error } = await supabase.from('letters').delete().eq('id', activeLetterOnDesk.id).or(`sender_id.eq.${currentUser.id},recipient_id.eq.${currentUser.id}`);
                     if (error) throw error;
-                    document.getElementById('active-letter-board').classList.add('hidden');
-                    document.getElementById('right-col-empty').classList.remove('hidden');
+                    showViewRightPane('right-col-empty');
                     activeLetterOnDesk = null; showMobileRightPane(false); await fetchInboxFeed();
                 } catch (err) { await showAppConfirm('Error', `Failed to burn letter: ${err.message}`); }
             }
@@ -957,10 +1018,7 @@
         async function initDashboard() {
             try { await supabase.rpc('process_scheduled_letters'); } catch (err) { console.warn('Silent processing request handled:', err); }
             currentFolder = 'delivered';
-            document.getElementById('right-col-empty').classList.remove('hidden');
-            document.getElementById('right-col-profile').classList.add('hidden');
-            document.getElementById('right-col-friend-profile').classList.add('hidden');
-            document.getElementById('active-letter-board').classList.add('hidden');
+            showViewRightPane('right-col-empty');
             showMobileRightPane(false);
             document.querySelectorAll('.folder-tab-btn').forEach(b => b.classList.remove('border-forest', 'text-forest', 'font-semibold'));
             const inboxTab = document.querySelector('[data-folder="delivered"]');
@@ -970,6 +1028,12 @@
             await fetchInboxFeed();
             updateUnreadInboxBadge();
             setupRealtimeInboxChannel(); 
+            
+            if (!clientCronInterval) {
+                clientCronInterval = setInterval(async () => {
+                    try { await supabase.rpc('process_scheduled_letters'); } catch (err) {}
+                }, 10000);
+            }
         }
 
         function setupRealtimeInboxChannel() {
@@ -982,6 +1046,9 @@
                     if (letter.status === 'delivered') {
                         triggerToastNotification(`A new envelope has been delivered: "${letter.subject || 'Correspondence'}"`);
                         updateUnreadInboxBadge();
+                        if (currentFolder === 'delivered') fetchInboxFeed();
+                    } else if (letter.status === 'scheduled') {
+                        triggerToastNotification(`A letter is en route. It will arrive in ${getTimeRemaining(letter.delivery_at)}.`);
                         if (currentFolder === 'delivered') fetchInboxFeed();
                     }
                 })
@@ -1003,7 +1070,7 @@
             gsap.killTweensOf(toast);
             gsap.set(toast, { y: -100, opacity: 0 });
             gsap.to(toast, { duration: 0.5, y: 0, opacity: 1, ease: 'power2.out' });
-            setTimeout(() => { gsap.to(toast, { duration: 0.5, y: -100, opacity: 0, ease: 'power2.in', onComplete: () => { toast.classList.add('hidden'); }}); }, 4000);
+            setTimeout(() => { gsap.to(toast, { duration: 0.5, y: -100, opacity: 0, ease: 'power2.in', onComplete: () => { toast.classList.add('hidden'); }}); }, 4500);
         }
 
         async function fetchInboxFeed() {
@@ -1012,11 +1079,18 @@
             if (!list) return;
             list.innerHTML = '';
             if (countdownInterval) clearInterval(countdownInterval);
+            
             let query = supabase.from('letters').select('*, sender:profiles!letters_sender_id_fkey(display_name, username), recipient:profiles!letters_recipient_id_fkey(display_name)');
-            if (currentFolder === 'delivered') query = query.eq('recipient_id', currentUser.id).in('status', ['delivered', 'read']);
-            else if (currentFolder === 'scheduled') query = query.eq('sender_id', currentUser.id).eq('status', 'scheduled');
-            else if (currentFolder === 'sent') query = query.eq('sender_id', currentUser.id).in('status', ['delivered', 'read', 'sent', 'archived']);
-            else if (currentFolder === 'draft') query = query.eq('sender_id', currentUser.id).eq('status', 'draft');
+            
+            if (currentFolder === 'delivered') {
+                query = query.eq('recipient_id', currentUser.id).in('status', ['delivered', 'read', 'scheduled']);
+            } else if (currentFolder === 'scheduled') {
+                query = query.eq('sender_id', currentUser.id).eq('status', 'scheduled');
+            } else if (currentFolder === 'sent') {
+                query = query.eq('sender_id', currentUser.id).in('status', ['delivered', 'read', 'sent', 'archived', 'scheduled']);
+            } else if (currentFolder === 'draft') {
+                query = query.eq('sender_id', currentUser.id).eq('status', 'draft');
+            }
 
             const { data: letters, error } = await query.order('created_at', { ascending: false });
             if (error || !letters || letters.length === 0) { toggleDashboardState('empty'); document.getElementById('letter-count').textContent = '0 Letters'; return; }
@@ -1026,27 +1100,58 @@
             letters.forEach(letter => {
                 const card = document.createElement('div');
                 card.className = "letter-card bg-ivory border border-beige hover:border-gold p-4 rounded-xl cursor-pointer transition-all hover:shadow-sm flex justify-between items-center group relative overflow-hidden";
-                const { text: parsedText } = parsePostcardFromContent(letter.content);
+                const { text: parsedText, ephemeral } = parsePostcardFromContent(letter.content);
                 card.dataset.content = parsedText;
+                
+                const isScheduledTransit = (currentFolder === 'delivered' || currentFolder === 'sent') && letter.status === 'scheduled';
                 const isUnread = currentFolder === 'delivered' && letter.status === 'delivered';
-                const dot = isUnread ? `<span class="h-2 w-2 rounded-full bg-gold mr-3 inline-block flex-shrink-0"></span>` : '';
+                
+                let dot = '';
+                if (isUnread) {
+                    dot = `<span class="h-2 w-2 rounded-full bg-gold mr-3 inline-block flex-shrink-0"></span>`;
+                } else if (isScheduledTransit) {
+                    dot = `<i data-lucide="clock" class="h-4 w-4 text-gold mr-3 flex-shrink-0"></i>`;
+                }
+                
                 const dateStr = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
                 let metaContent = `<span class="text-[10px] text-ink/40">${dateStr}</span>`;
-                if (currentFolder === 'scheduled' && letter.delivery_at) {
+                
+                if (isScheduledTransit && letter.delivery_at) {
                     metaContent = `<span class="text-[10px] text-gold font-semibold countdown-meta block" data-delivery="${letter.delivery_at}">${getTimeRemaining(letter.delivery_at)}</span>`;
                 } else if (currentFolder === 'sent') {
                     if (letter.status === 'read') metaContent = `<span class="text-[10px] text-forest flex items-center gap-1 justify-end"><i data-lucide="check-check" class="h-3 w-3"></i> Read</span>`;
-                    else metaContent = `<span class="text-[10px] text-ink/40 flex items-center gap-1 justify-end"><i data-lucide="check" class="h-3 w-3"></i> Sent</span>`;
+                    else if (letter.status === 'delivered') metaContent = `<span class="text-[10px] text-ink/40 flex items-center gap-1 justify-end"><i data-lucide="check" class="h-3 w-3"></i> Delivered</span>`;
+                    else metaContent = `<span class="text-[10px] text-ink/40 flex items-center gap-1 justify-end"><i data-lucide="clock" class="h-3 w-3"></i> Transit</span>`;
+                } else if (currentFolder === 'delivered' && ephemeral) {
+                    metaContent = `<span class="text-[10px] text-red-500 flex items-center gap-1 justify-end"><i data-lucide="flame" class="h-3 w-3"></i> Fragile</span>`;
                 }
+                
                 const nameLabel = currentFolder === 'delivered' ? `From: ${letter.sender?.display_name || 'Anonymous'}` : `To: ${letter.recipient?.display_name || 'Future Self'}`;
                 card.innerHTML = `<div class="flex items-center overflow-hidden min-w-0 mr-2">${dot}<div class="min-w-0"><h4 class="font-serif text-base font-semibold text-forest group-hover:text-gold transition-colors truncate">${letter.subject || '(Untitled Scroll)'}</h4><p class="text-[11px] text-ink/50 mt-0.5 truncate">${nameLabel}</p></div></div><div class="text-right flex-shrink-0">${metaContent}</div>`;
-                card.addEventListener('click', () => openLetterDetails(letter));
+                
+                if (isScheduledTransit && currentFolder === 'delivered') {
+                    card.classList.add('opacity-70', 'border-dashed', 'border-gold');
+                }
+                
+                card.addEventListener('click', () => {
+                    if (currentFolder === 'delivered' && letter.status === 'scheduled') {
+                        triggerToastNotification(`This letter is currently in transit. It will arrive in ${getTimeRemaining(letter.delivery_at)}.`);
+                        return;
+                    }
+                    openLetterDetails(letter);
+                });
                 list.appendChild(card);
             });
             lucide.createIcons();
-            if (currentFolder === 'scheduled') {
-                countdownInterval = setInterval(() => { document.querySelectorAll('.countdown-meta').forEach(el => { el.textContent = getTimeRemaining(el.dataset.delivery); }); }, 60000);
+            
+            if (document.querySelector('.countdown-meta')) {
+                countdownInterval = setInterval(() => { 
+                    document.querySelectorAll('.countdown-meta').forEach(el => { 
+                        el.textContent = getTimeRemaining(el.dataset.delivery); 
+                    }); 
+                }, 1000);
             }
+            
             const cards = list.querySelectorAll('.letter-card');
             gsap.fromTo(cards, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.05, ease: 'power2.out' });
         }
@@ -1157,11 +1262,10 @@
         });
 
         // ==========================================
-        // COMPOSER MODULE & AMBIENCE
+        // COMPOSER MODULE, ZEN MODE & CHRONOTHERAPY
         // ==========================================
         document.getElementById('btn-close-composer').addEventListener('click', () => routeTo('view-dashboard'));
 
-        // Ambience Listeners
         document.getElementById('btn-ambience-none').addEventListener('click', () => {
             stopAmbience();
             document.querySelectorAll('[id^="btn-ambience-"]').forEach(b => { b.classList.remove('bg-beige/40', 'text-forest', 'font-semibold'); b.classList.add('text-ink/50'); });
@@ -1178,13 +1282,30 @@
             document.getElementById('btn-ambience-fire').classList.add('bg-beige/40', 'text-forest', 'font-semibold');
         });
 
-        // Pen Scratch Listener
         document.getElementById('letter-body').addEventListener('input', () => {
-            initAudioCtx();
-            clearTimeout(penScratchTimeout);
-            // Play scratch if user is actively typing
-            playPenScratch();
+            initAudioCtx(); clearTimeout(penScratchTimeout); playPenScratch();
         });
+
+        document.getElementById('btn-toggle-zen').addEventListener('click', () => document.body.classList.add('zen-mode-active'));
+        document.getElementById('btn-exit-zen').addEventListener('click', () => document.body.classList.remove('zen-mode-active'));
+
+        function applyChronotherapy() {
+            const hour = new Date().getHours();
+            const canvas = document.getElementById('paper-canvas');
+            let bg, textInput;
+            if (hour >= 5 && hour < 12) { 
+                bg = 'linear-gradient(to bottom, #FFFDF8, #FFFCF4)'; textInput = '#3A2F28'; 
+            } else if (hour >= 12 && hour < 18) { 
+                bg = '#FFFDF8'; textInput = '#3A2F28'; 
+            } else if (hour >= 18 && hour < 21) { 
+                bg = 'linear-gradient(to bottom, #FFFDF8, #F5EFE6)'; textInput = '#3A2F28'; 
+            } else { 
+                bg = 'linear-gradient(to bottom, #FFFDF8, #E6D8C3)'; textInput = '#3A2F28'; 
+            }
+            canvas.style.backgroundImage = bg;
+            document.getElementById('letter-body').style.color = textInput;
+            document.getElementById('letter-subject').style.color = textInput;
+        }
 
         function initComposer() {
             document.getElementById('letter-subject').value = '';
@@ -1195,12 +1316,13 @@
             document.getElementById('autosave-badge').textContent = 'Ready to compose';
             activeStyling = { inkColor: '#3A2F28', paperStyle: 'linen', fontFamily: 'serif' };
             const body = document.getElementById('letter-body');
-            body.style.color = '#3A2F28';
-            body.className = "bg-transparent flex-grow text-lg leading-relaxed focus:outline-none resize-none font-serif placeholder-ink/20 text-[#3A2F28] min-h-[350px] w-full";
-            document.getElementById('paper-canvas').style.backgroundColor = '#FFFDF8';
+            body.className = "bg-transparent flex-grow text-lg focus:outline-none resize-none font-serif placeholder-ink/20 min-h-[350px] w-full ink-text";
+            applyChronotherapy();
             pendingPostcardUrl = null;
             document.getElementById('postcard-preview-container').classList.add('hidden');
             document.getElementById('postcard-file-input').value = '';
+            document.getElementById('ephemeral-toggle').checked = false;
+            document.body.classList.remove('zen-mode-active');
         }
 
         document.querySelectorAll('#ink-palette button').forEach(btn => {
@@ -1229,7 +1351,6 @@
             });
         });
 
-        // Postcard Upload Listener
         document.getElementById('postcard-upload-zone').addEventListener('click', () => document.getElementById('postcard-file-input').click());
         document.getElementById('postcard-file-input').addEventListener('change', async (e) => {
             const file = e.target.files[0]; if (!file) return;
@@ -1281,10 +1402,9 @@
             const autosaveText = document.getElementById('autosave-badge');
             if (autosaveText) autosaveText.textContent = "Sealing thoughts...";
             let contentToSave = document.getElementById('letter-body').value;
-            // If we are drafting and have a postcard, persist it in the content string
-            if (pendingPostcardUrl) {
-                contentToSave = `[POSTCARD:${pendingPostcardUrl}]\n${contentToSave}`;
-            }
+            if (document.getElementById('ephemeral-toggle').checked) contentToSave = `[EPHEMERAL]\n${contentToSave}`;
+            if (pendingPostcardUrl) contentToSave = `[POSTCARD:${pendingPostcardUrl}]\n${contentToSave}`;
+            
             const payload = {
                 sender_id: currentUser.id,
                 recipient_id: document.getElementById('recipient-id').value || null,
@@ -1306,6 +1426,7 @@
 
         document.getElementById('letter-subject').addEventListener('input', () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(triggerAutosaveProcess, 1500); });
         document.getElementById('letter-body').addEventListener('input', () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(triggerAutosaveProcess, 1500); });
+        document.getElementById('ephemeral-toggle').addEventListener('change', triggerAutosaveProcess);
 
         document.getElementById('btn-save-draft').addEventListener('click', async () => {
             const btn = document.getElementById('btn-save-draft'); setButtonLoading(btn, true, 'Saving...');
@@ -1314,7 +1435,8 @@
 
         function calculateDeliveryDelay() {
             const speed = document.getElementById('delivery-speed').value; const now = new Date();
-            if (speed === '1h') now.setHours(now.getHours() + 1);
+            if (speed === '1m') now.setMinutes(now.getMinutes() + 1);
+            else if (speed === '1h') now.setHours(now.getHours() + 1);
             else if (speed === '12h') now.setHours(now.getHours() + 12);
             else if (speed === '1d') now.setDate(now.getDate() + 1);
             else if (speed === '7d') now.setDate(now.getDate() + 7);
@@ -1340,11 +1462,9 @@
 
             setButtonLoading(btnHeader, true, 'Sealing...'); setButtonLoading(btnSidebar, true, 'Sealing...');
 
-            // Prepend postcard tag to actual DB content
             let finalContent = rawContent;
-            if (pendingPostcardUrl) {
-                finalContent = `[POSTCARD:${pendingPostcardUrl}]\n${rawContent}`;
-            }
+            if (document.getElementById('ephemeral-toggle').checked) finalContent = `[EPHEMERAL]\n${finalContent}`;
+            if (pendingPostcardUrl) finalContent = `[POSTCARD:${pendingPostcardUrl}]\n${finalContent}`;
 
             const deliveryAt = calculateDeliveryDelay();
             const isScheduled = deliveryAt !== null;
@@ -1359,7 +1479,6 @@
             else { result = await supabase.from('letters').insert(payload).select().single(); if (!result.error && result.data) activeDraftId = result.data.id; }
 
             if (result.error) { await showAppConfirm('Dispatch Error', `Error executing transit dispatch: ${result.error.message}`); setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false); return; }
-            if (isScheduled && activeDraftId) { await supabase.from('scheduled_letters').insert({ letter_id: activeDraftId, delivery_at: deliveryAt }); }
             routeTo('view-dashboard');
         }
 
@@ -1370,14 +1489,10 @@
         // DYNAMIC READING DESK & ENVELOPE UNFOLD
         // ==========================================
         async function openLetterDetails(letter) {
-            document.getElementById('right-col-empty').classList.add('hidden');
-            document.getElementById('right-col-profile').classList.add('hidden');
-            document.getElementById('right-col-friend-profile').classList.add('hidden');
-            const board = document.getElementById('active-letter-board');
-            board.classList.remove('hidden');
+            showViewRightPane('active-letter-board');
             activeLetterOnDesk = letter; 
 
-            const { url: postcardUrl, text: parsedText } = parsePostcardFromContent(letter.content);
+            const { url: postcardUrl, text: parsedText, ephemeral } = parsePostcardFromContent(letter.content);
 
             document.getElementById('desk-letter-title').textContent = letter.subject || '(Untitled Scroll)';
             document.getElementById('desk-letter-subtitle').textContent = letter.sender_id === currentUser.id ? `To: ${letter.recipient?.display_name || 'Future Self'}` : `From: ${letter.sender?.display_name || 'Anonymous'}`;
@@ -1391,9 +1506,8 @@
             else textContent.style.fontSize = '18px';
             textContent.style.color = letter.ink_color || '#3A2F28';
             const fontClass = fontClassMap[letter.font_family] || 'font-serif';
-            textContent.className = `max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap ${fontClass} select-text`;
+            textContent.className = `max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap ${fontClass} select-text ink-text`;
 
-            // Handle Postcard Image rendering
             const postcardContainer = document.getElementById('desk-postcard-container');
             if (postcardUrl) {
                 document.getElementById('desk-postcard-img').src = postcardUrl;
@@ -1418,15 +1532,23 @@
 
             if (isDeliveredAndUnread) {
                 activeTargetLetterToUnseal = letter;
+                
+                if (ephemeral) {
+                    const proceed = await showAppConfirm('Fragile Letter', 'This letter is fragile. It will permanently burn away when you close it. Do you wish to unfold it?');
+                    if (!proceed) { 
+                        showViewRightPane('right-col-empty'); 
+                        return; 
+                    }
+                }
+
                 document.getElementById('env-letter-title').textContent = letter.subject || '(Untitled Scroll)';
                 document.getElementById('env-letter-author').textContent = `From: ${letter.sender?.display_name || 'Anonymous'}`;
                 document.getElementById('env-letter-date').textContent = new Date(letter.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
                 const contentText = document.getElementById('env-letter-content');
                 contentText.textContent = parsedText; contentText.style.color = letter.ink_color || '#3A2F28';
                 const envFontClass = fontClassMap[letter.font_family] || 'font-serif';
-                contentText.className = `text-base leading-relaxed whitespace-pre-wrap ${envFontClass} select-text`;
+                contentText.className = `text-base leading-relaxed whitespace-pre-wrap ${envFontClass} select-text ink-text`;
 
-                // Envelope Postcard
                 const envPostcardContainer = document.getElementById('env-postcard-container');
                 if (postcardUrl) {
                     document.getElementById('env-postcard-img').src = postcardUrl;
@@ -1435,9 +1557,8 @@
                     envPostcardContainer.classList.add('hidden');
                 }
 
-                // Default wax seal to sender's first initial
                 const senderInitial = letter.sender?.display_name ? letter.sender.display_name.charAt(0).toUpperCase() : 'D';
-                document.getElementById('wax-seal-bg').style.backgroundColor = '#801818'; // Crimson for received
+                document.getElementById('wax-seal-bg').style.backgroundColor = ephemeral ? '#111111' : '#801818';
                 document.getElementById('wax-seal-text').textContent = senderInitial;
 
                 document.getElementById('envelope-address').textContent = `To: ${currentUser.user_metadata?.display_name || 'Dear Companion'}`;
@@ -1448,7 +1569,6 @@
                 document.getElementById('btn-close-envelope-modal').classList.add('hidden');
                 document.getElementById('envelope-modal').classList.remove('hidden');
             } else {
-                // If previewing our own sent letter, use our custom wax seal
                 if (letter.sender_id === currentUser.id) {
                     document.getElementById('wax-seal-bg').style.backgroundColor = activeWaxColor;
                     document.getElementById('wax-seal-text').textContent = activeMonogram;
@@ -1491,16 +1611,27 @@
             }});
         });
 
-        document.getElementById('btn-close-envelope-modal').addEventListener('click', () => {
+        document.getElementById('btn-close-envelope-modal').addEventListener('click', async () => {
             document.getElementById('envelope-modal').classList.add('hidden');
-            if (activeTargetLetterToUnseal) { renderDeskReadingPanel(activeTargetLetterToUnseal); activeTargetLetterToUnseal = null; fetchInboxFeed(); }
+            if (activeTargetLetterToUnseal) {
+                const letterToRender = activeTargetLetterToUnseal;
+                const { ephemeral } = parsePostcardFromContent(letterToRender.content);
+                
+                if (ephemeral) {
+                    await supabase.from('letters').delete().eq('id', letterToRender.id);
+                    triggerToastNotification('The fragile letter has been burned.');
+                    showViewRightPane('right-col-empty');
+                    fetchInboxFeed();
+                } else {
+                    renderDeskReadingPanel(letterToRender);
+                    fetchInboxFeed(); 
+                }
+                activeTargetLetterToUnseal = null;
+            }
         });
 
         function renderDeskReadingPanel(letter) {
-            document.getElementById('right-col-empty').classList.add('hidden');
-            document.getElementById('right-col-profile').classList.add('hidden');
-            document.getElementById('right-col-friend-profile').classList.add('hidden');
-            const board = document.getElementById('active-letter-board'); board.classList.remove('hidden');
+            showViewRightPane('active-letter-board');
             activeLetterOnDesk = letter; 
             
             const { url: postcardUrl, text: parsedText } = parsePostcardFromContent(letter.content);
@@ -1517,9 +1648,8 @@
             else textContent.style.fontSize = '18px';
             textContent.style.color = letter.ink_color || '#3A2F28';
             const fontClass = fontClassMap[letter.font_family] || 'font-serif';
-            textContent.className = `max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap ${fontClass} select-text`;
+            textContent.className = `max-w-2xl mx-auto text-lg leading-relaxed whitespace-pre-wrap ${fontClass} select-text ink-text`;
 
-            // Render Postcard
             const postcardContainer = document.getElementById('desk-postcard-container');
             if (postcardUrl) {
                 document.getElementById('desk-postcard-img').src = postcardUrl;
@@ -1538,11 +1668,7 @@
         // PROFILE DESK, WAX SEAL & BACKGROUND
         // ==========================================
         async function showProfilePane() {
-            document.getElementById('right-col-empty').classList.add('hidden');
-            document.getElementById('active-letter-board').classList.add('hidden');
-            document.getElementById('right-col-friend-profile').classList.add('hidden');
-            const profileView = document.getElementById('right-col-profile');
-            profileView.classList.remove('hidden');
+            showViewRightPane('right-col-profile');
             showMobileRightPane(true); clearProfileStatus();
 
             const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', currentUser.id).single();
@@ -1557,26 +1683,22 @@
                 document.getElementById('profile-joined-text').textContent = `Joined: ${new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
                 await fetchAndRenderProfileStats();
 
-                // Load Custom BG and Wax Seal from user_metadata
                 const meta = currentUser.user_metadata || {};
                 activeWaxColor = meta.wax_color || '#801818';
                 activeMonogram = meta.monogram || (profile.display_name ? profile.display_name.charAt(0).toUpperCase() : 'D');
                 
-                // Apply BG
                 if (meta.background_url) {
                     document.getElementById('profile-bg-layer').style.backgroundImage = `url(${meta.background_url})`;
                 } else {
                     document.getElementById('profile-bg-layer').style.backgroundImage = 'none';
                 }
 
-                // Apply Wax UI
                 document.querySelectorAll('#wax-color-palette button').forEach(b => b.classList.replace('border-forest', 'border-transparent'));
                 document.querySelector(`#wax-color-palette button[data-wax="${activeWaxColor}"]`)?.classList.replace('border-transparent', 'border-forest');
                 document.getElementById('edit-monogram').value = activeMonogram;
             }
         }
 
-        // Wax Color Selection
         document.querySelectorAll('#wax-color-palette button').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 document.querySelectorAll('#wax-color-palette button').forEach(b => b.classList.replace('border-forest', 'border-transparent'));
@@ -1585,8 +1707,11 @@
             });
         });
 
-        // Custom Background Upload
-        document.getElementById('btn-upload-bg').addEventListener('click', () => document.getElementById('bg-file-input').click());
+        const handleBgUpload = () => document.getElementById('bg-file-input').click();
+        document.getElementById('btn-upload-bg').addEventListener('click', handleBgUpload);
+        const btnUploadBgMobile = document.getElementById('btn-upload-bg-mobile');
+        if (btnUploadBgMobile) btnUploadBgMobile.addEventListener('click', handleBgUpload);
+
         document.getElementById('bg-file-input').addEventListener('change', async (e) => {
             const file = e.target.files[0]; if (!file) return;
             if (file.size > 5242880) { showProfileStatus('Background image must be smaller than 5MB.', 'error'); return; }
@@ -1598,7 +1723,6 @@
                 if (uploadError) throw uploadError;
                 const { data: { publicUrl } } = supabase.storage.from('avatars').getPublicUrl(filePath);
                 
-                // Save to auth user_metadata
                 const { error: metaError } = await supabase.auth.updateUser({ data: { background_url: publicUrl } });
                 if (metaError) throw metaError;
                 
@@ -1644,8 +1768,8 @@
             } catch (err) { showProfileStatus(`Photo upload failed: ${err.message}`, 'error'); }
         });
 
-        document.getElementById('form-edit-profile').addEventListener('submit', async (e) => {
-            e.preventDefault(); clearProfileStatus();
+        async function handleProfileSubmit(e) {
+            if (e) e.preventDefault(); clearProfileStatus();
             const displayName = document.getElementById('edit-display-name').value.trim();
             const bio = document.getElementById('edit-bio').value.trim();
             const country = document.getElementById('edit-country').value.trim();
@@ -1656,7 +1780,6 @@
                 const { error } = await supabase.from('profiles').update({ display_name: displayName, bio: bio, country: country }).eq('id', currentUser.id);
                 if (error) throw error;
                 
-                // Save wax color and monogram to user_metadata
                 const { error: metaError } = await supabase.auth.updateUser({ data: { wax_color: activeWaxColor, monogram: monogram } });
                 if (metaError) throw metaError;
                 activeMonogram = monogram;
@@ -1666,7 +1789,9 @@
                 const img = document.getElementById('profile-avatar-img');
                 if (img.classList.contains('hidden')) { document.getElementById('profile-avatar-fallback').textContent = displayName.charAt(0).toUpperCase(); }
             } catch (err) { showProfileStatus(err.message, 'error'); }
-        });
+        }
+        document.getElementById('form-edit-profile').addEventListener('submit', handleProfileSubmit);
+        document.getElementById('btn-save-profile-top').addEventListener('click', handleProfileSubmit);
 
         function showProfileStatus(message, type) {
             const box = document.getElementById('profile-status-box');
@@ -1683,11 +1808,7 @@
         // DYNAMIC COMPANIONS PROFILE DESK
         // ==========================================
         async function showCompanionProfilePane(friend) {
-            document.getElementById('right-col-empty').classList.add('hidden');
-            document.getElementById('right-col-profile').classList.add('hidden');
-            document.getElementById('active-letter-board').classList.add('hidden');
-            const friendProfileView = document.getElementById('right-col-friend-profile');
-            friendProfileView.classList.remove('hidden');
+            showViewRightPane('right-col-friend-profile');
             showMobileRightPane(true);
             const { data: profile, error } = await supabase.from('profiles').select('*').eq('id', friend.friend_id).single();
             if (!error && profile) {

@@ -22,6 +22,8 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <!-- LocalForage for Deep Offline Mode (IndexedDB wrapper) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/localforage/1.10.0/localforage.min.js"></script>
 
     <!-- Tailwind Config Sync -->
     <script>
@@ -232,6 +234,12 @@
                 </div>
                 
                 <div id="atrium-composer" class="hidden p-4 border-b border-beige bg-[#F8F6F2] flex-shrink-0">
+                    <select id="atrium-topic-input" class="w-full bg-[#FCFBF9] border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink mb-2">
+                        <option value="general">General Musing</option>
+                        <option value="poetry">Poetry & Verse</option>
+                        <option value="philosophy">Philosophy</option>
+                        <option value="future_self">Letter to Future Self</option>
+                    </select>
                     <textarea id="atrium-input" rows="3" class="w-full bg-ivory border border-beige rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-forest text-ink resize-none custom-scrollbar" placeholder="Share a brief thought, quote, or poem with the sanctuary..."></textarea>
                     <div class="flex justify-between items-center mt-2">
                         <span id="atrium-char-count" class="text-[10px] text-ink/40">0 / 200</span>
@@ -239,6 +247,15 @@
                             <i data-lucide="send" class="h-3 w-3"></i> Post
                         </button>
                     </div>
+                </div>
+
+                <!-- Atrium Topic Filters -->
+                <div id="atrium-topic-filters" class="hidden flex-wrap gap-2 p-3 border-b border-beige bg-[#F8F6F2] flex-shrink-0">
+                    <button data-topic="all" class="atrium-filter-btn px-3 py-1 text-[10px] uppercase tracking-widest rounded-full border border-forest bg-forest text-ivory">All</button>
+                    <button data-topic="general" class="atrium-filter-btn px-3 py-1 text-[10px] uppercase tracking-widest rounded-full border border-beige text-ink/60 hover:bg-beige/40">General</button>
+                    <button data-topic="poetry" class="atrium-filter-btn px-3 py-1 text-[10px] uppercase tracking-widest rounded-full border border-beige text-ink/60 hover:bg-beige/40">Poetry</button>
+                    <button data-topic="philosophy" class="atrium-filter-btn px-3 py-1 text-[10px] uppercase tracking-widest rounded-full border border-beige text-ink/60 hover:bg-beige/40">Philosophy</button>
+                    <button data-topic="future_self" class="atrium-filter-btn px-3 py-1 text-[10px] uppercase tracking-widest rounded-full border border-beige text-ink/60 hover:bg-beige/40">Future Self</button>
                 </div>
 
                 <div id="filter-search-container" class="hidden p-3 border-b border-beige bg-[#F8F6F2] flex-shrink-0">
@@ -300,6 +317,13 @@
                             <div class="flex items-center justify-between pt-2 border-t border-linen">
                                 <span class="text-xs font-semibold text-ink/70">Audio Unfolding Sound</span>
                                 <input type="checkbox" id="settings-audio-enabled" checked class="w-4 h-4 accent-forest">
+                            </div>
+                            <div class="flex items-center justify-between pt-2 border-t border-linen">
+                                <div>
+                                    <span class="block text-xs font-semibold text-ink/70">Push Notifications</span>
+                                    <span class="text-[10px] text-ink/40 italic">Get pinged when a letter arrives</span>
+                                </div>
+                                <button id="btn-enable-notifications" class="bg-beige text-ink/70 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-gold hover:text-forest transition-all">Enable</button>
                             </div>
                         </div>
                     </div>
@@ -689,12 +713,13 @@
         const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         const CREATOR_EMAIL = "aathirhussain019@gmail.com";
-        const CREATOR_USERNAME = "bhat"; // Updated to match your pen name
+        const CREATOR_USERNAME = "bhat"; 
 
         let currentUser = null;
         let activeDraftId = null;
         let currentFolder = 'delivered';
         let currentViewMode = 'inbox';
+        let currentAtriumFilter = 'all';
         let debounceTimer = null;
         let activeStyling = { inkColor: '#3A2F28', paperStyle: 'linen', fontFamily: 'serif' };
         let activeLetterOnDesk = null; 
@@ -706,7 +731,7 @@
         let pendingPostcardUrl = null; 
         let clientCronInterval = null;
         let userSentCount = 0;
-        let activeViewingUserId = null; // Added to track profile views
+        let activeViewingUserId = null; 
 
         let activeWaxColor = '#801818';
         let activeMonogram = 'D';
@@ -717,6 +742,12 @@
             handwriting2: 'font-handwriting2',
             handwriting3: 'font-handwriting3'
         };
+
+        // Configure localforage for offline drafts
+        localforage.config({
+            name: 'DearSanctuary',
+            storeName: 'offline_drafts'
+        });
 
         // Safe Service Worker Registration
         if ('serviceWorker' in navigator) {
@@ -791,6 +822,15 @@
             const pcMatch = text.match(/^\[POSTCARD:(.*?)\]\n?/);
             if (pcMatch && pcMatch[1]) { url = pcMatch[1]; text = text.replace(pcMatch[0], ''); }
             return { url, text, ephemeral };
+        }
+
+        function parseTopicFromContent(rawContent) {
+            if (!rawContent) return { topic: 'general', text: rawContent || '' };
+            const match = rawContent.match(/^\[TOPIC:(.*?)\]\n?/);
+            if (match && match[1]) {
+                return { topic: match[1], text: rawContent.replace(match[0], '') };
+            }
+            return { topic: 'general', text: rawContent };
         }
 
         function showViewRightPane(elementId) {
@@ -1013,6 +1053,9 @@
             }
         });
 
+        // Online/Offline Sync Listeners for Deep Offline Mode
+        window.addEventListener('online', syncOfflineDrafts);
+
         function switchToCompanionsMode(targetMode) {
             currentViewMode = targetMode;
             const folderTabs = document.getElementById('mailbox-folder-tabs');
@@ -1022,8 +1065,9 @@
             const settingsPanel = document.getElementById('settings-panel');
             const atriumPanel = document.getElementById('atrium-panel');
             const atriumComposer = document.getElementById('atrium-composer');
+            const atriumFilters = document.getElementById('atrium-topic-filters');
             
-            folderTabs.classList.add('hidden'); searchBar.classList.add('hidden'); lettersList.classList.add('hidden'); companionsPanel.classList.add('hidden'); settingsPanel.classList.add('hidden'); atriumPanel.classList.add('hidden'); atriumComposer.classList.add('hidden');
+            folderTabs.classList.add('hidden'); searchBar.classList.add('hidden'); lettersList.classList.add('hidden'); companionsPanel.classList.add('hidden'); settingsPanel.classList.add('hidden'); atriumPanel.classList.add('hidden'); atriumComposer.classList.add('hidden'); atriumFilters.classList.add('hidden');
             
             if (targetMode === 'friends') {
                 companionsPanel.classList.remove('hidden');
@@ -1038,7 +1082,8 @@
             } else if (targetMode === 'atrium') {
                 atriumPanel.classList.remove('hidden');
                 atriumComposer.classList.remove('hidden');
-                document.getElementById('mailbox-title').textContent = 'The A true ';
+                atriumFilters.classList.remove('hidden');
+                document.getElementById('mailbox-title').textContent = 'The Atrium';
                 document.getElementById('letter-count').textContent = 'Public Board';
                 toggleDashboardState('list'); 
                 showMobileRightPane(false);
@@ -1059,6 +1104,38 @@
             if (size === 'small') contentPane.style.fontSize = '14px';
             else if (size === 'large') contentPane.style.fontSize = '22px';
             else contentPane.style.fontSize = '18px';
+        });
+
+        // Enable Push Notifications Logic
+        document.getElementById('btn-enable-notifications').addEventListener('click', async () => {
+            if (!('Notification' in window)) {
+                await showAppConfirm('Not Supported', 'This browser does not support system notifications.');
+                return;
+            }
+            const permission = await Notification.requestPermission();
+            if (permission === 'granted') {
+                triggerToastNotification('Notifications enabled. You will be pinged upon arrival.');
+                new Notification('Dear Sanctuary', { body: 'Notifications are active. You will know when a letter arrives.', icon: './icon.svg' });
+                document.getElementById('btn-enable-notifications').textContent = 'Enabled';
+                document.getElementById('btn-enable-notifications').classList.add('bg-forest', 'text-ivory');
+                document.getElementById('btn-enable-notifications').classList.remove('bg-beige', 'text-ink/70');
+            } else {
+                await showAppConfirm('Permission Denied', 'Please enable notifications in your browser settings to receive letter arrivals.');
+            }
+        });
+
+        // Atrium Topic Filters Logic
+        document.querySelectorAll('.atrium-filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.atrium-filter-btn').forEach(b => {
+                    b.classList.remove('border-forest', 'bg-forest', 'text-ivory');
+                    b.classList.add('border-beige', 'text-ink/60');
+                });
+                e.currentTarget.classList.add('border-forest', 'bg-forest', 'text-ivory');
+                e.currentTarget.classList.remove('border-beige', 'text-ink/60');
+                currentAtriumFilter = e.currentTarget.dataset.topic;
+                fetchAtriumPosts();
+            });
         });
 
         document.querySelectorAll('.folder-tab-btn').forEach(btn => {
@@ -1112,6 +1189,7 @@
             updateBottomNavActive('inbox');
             updateUnreadInboxBadge();
             setupRealtimeInboxChannel(); 
+            syncOfflineDrafts(); // Attempt to sync any offline drafts on load
             
             if (!clientCronInterval) {
                 clientCronInterval = setInterval(async () => {
@@ -1129,6 +1207,10 @@
                     const letter = payload.new;
                     if (letter.status === 'delivered') {
                         triggerToastNotification(`A new envelope has been delivered: "${letter.subject || 'Correspondence'}"`);
+                        // System Push Notification
+                        if (Notification.permission === 'granted') {
+                            new Notification('A letter has arrived', { body: letter.subject || 'Correspondence', icon: './icon.svg' });
+                        }
                         updateUnreadInboxBadge();
                         fetchInboxFeed();
                     } else if (letter.status === 'scheduled') {
@@ -1139,6 +1221,9 @@
                 .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'letters', filter: `recipient_id=eq.${currentUser.id}` }, (payload) => {
                     if (payload.new.status === 'delivered' && payload.old.status === 'scheduled') {
                         triggerToastNotification(`A scheduled envelope has arrived: "${payload.new.subject || 'Correspondence'}"`);
+                        if (Notification.permission === 'granted') {
+                            new Notification('A delayed letter has arrived', { body: payload.new.subject || 'Correspondence', icon: './icon.svg' });
+                        }
                         updateUnreadInboxBadge();
                         fetchInboxFeed();
                     }
@@ -1337,7 +1422,18 @@
                 return;
             }
 
-            const postIds = posts.map(p => p.id);
+            // Filter posts by topic on the client side
+            const filteredPosts = currentAtriumFilter === 'all' ? posts : posts.filter(p => {
+                const { topic } = parseTopicFromContent(p.content);
+                return topic === currentAtriumFilter;
+            });
+
+            const postIds = filteredPosts.map(p => p.id);
+            if (postIds.length === 0) {
+                list.innerHTML = `<div class="flex flex-col items-center justify-center py-10 text-center space-y-3"><p class="font-serif italic text-sm text-ink/60">No musings in this category yet.</p></div>`;
+                return;
+            }
+
             const [
                 { data: likes }, 
                 { data: replies }, 
@@ -1346,7 +1442,7 @@
             ] = await Promise.all([
                 supabase.from('community_likes').select('post_id, user_id').in('post_id', postIds),
                 supabase.from('community_replies').select('*').in('post_id', postIds),
-                supabase.from('profiles').select('id, display_name, avatar_url, username').in('id', [...new Set(posts.map(p => p.user_id))]),
+                supabase.from('profiles').select('id, display_name, avatar_url, username').in('id', [...new Set(filteredPosts.map(p => p.user_id))]),
                 supabase.from('community_pins').select('post_id').eq('user_id', currentUser.id)
             ]);
 
@@ -1366,8 +1462,8 @@
 
             list.innerHTML = '';
             
-            const myPosts = posts.filter(p => p.user_id === currentUser.id);
-            const globalPosts = posts.filter(p => p.user_id !== currentUser.id);
+            const myPosts = filteredPosts.filter(p => p.user_id === currentUser.id);
+            const globalPosts = filteredPosts.filter(p => p.user_id !== currentUser.id);
 
             const renderPost = (post) => {
                 const profile = profileMap[post.user_id] || {};
@@ -1379,6 +1475,14 @@
                 const isLiked = postLikes.includes(currentUser.id);
                 const isPinned = pinnedIds.has(post.id);
                 const isCreatorPost = profile.username?.toLowerCase() === CREATOR_USERNAME;
+                const { topic, text: parsedText } = parseTopicFromContent(post.content);
+
+                const topicColors = {
+                    general: 'bg-beige text-ink/60',
+                    poetry: 'bg-purple-100 text-purple-700',
+                    philosophy: 'bg-blue-100 text-blue-700',
+                    future_self: 'bg-amber-100 text-amber-700'
+                };
 
                 const repliesHtml = postReplies.map(r => {
                     const rProfile = profileMap[r.user_id] || {};
@@ -1422,10 +1526,11 @@
                                     <h4 class="view-user-profile text-sm font-semibold text-forest truncate cursor-pointer hover:text-gold" data-user-id="${post.user_id}">${displayName}</h4>
                                     <span class="text-[10px] text-ink/40">${dateStr}</span>
                                     ${isCreatorPost ? '<span class="hidden sm:inline-block px-1.5 py-0.5 bg-gold/20 text-gold text-[9px] font-bold rounded">CREATOR</span>' : ''}
+                                    <span class="px-1.5 py-0.5 ${topicColors[topic] || topicColors.general} text-[9px] font-bold rounded uppercase tracking-wider">${topic.replace('_', ' ')}</span>
                                 </div>
                                 ${actionButtons}
                             </div>
-                            <p class="post-content text-sm font-serif text-ink leading-relaxed mt-1 whitespace-pre-wrap" data-post-id="${post.id}">${post.content}</p>
+                            <p class="post-content text-sm font-serif text-ink leading-relaxed mt-1 whitespace-pre-wrap" data-post-id="${post.id}">${parsedText}</p>
                             
                             <div class="flex items-center gap-6 mt-3 text-ink/50">
                                 <button class="like-btn flex items-center gap-1.5 text-xs hover:text-red-500 transition-colors ${isLiked ? 'is-liked' : ''}" data-post-id="${post.id}">
@@ -1584,11 +1689,15 @@
 
         document.getElementById('btn-post-atrium').addEventListener('click', async () => {
             const input = document.getElementById('atrium-input');
+            const topicInput = document.getElementById('atrium-topic-input');
             const text = input.value.trim();
             if (!text) return;
             const btn = document.getElementById('btn-post-atrium');
             setButtonLoading(btn, true, 'Posting...');
-            const { error } = await supabase.from('community_posts').insert({ user_id: currentUser.id, content: text });
+            
+            // Prepend topic tag to content
+            const finalContent = `[TOPIC:${topicInput.value}]\n${text}`;
+            const { error } = await supabase.from('community_posts').insert({ user_id: currentUser.id, content: finalContent });
             setButtonLoading(btn, false);
             if (!error) {
                 input.value = '';
@@ -1898,6 +2007,9 @@
             }, 400);
         });
 
+        // ==========================================
+        // DEEP OFFLINE MODE (IndexedDB via localforage)
+        // ==========================================
         async function triggerAutosaveProcess() {
             const autosaveText = document.getElementById('autosave-badge');
             if (autosaveText) autosaveText.textContent = "Sealing thoughts...";
@@ -1914,6 +2026,14 @@
                 font_family: activeStyling.fontFamily,
                 status: 'draft'
             };
+
+            if (!navigator.onLine) {
+                // Save offline
+                await localforage.setItem('offline_draft_' + Date.now(), payload);
+                if (autosaveText) autosaveText.textContent = "Saved Offline (Will sync when online)";
+                return;
+            }
+
             if (activeDraftId) {
                 await supabase.from('letters').update(payload).eq('id', activeDraftId);
             } else {
@@ -1921,6 +2041,23 @@
                 if (!error && data) activeDraftId = data.id;
             }
             if (autosaveText) autosaveText.textContent = "Parchment draft saved";
+        }
+
+        async function syncOfflineDrafts() {
+            if (!navigator.onLine || !currentUser) return;
+            const keys = await localforage.keys();
+            const offlineDraftKeys = keys.filter(k => k.startsWith('offline_draft_'));
+            if (offlineDraftKeys.length === 0) return;
+
+            triggerToastNotification('Syncing offline manuscripts...');
+            for (const key of offlineDraftKeys) {
+                const payload = await localforage.getItem(key);
+                const { data, error } = await supabase.from('letters').insert(payload).select().single();
+                if (!error && data) {
+                    await localforage.removeItem(key);
+                }
+            }
+            triggerToastNotification('Offline drafts securely archived.');
         }
 
         document.getElementById('letter-subject').addEventListener('input', () => { clearTimeout(debounceTimer); debounceTimer = setTimeout(triggerAutosaveProcess, 1500); });
@@ -1969,6 +2106,11 @@
                 await showAppConfirm('Routing Required', 'An envelope requires a valid recipient pen name to route delivery.'); 
                 setButtonLoading(btnHeader, false); setButtonLoading(btnSidebar, false);
                 return; 
+            }
+
+            if (!navigator.onLine) {
+                await showAppConfirm('Offline Mode', 'You are currently offline. You cannot seal and send a letter without an internet connection. Your draft has been saved offline and will sync when you reconnect.');
+                return;
             }
 
             setButtonLoading(btnHeader, true, 'Sealing...'); setButtonLoading(btnSidebar, true, 'Sealing...');
@@ -2439,7 +2581,7 @@
         function clearProfileStatus() { const box = document.getElementById('profile-status-box'); if (box) box.classList.add('hidden'); }
 
         // ==========================================
-        // DYNAMIC USER PROFILE DESK (Handles Friends, Non-Friends, and Requests)
+        // DYNAMIC USER PROFILE DESK
         // ==========================================
         async function viewUserProfile(userId) {
             if (userId === currentUser.id) {
@@ -2447,12 +2589,11 @@
                 return;
             }
 
-            activeViewingUserId = userId; // Track who we are looking at
+            activeViewingUserId = userId;
 
             showViewRightPane('right-col-friend-profile');
             showMobileRightPane(true);
 
-            // Reset Friend Tabs
             document.getElementById('friend-profile-tabs').classList.remove('hidden');
             document.getElementById('friend-details-pane').classList.remove('hidden');
             document.getElementById('friend-scrapbook-pane').classList.add('hidden');
@@ -2475,7 +2616,6 @@
             if (profile.avatar_url) { img.src = profile.avatar_url; img.classList.remove('hidden'); fallback.classList.add('hidden'); } 
             else { img.classList.add('hidden'); fallback.classList.remove('hidden'); fallback.textContent = (profile.display_name || 'F').charAt(0).toUpperCase(); }
 
-            // Creator Theme Logic for Friend Profile
             const isCreatorProfile = profile.username?.toLowerCase() === CREATOR_USERNAME;
             const friendHeader = document.getElementById('friend-header-bg');
             const friendAvatarRing = document.getElementById('friend-avatar-ring');
@@ -2495,7 +2635,6 @@
 
             const actionBtn = document.getElementById('btn-friend-action');
             
-            // Check if friends using user_friends view
             const { data: isFriend } = await supabase.from('user_friends').select('friend_id').eq('friend_id', userId).maybeSingle();
             
             if (isFriend) {
@@ -2510,7 +2649,6 @@
                 };
                 await fetchFriendLettersHistory(userId);
             } else {
-                // Check if request already sent/received
                 const { data: req } = await supabase.from('friend_requests')
                     .select('*').or(`and(sender_id.eq.${currentUser.id},receiver_id.eq.${userId}),and(sender_id.eq.${userId},receiver_id.eq.${currentUser.id})`).eq('status', 'pending').maybeSingle();
                 
@@ -2543,7 +2681,6 @@
             lucide.createIcons();
         }
 
-        // Friend Profile Tab Listeners
         document.getElementById('tab-friend-profile').addEventListener('click', () => {
             document.getElementById('friend-details-pane').classList.remove('hidden');
             document.getElementById('friend-scrapbook-pane').classList.add('hidden');
@@ -2554,7 +2691,7 @@
         });
 
         document.getElementById('tab-friend-scrapbook').addEventListener('click', async (e) => {
-            const userId = activeViewingUserId; // Use tracked ID
+            const userId = activeViewingUserId; 
             if (!userId) return;
 
             document.getElementById('friend-details-pane').classList.add('hidden');

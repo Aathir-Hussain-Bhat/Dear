@@ -2,7 +2,7 @@
 <html lang="en" class="h-full bg-[#F8F6F2]">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dear — Intentional Letter Messaging</title>
     
     <!-- PWA Configuration Manifest Link -->
@@ -51,10 +51,12 @@
         }
     </script>
     <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        /* Custom Scrollbar for aesthetic */
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E1DA; border-radius: 2px; }
         
+        /* Vintage postcard styling */
         .vintage-postcard {
             border: 8px solid #FFFDF8;
             box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
@@ -64,8 +66,10 @@
         }
         .vintage-postcard:hover { transform: rotate(0deg) scale(1.02); }
 
+        /* Ink bleed filter for text */
         .ink-text { filter: url(#ink-bleed-filter); }
 
+        /* Zen mode isolation */
         .zen-mode-active #paper-canvas {
             box-shadow: 0 0 0 9999px rgba(58, 47, 40, 0.85);
             z-index: 50; border-radius: 0;
@@ -80,6 +84,7 @@
         .zen-exit-btn { display: none; }
         .zen-mode-active .zen-exit-btn { display: flex; }
 
+        /* Paper canvas texture and lines */
         #paper-canvas {
             background-color: #FFFDF8;
             background-image: linear-gradient(#e5e1da10 1px, transparent 1px);
@@ -89,14 +94,35 @@
         }
         #letter-body { line-height: 32px; letter-spacing: 0.02em; }
 
+        /* Creator specific glow */
         .creator-glow {
             box-shadow: 0 0 15px rgba(200, 169, 106, 0.4);
             border: 2px solid #C8A96A;
+        }
+
+        /* Presence indicator pulse animation */
+        .presence-pulse {
+            animation: presence-pulse 2s infinite;
+        }
+        @keyframes presence-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+
+        /* Mobile responsive tweaks for modals and views */
+        @media (max-width: 768px) {
+            #envelope-modal { padding: 4px; }
+            #envelope-container { height: 85vh; max-height: 500px; }
+            #physical-envelope { height: 240px; }
+            #envelope-letter-sheet { height: calc(85vh - 40px); max-height: 460px; }
+            .dashboard-left-col { width: 100% !important; }
         }
     </style>
 </head>
 <body class="h-full font-sans text-ink selection:bg-gold selection:text-forest overflow-hidden">
 
+    <!-- SVG Filter Definition for Ink Bleed -->
     <svg style="position: absolute; width: 0; height: 0;">
         <filter id="ink-bleed-filter">
             <feTurbulence type="fractalNoise" baseFrequency="0.02" numOctaves="3" result="noise"/>
@@ -104,11 +130,13 @@
         </filter>
     </svg>
 
+    <!-- Toast Notification Component -->
     <div id="toast-notification" class="hidden fixed top-6 left-1/2 transform -translate-x-1/2 bg-forest border border-gold rounded-full px-6 py-3 shadow-2xl flex items-center space-x-3 z-[100] transition-all duration-300">
         <i data-lucide="mail-open" class="h-4 w-4 text-gold animate-bounce"></i>
         <span id="toast-message" class="text-xs font-serif italic text-ivory">A new sealed envelope has arrived</span>
     </div>
 
+    <!-- Global Confirmation Modal -->
     <div id="app-confirm-modal" class="hidden fixed inset-0 bg-ink/50 backdrop-blur-sm z-[200] flex items-center justify-center p-4">
         <div class="bg-ivory border border-beige rounded-2xl shadow-2xl p-8 max-w-sm w-full text-center space-y-4 transform scale-95 opacity-0 transition-all duration-300" id="app-confirm-box">
             <div class="flex justify-center">
@@ -216,18 +244,18 @@
             <div class="flex items-center space-x-3">
                 <span class="font-serif text-3xl italic text-ivory tracking-wide">Dear</span>
             </div>
-            <div class="flex items-center space-x-6 text-ivory/80">
+            <div class="flex items-center space-x-4 md:space-x-6 text-ivory/80">
                 <button id="nav-search-btn" class="hover:text-gold transition-colors focus:outline-none" title="Search Letters"><i data-lucide="search" class="h-5 w-5"></i></button>
                 <button id="nav-profile-btn" class="hover:text-gold transition-colors focus:outline-none" title="My Profile Settings"><i data-lucide="user" class="h-5 w-5"></i></button>
                 <button id="btn-open-composer" class="bg-gold text-forest px-4 py-1.5 rounded-lg text-xs font-semibold hover:bg-ivory hover:text-forest transition-all flex items-center space-x-1 shadow-sm" title="Write a New Letter">
-                    <i data-lucide="feather" class="h-3.5 w-3.5"></i><span>Compose</span>
+                    <i data-lucide="feather" class="h-3.5 w-3.5"></i><span class="hidden sm:inline">Compose</span>
                 </button>
                 <button id="nav-more-btn" class="hover:text-gold transition-colors focus:outline-none" title="More Options"><i data-lucide="more-vertical" class="h-5 w-5"></i></button>
             </div>
         </header>
 
         <main class="flex-grow flex w-full overflow-hidden relative pb-16 md:pb-0">
-            <section id="dashboard-left-col" class="w-full md:w-96 flex flex-col bg-ivory border-r border-beige flex-shrink-0">
+            <section id="dashboard-left-col" class="dashboard-left-col w-full md:w-96 flex flex-col bg-ivory border-r border-beige flex-shrink-0">
                 <div class="px-4 py-3 border-b border-beige bg-[#FAF8F5] flex justify-between items-center flex-shrink-0 select-none">
                     <h2 id="mailbox-title" class="font-serif text-lg font-semibold text-forest">Inbox</h2>
                     <span id="letter-count" class="text-[10px] font-semibold text-ink/40 uppercase tracking-wider">0 Letters</span>
@@ -271,7 +299,7 @@
                     <button data-folder="draft" class="folder-tab-btn flex-1 py-3 text-center border-b-2 border-transparent hover:text-forest">Drafts</button>
                 </div>
                 <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar relative p-4 bg-ivory">
-                    <div id="dashboard-loader" class="flex flex-col items-center justify-center py-20 space-y-3">
+                    <div id="dashboard-loader" class="hidden flex-col items-center justify-center py-20 space-y-3">
                         <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-forest"></div>
                         <p class="font-serif italic text-xs text-ink/60">Reading letter catalog...</p>
                     </div>
@@ -282,7 +310,7 @@
                     <div id="letters-list" class="hidden space-y-3"></div>
                     
                     <div id="atrium-panel" class="hidden space-y-4">
-                        <div id="atrium-list" class="space-y-4"></div>
+                        <div id="atrium-list" class="space-y-3"></div>
                     </div>
 
                     <div id="friends-panel" class="hidden space-y-4">
@@ -303,6 +331,8 @@
                             <div id="companions-list" class="space-y-6"></div>
                         </div>
                     </div>
+                    
+                    <!-- Explicit Settings Panel (Mobile & Desktop visible) -->
                     <div id="settings-panel" class="hidden space-y-6">
                         <div class="bg-[#FCFBF9] border border-beige rounded-xl p-4 space-y-4">
                             <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">Display Preferences</h3>
@@ -326,11 +356,18 @@
                                 <button id="btn-enable-notifications" class="bg-beige text-ink/70 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-gold hover:text-forest transition-all">Enable</button>
                             </div>
                         </div>
+                        <div class="bg-[#FCFBF9] border border-beige rounded-xl p-4 space-y-4">
+                             <h3 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold">Account Status</h3>
+                             <p class="text-xs text-ink/60 italic">Manage your presence and availability across the sanctuary.</p>
+                             <button id="btn-settings-view-profile" class="w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm">
+                                 <i data-lucide="user-cog" class="h-4 w-4"></i><span>Edit Profile & Status</span>
+                             </button>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <section id="dashboard-right-col" class="hidden md:flex flex-grow flex-col bg-[#F8F6F2] relative overflow-hidden">
+            <section id="dashboard-right-col" class="hidden md:flex flex-grow flex-col h-full bg-[#F8F6F2] relative overflow-hidden">
                 <div id="right-col-empty" class="hidden flex-col items-center justify-center flex-grow p-8 text-center bg-[#F8F6F2]">
                     <div class="max-w-xs space-y-4">
                         <i data-lucide="feather" class="h-12 w-12 text-gold/60 mx-auto"></i>
@@ -339,8 +376,8 @@
                     </div>
                 </div>
 
-                <div id="right-col-profile" class="hidden flex-col h-full overflow-hidden bg-[#F8F6F2] relative">
-                    <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none relative z-10">
+                <div id="right-col-profile" class="hidden flex-col h-full bg-[#F8F6F2] relative overflow-hidden">
+                    <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none relative z-20">
                         <div class="flex items-center space-x-3">
                             <button id="btn-back-to-list-profile" class="md:hidden text-forest hover:text-gold transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
                             <h3 class="font-serif text-xl font-semibold text-forest">My Sanctuary Profile</h3>
@@ -360,98 +397,116 @@
                         <input type="file" id="bg-file-input" class="hidden" accept="image/*">
                     </div>
 
-                    <div id="profile-bg-layer" class="absolute inset-0 bg-cover bg-center pointer-events-none" style="background-image: none;"></div>
-                    <div class="absolute inset-0 bg-ivory/80 pointer-events-none"></div>
+                    <div class="flex-1 min-h-0 w-full overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center relative">
+                        <div id="profile-bg-layer" class="absolute inset-0 bg-cover bg-center pointer-events-none z-0" style="background-image: none;"></div>
+                        <div class="absolute inset-0 bg-ivory/80 pointer-events-none z-0"></div>
 
-                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center relative z-10">
-                        <div id="profile-details-pane" class="max-w-md w-full bg-ivory/90 backdrop-blur-sm border border-beige rounded-2xl shadow-xl overflow-hidden mb-8">
-                            <div id="profile-header-bg" class="bg-forest p-6 flex flex-col items-center relative">
-                                <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[5deg]">
-                                    <span class="text-[8px] block font-bold tracking-widest">SANCTUARY</span>
-                                    <span class="text-[6px] block">EST. 1840</span>
-                                </div>
-                                <div class="relative group cursor-pointer mb-4" id="avatar-container" title="Update Profile Photo">
-                                    <div id="profile-avatar-ring" class="p-1 bg-gold rounded-full shadow-lg">
-                                        <img id="profile-avatar-img" class="h-24 w-24 rounded-full object-cover hidden" src="" alt="Avatar">
-                                        <div id="profile-avatar-fallback" class="h-24 w-24 rounded-full bg-ivory text-forest flex items-center justify-center font-serif font-bold text-4xl">C</div>
+                        <div class="relative z-10 w-full max-w-md flex flex-col items-center">
+                            <div id="profile-details-pane" class="w-full bg-ivory/90 backdrop-blur-sm border border-beige rounded-2xl shadow-xl overflow-hidden mb-8">
+                                <div id="profile-header-bg" class="bg-forest p-6 flex flex-col items-center relative">
+                                    <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[5deg]">
+                                        <span class="text-[8px] block font-bold tracking-widest">SANCTUARY</span>
+                                        <span class="text-[6px] block">EST. 1840</span>
                                     </div>
-                                    <div class="absolute inset-1 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                                        <i data-lucide="camera" class="h-6 w-6 text-ivory"></i>
-                                    </div>
-                                    <input type="file" id="avatar-file-input" class="hidden" accept="image/*">
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <h3 id="profile-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Dear Companion</h3>
-                                    <span id="creator-badge-profile" class="hidden px-2 py-0.5 bg-gold text-forest text-[10px] font-bold rounded-full flex items-center gap-1">
-                                        <i data-lucide="award" class="h-3 w-3"></i> Creator
-                                    </span>
-                                </div>
-                                <p id="profile-username" class="text-sm text-gold tracking-wide">@username</p>
-                            </div>
-                            <div class="grid grid-cols-3 border-b border-beige divide-x divide-beige">
-                                <div class="p-4 text-center">
-                                    <span id="stat-sent" class="block font-serif text-2xl text-forest font-bold">0</span>
-                                    <span class="text-[10px] text-ink/50 uppercase tracking-wider">Dispatched</span>
-                                </div>
-                                <div class="p-4 text-center">
-                                    <span id="stat-received" class="block font-serif text-2xl text-forest font-bold">0</span>
-                                    <span class="text-[10px] text-ink/50 uppercase tracking-wider">Received</span>
-                                </div>
-                                <div class="p-4 text-center">
-                                    <span id="stat-pending" class="block font-serif text-2xl text-forest font-bold">0</span>
-                                    <span class="text-[10px] text-ink/50 uppercase tracking-wider">In Transit</span>
-                                </div>
-                            </div>
-                            <div class="p-6 space-y-5">
-                                <div id="profile-status-box" class="hidden p-3 rounded-lg text-xs" role="alert"></div>
-                                
-                                <div class="pt-2 border-t border-beige">
-                                    <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold mb-2">Wax Seal Collection</h4>
-                                    <div id="seal-collection-grid" class="flex flex-wrap gap-2"></div>
-                                </div>
-
-                                <form id="form-edit-profile" class="space-y-5">
-                                    <div>
-                                        <label for="edit-display-name" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Signature Name</label>
-                                        <input type="text" id="edit-display-name" class="w-full bg-transparent border-b border-beige pb-2 text-lg font-serif text-ink focus:outline-none focus:border-gold transition-colors">
-                                    </div>
-                                    <div>
-                                        <label for="edit-bio" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Pen Musings / Biography</label>
-                                        <textarea id="edit-bio" rows="3" class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink focus:outline-none focus:border-gold transition-colors resize-none custom-scrollbar" placeholder="Share your silent thoughts..."></textarea>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-6">
-                                        <div>
-                                            <label for="edit-country" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Origin Location</label>
-                                            <input type="text" id="edit-country" class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink focus:outline-none focus:border-gold transition-colors">
+                                    <div class="relative group cursor-pointer mb-4" id="avatar-container" title="Update Profile Photo">
+                                        <div id="profile-avatar-ring" class="p-1 bg-gold rounded-full shadow-lg">
+                                            <img id="profile-avatar-img" class="h-24 w-24 rounded-full object-cover hidden" src="" alt="Avatar">
+                                            <div id="profile-avatar-fallback" class="h-24 w-24 rounded-full bg-ivory text-forest flex items-center justify-center font-serif font-bold text-4xl">C</div>
                                         </div>
-                                        <div>
-                                            <label class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Account Email</label>
-                                            <input type="text" id="profile-email-input" readonly class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink/40 focus:outline-none cursor-not-allowed">
+                                        <div class="absolute inset-1 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <i data-lucide="camera" class="h-6 w-6 text-ivory"></i>
                                         </div>
+                                        <input type="file" id="avatar-file-input" class="hidden" accept="image/*">
                                     </div>
+                                    <div class="flex items-center gap-2">
+                                        <h3 id="profile-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Dear Companion</h3>
+                                        <span id="creator-badge-profile" class="hidden px-2 py-0.5 bg-gold text-forest text-[10px] font-bold rounded-full flex items-center gap-1">
+                                            <i data-lucide="award" class="h-3 w-3"></i> Creator
+                                        </span>
+                                    </div>
+                                    <p id="profile-username" class="text-sm text-gold tracking-wide">@username</p>
+                                    <!-- WhatsApp-style Status Text Display -->
+                                    <p id="profile-status-display" class="text-xs text-ivory/80 italic mt-1 flex items-center gap-1">
+                                        <i data-lucide="quote" class="h-3 w-3"></i> Hey there! I am using Dear.
+                                    </p>
+                                </div>
+                                <div class="grid grid-cols-3 border-b border-beige divide-x divide-beige">
+                                    <div class="p-4 text-center">
+                                        <span id="stat-sent" class="block font-serif text-2xl text-forest font-bold">0</span>
+                                        <span class="text-[10px] text-ink/50 uppercase tracking-wider">Dispatched</span>
+                                    </div>
+                                    <div class="p-4 text-center">
+                                        <span id="stat-received" class="block font-serif text-2xl text-forest font-bold">0</span>
+                                        <span class="text-[10px] text-ink/50 uppercase tracking-wider">Received</span>
+                                    </div>
+                                    <div class="p-4 text-center">
+                                        <span id="stat-pending" class="block font-serif text-2xl text-forest font-bold">0</span>
+                                        <span class="text-[10px] text-ink/50 uppercase tracking-wider">In Transit</span>
+                                    </div>
+                                </div>
+                                <div class="p-6 space-y-5">
+                                    <div id="profile-status-box" class="hidden p-3 rounded-lg text-xs" role="alert"></div>
                                     
-                                    <div class="pt-4 border-t border-beige">
-                                        <label class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-2">Signet Ring (Wax Seal)</label>
-                                        <div class="flex gap-2 mb-3" id="wax-color-palette">
-                                            <button type="button" data-wax="#801818" class="h-6 w-6 rounded-full border-2 border-forest" style="background-color: #801818;"></button>
-                                            <button type="button" data-wax="#1F4D3A" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1F4D3A;"></button>
-                                            <button type="button" data-wax="#C8A96A" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #C8A96A;"></button>
-                                            <button type="button" data-wax="#1E293B" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1E293B;"></button>
+                                    <div class="pt-2 border-t border-beige">
+                                        <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold mb-2">Wax Seal Collection</h4>
+                                        <div id="seal-collection-grid" class="flex flex-wrap gap-2"></div>
+                                    </div>
+
+                                    <form id="form-edit-profile" class="space-y-5">
+                                        <div>
+                                            <label for="edit-display-name" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Signature Name</label>
+                                            <input type="text" id="edit-display-name" class="w-full bg-transparent border-b border-beige pb-2 text-lg font-serif text-ink focus:outline-none focus:border-gold transition-colors">
                                         </div>
-                                        <input type="text" id="edit-monogram" maxlength="2" class="w-16 bg-transparent border-b border-beige pb-2 text-lg font-serif text-ink focus:outline-none focus:border-gold transition-colors uppercase text-center" placeholder="ED">
-                                    </div>
+                                        <div>
+                                            <label for="edit-bio" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Pen Musings / Biography</label>
+                                            <textarea id="edit-bio" rows="3" class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink focus:outline-none focus:border-gold transition-colors resize-none custom-scrollbar" placeholder="Share your silent thoughts..."></textarea>
+                                        </div>
+                                        <!-- WhatsApp-style Status Input -->
+                                        <div>
+                                            <label for="edit-status" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Current Status (Resets after 12h)</label>
+                                            <input type="text" id="edit-status" maxlength="80" class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink focus:outline-none focus:border-gold transition-colors" placeholder="What are you pondering today?">
+                                        </div>
+                                        <div class="grid grid-cols-2 gap-6">
+                                            <div>
+                                                <label for="edit-country" class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Origin Location</label>
+                                                <input type="text" id="edit-country" class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink focus:outline-none focus:border-gold transition-colors">
+                                            </div>
+                                            <div>
+                                                <label class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-1">Account Email</label>
+                                                <input type="text" id="profile-email-input" readonly class="w-full bg-transparent border-b border-beige pb-2 text-sm text-ink/40 focus:outline-none cursor-not-allowed">
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="pt-4 border-t border-beige">
+                                            <label class="block text-[10px] uppercase tracking-widest font-bold text-ink/50 mb-2">Signet Ring (Wax Seal)</label>
+                                            <div class="flex gap-2 mb-3" id="wax-color-palette">
+                                                <button type="button" data-wax="#801818" class="h-6 w-6 rounded-full border-2 border-forest" style="background-color: #801818;"></button>
+                                                <button type="button" data-wax="#1F4D3A" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1F4D3A;"></button>
+                                                <button type="button" data-wax="#C8A96A" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #C8A96A;"></button>
+                                                <button type="button" data-wax="#1E293B" class="h-6 w-6 rounded-full border-2 border-transparent" style="background-color: #1E293B;"></button>
+                                            </div>
+                                            <input type="text" id="edit-monogram" maxlength="2" class="w-16 bg-transparent border-b border-beige pb-2 text-lg font-serif text-ink focus:outline-none focus:border-gold transition-colors uppercase text-center" placeholder="ED">
+                                        </div>
 
-                                    <div class="pt-4 flex justify-between items-center">
-                                        <span id="profile-joined-text" class="text-[10px] text-ink/40 italic">Joined: ---</span>
-                                        <button type="button" id="btn-upload-bg-mobile" class="sm:hidden text-xs text-forest hover:text-gold flex items-center gap-1">
-                                            <i data-lucide="image" class="h-4 w-4"></i> Change BG
-                                        </button>
+                                        <div class="pt-4 flex justify-between items-center">
+                                            <span id="profile-joined-text" class="text-[10px] text-ink/40 italic">Joined: ---</span>
+                                            <button type="button" id="btn-upload-bg-mobile" class="sm:hidden text-xs text-forest hover:text-gold flex items-center gap-1">
+                                                <i data-lucide="image" class="h-4 w-4"></i> Change BG
+                                            </button>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- Friends List on Profile -->
+                                <div class="p-6 pt-0">
+                                    <div class="pt-4 border-t border-beige">
+                                        <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold mb-2">Companions Directory</h4>
+                                        <div id="profile-friends-list" class="flex flex-wrap gap-2"></div>
                                     </div>
-                                </form>
+                                </div>
                             </div>
-                        </div>
 
-                        <div id="profile-scrapbook-pane" class="hidden max-w-md w-full space-y-4"></div>
+                            <div id="profile-scrapbook-pane" class="hidden w-full space-y-4"></div>
+                        </div>
                     </div>
                 </div>
 
@@ -470,7 +525,7 @@
                             <button id="btn-delete-letter" class="text-red-500 hover:text-red-700 p-1.5 hover:bg-red-50 rounded transition-colors" title="Burn Letter Permanently"><i data-lucide="trash-2" class="h-4 w-4"></i></button>
                         </div>
                     </div>
-                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-8 md:p-12 bg-ivory relative">
+                    <div class="flex-1 min-h-0 w-full overflow-y-auto custom-scrollbar p-8 md:p-12 bg-ivory relative">
                         <div id="desk-postcard-container" class="hidden max-w-xs mx-auto mb-8">
                             <img id="desk-postcard-img" src="" alt="Postcard" class="w-full h-auto vintage-postcard">
                         </div>
@@ -478,8 +533,8 @@
                     </div>
                 </div>
 
-                <div id="right-col-friend-profile" class="hidden flex-col h-full overflow-hidden bg-[#F8F6F2]">
-                    <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none">
+                <div id="right-col-friend-profile" class="hidden flex-col h-full bg-[#F8F6F2] relative overflow-hidden">
+                    <div class="bg-ivory border-b border-beige px-6 py-4 flex items-center justify-between flex-shrink-0 select-none relative z-20">
                         <div class="flex items-center space-x-3">
                             <button id="btn-back-to-list-friend-profile" class="md:hidden text-forest hover:text-gold mr-2 transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
                             <h3 class="font-serif text-xl font-semibold text-forest">Companion Profile</h3>
@@ -489,41 +544,55 @@
                             <button id="tab-friend-scrapbook" class="px-3 py-1 border-b-2 border-transparent hover:text-forest transition-colors">Commonplace Book</button>
                         </div>
                     </div>
-                    <div class="flex-1 min-h-0 overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center">
-                        
-                        <div id="friend-details-pane" class="max-w-md w-full bg-ivory border border-beige rounded-2xl shadow-xl overflow-hidden mb-8">
-                            <div id="friend-header-bg" class="bg-forest p-6 flex flex-col items-center relative">
-                                <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[-5deg]"><span class="text-[8px] block font-bold tracking-widest">FRIEND</span></div>
-                                <div id="friend-avatar-ring" class="mb-4 p-1 bg-gold rounded-full shadow-lg">
-                                    <img id="friend-profile-img" class="h-24 w-24 rounded-full object-cover hidden" src="" alt="Avatar">
-                                    <div id="friend-profile-fallback" class="h-24 w-24 rounded-full bg-ivory text-forest flex items-center justify-center font-serif font-bold text-4xl">F</div>
+                    <div class="flex-1 min-h-0 w-full overflow-y-auto custom-scrollbar p-6 md:p-8 flex flex-col items-center relative">
+                        <div class="relative z-10 w-full max-w-md flex flex-col items-center">
+                            <div id="friend-details-pane" class="w-full bg-ivory border border-beige rounded-2xl shadow-xl overflow-hidden mb-8">
+                                <div id="friend-header-bg" class="bg-forest p-6 flex flex-col items-center relative">
+                                    <div class="absolute top-4 right-4 border-2 border-dashed border-gold/40 text-gold/80 p-2 rounded-sm text-center rotate-[-5deg]"><span class="text-[8px] block font-bold tracking-widest">FRIEND</span></div>
+                                    <div class="relative mb-4">
+                                        <div id="friend-avatar-ring" class="p-1 bg-gold rounded-full shadow-lg">
+                                            <img id="friend-profile-img" class="h-24 w-24 rounded-full object-cover hidden" src="" alt="Avatar">
+                                            <div id="friend-profile-fallback" class="h-24 w-24 rounded-full bg-ivory text-forest flex items-center justify-center font-serif font-bold text-4xl">F</div>
+                                        </div>
+                                        <!-- Presence Dot -->
+                                        <span id="friend-presence-dot" class="hidden absolute bottom-2 right-2 h-5 w-5 rounded-full bg-gray-400 border-2 border-ivory transition-colors"></span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <h4 id="friend-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Companion Name</h4>
+                                        <span id="creator-badge-friend" class="hidden px-2 py-0.5 bg-gold text-forest text-[10px] font-bold rounded-full flex items-center gap-1">
+                                            <i data-lucide="award" class="h-3 w-3"></i> Creator
+                                        </span>
+                                    </div>
+                                    <p id="friend-username" class="text-sm text-gold tracking-wide">@username</p>
+                                    <p id="friend-status-text" class="text-xs text-ivory/80 italic mt-1 flex items-center gap-1">
+                                        <i data-lucide="quote" class="h-3 w-3"></i> Hey there! I am using Dear.
+                                    </p>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <h4 id="friend-display-name" class="font-serif text-3xl italic text-ivory font-semibold">Companion Name</h4>
-                                    <span id="creator-badge-friend" class="hidden px-2 py-0.5 bg-gold text-forest text-[10px] font-bold rounded-full flex items-center gap-1">
-                                        <i data-lucide="award" class="h-3 w-3"></i> Creator
-                                    </span>
+                                <div class="p-6 space-y-4">
+                                    <div class="space-y-3 text-sm">
+                                        <div class="flex justify-between items-center border-b border-linen pb-2"><span class="text-ink/50 text-xs uppercase tracking-widest">Origin</span><strong id="friend-country" class="text-ink font-serif">---</strong></div>
+                                        <div class="flex justify-between items-center border-b border-linen pb-2"><span class="text-ink/50 text-xs uppercase tracking-widest">Joined</span><strong id="friend-joined" class="text-ink font-serif">---</strong></div>
+                                        <div class="flex flex-col gap-1 border-b border-linen pb-3 pt-1"><span class="text-ink/50 text-xs uppercase tracking-widest mb-1">Pen Musings</span><span id="friend-bio" class="italic text-ink/70 leading-relaxed font-serif text-sm">No shared musings compiled yet...</span></div>
+                                    </div>
+                                    <button id="btn-friend-action" class="w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm">
+                                        <i data-lucide="feather" class="h-4 w-4"></i><span id="friend-action-text">Address a Letter</span>
+                                    </button>
+                                    <div class="space-y-3 pt-2">
+                                        <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold flex items-center gap-1 select-none"><i data-lucide="mail" class="h-3.5 w-3.5"></i><span>Sanctuary Correspondence Log</span></h4>
+                                        <div id="friend-letters-list" class="space-y-3"></div>
+                                    </div>
                                 </div>
-                                <p id="friend-username" class="text-sm text-gold tracking-wide">@username</p>
+                                <!-- Friends List on Friend Profile -->
+                                <div class="p-6 pt-0">
+                                    <div class="space-y-3 pt-2 border-t border-linen">
+                                        <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold flex items-center gap-1 select-none"><i data-lucide="users" class="h-3.5 w-3.5"></i><span>Companions</span></h4>
+                                        <div id="friend-friends-list" class="flex flex-wrap gap-2"></div>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="p-6 space-y-4">
-                                <div class="space-y-3 text-sm">
-                                    <div class="flex justify-between items-center border-b border-linen pb-2"><span class="text-ink/50 text-xs uppercase tracking-widest">Origin</span><strong id="friend-country" class="text-ink font-serif">---</strong></div>
-                                    <div class="flex justify-between items-center border-b border-linen pb-2"><span class="text-ink/50 text-xs uppercase tracking-widest">Joined</span><strong id="friend-joined" class="text-ink font-serif">---</strong></div>
-                                    <div class="flex flex-col gap-1 border-b border-linen pb-3 pt-1"><span class="text-ink/50 text-xs uppercase tracking-widest mb-1">Pen Musings</span><span id="friend-bio" class="italic text-ink/70 leading-relaxed font-serif text-sm">No shared musings compiled yet...</span></div>
-                                </div>
-                                <button id="btn-friend-action" class="w-full bg-forest text-ivory text-xs py-3 rounded-lg font-semibold hover:bg-gold hover:text-forest transition-all flex items-center justify-center space-x-2 shadow-sm">
-                                    <i data-lucide="feather" class="h-4 w-4"></i><span id="friend-action-text">Address a Letter</span>
-                                </button>
-                                <div class="space-y-3 pt-2">
-                                    <h4 class="text-[10px] uppercase tracking-widest text-ink/40 font-bold flex items-center gap-1 select-none"><i data-lucide="mail" class="h-3.5 w-3.5"></i><span>Sanctuary Correspondence Log</span></h4>
-                                    <div id="friend-letters-list" class="space-y-3"></div>
-                                </div>
-                            </div>
+
+                            <div id="friend-scrapbook-pane" class="hidden w-full space-y-4"></div>
                         </div>
-
-                        <div id="friend-scrapbook-pane" class="hidden max-w-md w-full space-y-4"></div>
-
                     </div>
                 </div>
             </section>
@@ -539,15 +608,18 @@
             <button id="bottom-friends" class="flex flex-col items-center text-ivory/60 text-[10px] font-semibold p-2 border-t-2 border-transparent hover:text-ivory transition-colors">
                 <i data-lucide="users" class="h-5 w-5 mb-1"></i> Friends
             </button>
+            <button id="bottom-settings" class="flex flex-col items-center text-ivory/60 text-[10px] font-semibold p-2 border-t-2 border-transparent hover:text-ivory transition-colors">
+                <i data-lucide="settings" class="h-5 w-5 mb-1"></i> Settings
+            </button>
         </nav>
     </div>
 
     <!-- VIEW 3: COMPOSER -->
     <div id="view-composer" class="hidden h-full flex flex-col bg-goldbrown overflow-hidden">
-        <header class="composer-header bg-beige border-b border-beige px-6 py-4 flex justify-between items-center flex-shrink-0 transition-opacity">
-            <div class="flex items-center space-x-4">
+        <header class="composer-header bg-beige border-b border-beige px-4 md:px-6 py-4 flex justify-between items-center flex-shrink-0 transition-opacity">
+            <div class="flex items-center space-x-3 md:space-x-4">
                 <button id="btn-close-composer" class="text-ink/60 hover:text-ink transition-colors"><i data-lucide="arrow-left" class="h-5 w-5"></i></button>
-                <span class="font-serif text-2xl italic text-forest select-none">Write Letter</span>
+                <span class="font-serif text-xl md:text-2xl italic text-forest select-none">Write Letter</span>
                 
                 <div class="hidden md:flex items-center space-x-2 ml-6 border-l border-beige pl-6">
                     <span class="text-xs text-ink/50 uppercase tracking-wider">Ambience:</span>
@@ -556,14 +628,14 @@
                     <button id="btn-ambience-fire" class="text-xs px-2 py-1 rounded text-ink/50 hover:bg-beige/20">Fire</button>
                 </div>
             </div>
-            <div class="flex items-center space-x-3">
+            <div class="flex items-center space-x-2 md:space-x-3">
                 <button id="btn-toggle-zen" class="zen-toggle-btn text-xs font-semibold text-ink/60 border border-beige px-3 py-2 rounded-lg hover:bg-beige/40 transition-colors flex items-center gap-1">
-                    <i data-lucide="eye-off" class="h-3.5 w-3.5"></i> Zen Mode
+                    <i data-lucide="eye-off" class="h-3.5 w-3.5"></i> <span class="hidden sm:inline">Zen Mode</span>
                 </button>
                 <span id="autosave-badge" class="text-xs text-ink/40 italic hidden sm:inline">Parchment draft saved</span>
                 <button id="btn-save-draft" class="text-xs font-semibold text-forest border border-forest px-3 py-2 rounded-lg hover:bg-beige/20 transition-colors">Save Draft</button>
                 <button id="btn-seal-envelope-header" class="bg-forest text-ivory text-xs px-3 py-2 rounded-lg font-semibold hover:bg-forest/90 shadow-sm transition-all flex items-center space-x-1">
-                    <i data-lucide="mail" class="h-3.5 w-3.5"></i><span>Seal & Send</span>
+                    <i data-lucide="mail" class="h-3.5 w-3.5"></i><span class="hidden sm:inline">Seal & Send</span>
                 </button>
             </div>
         </header>
@@ -573,9 +645,9 @@
         </button>
 
         <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-8 flex flex-col md:flex-row gap-8 overflow-y-auto custom-scrollbar">
-            <section class="flex-grow bg-ivory border border-beige rounded-2xl shadow-sm p-8 md:p-12 flex flex-col relative transition-all duration-500" id="paper-canvas">
-                <input type="text" id="letter-subject" placeholder="Title of your letter" class="bg-transparent border-b border-beige pb-3 mb-8 text-3xl font-serif text-forest placeholder-forest/30 focus:outline-none focus:border-gold transition-colors w-full ink-text">
-                <textarea id="letter-body" placeholder="Write with calm intention. There are no instant reactions here..." class="bg-transparent flex-grow text-lg focus:outline-none resize-none font-serif placeholder-ink/20 min-h-[350px] w-full ink-text"></textarea>
+            <section class="flex-grow bg-ivory border border-beige rounded-2xl shadow-sm p-6 md:p-12 flex flex-col relative transition-all duration-500" id="paper-canvas">
+                <input type="text" id="letter-subject" placeholder="Title of your letter" class="bg-transparent border-b border-beige pb-3 mb-8 text-2xl md:text-3xl font-serif text-forest placeholder-forest/30 focus:outline-none focus:border-gold transition-colors w-full ink-text">
+                <textarea id="letter-body" placeholder="Write with calm intention. There are no instant reactions here..." class="bg-transparent flex-grow text-base md:text-lg focus:outline-none resize-none font-serif placeholder-ink/20 min-h-[350px] w-full ink-text"></textarea>
             </section>
 
             <aside class="composer-aside w-full md:w-80 space-y-6 transition-opacity">
@@ -606,7 +678,7 @@
                     </div>
 
                     <div>
-                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Ink Pigment <span class="text-gold text-[10px] normal-case font-normal">(Unlocks as you write)</span></span>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Ink Pigment</span>
                         <div class="flex space-x-3 relative" id="ink-palette">
                             <button data-color="#3A2F28" data-req="0" class="h-6 w-6 rounded-full border-2 border-forest" style="background-color: #3A2F28;"></button>
                             <button data-color="#1F4D3A" data-req="5" class="h-6 w-6 rounded-full border-2 border-transparent relative" style="background-color: #1F4D3A;"></button>
@@ -616,7 +688,7 @@
                     </div>
 
                     <div>
-                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Paper Quality <span class="text-gold text-[10px] normal-case font-normal">(Unlocks as you write)</span></span>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Paper Quality</span>
                         <div class="grid grid-cols-2 gap-2" id="paper-styles">
                             <button data-paper="linen" data-req="0" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-medium text-forest">Antique Linen</button>
                             <button data-paper="parchment" data-req="10" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-medium text-ink/70 relative">Parchment</button>
@@ -624,7 +696,7 @@
                     </div>
 
                     <div>
-                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Writing Hand <span class="text-gold text-[10px] normal-case font-normal">(Unlocks as you write)</span></span>
+                        <span class="block text-xs uppercase tracking-wider font-semibold text-ink/70 mb-2">Writing Hand</span>
                         <div class="grid grid-cols-3 gap-2" id="typeface-styles">
                             <button data-font="serif" data-req="0" class="text-xs py-2 bg-beige/40 rounded-lg border border-gold font-serif text-forest">Serif</button>
                             <button data-font="handwriting" data-req="15" class="text-xs py-2 bg-ivory rounded-lg border border-beige font-handwriting text-ink/70 relative">Caveat</button>
@@ -664,6 +736,7 @@
         <div class="absolute inset-0 bg-transparent"></div>
         <div class="absolute right-6 top-16 w-48 bg-ivory border border-beige rounded-xl shadow-xl py-2 z-40">
             <button id="btn-dropdown-profile" class="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-beige/40 flex items-center space-x-2"><i data-lucide="user" class="h-4 w-4 text-forest"></i><span>View Profile</span></button>
+            <button id="btn-dropdown-settings" class="w-full text-left px-4 py-2.5 text-sm text-ink hover:bg-beige/40 flex items-center space-x-2"><i data-lucide="settings" class="h-4 w-4 text-forest"></i><span>Settings</span></button>
             <button id="btn-dropdown-logout" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center space-x-2"><i data-lucide="log-out" class="h-4 w-4"></i><span>Logout Session</span></button>
         </div>
     </div>
@@ -706,6 +779,16 @@
     </div>
 
     <script type="module">
+        /* 
+         * REQUIRED SQL UPDATE FOR THIS VERSION:
+         * Please go to Supabase Dashboard -> SQL Editor and run:
+         * 
+         * ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS status_updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW();
+         * ALTER TABLE public.friendships ENABLE ROW LEVEL SECURITY;
+         * DROP POLICY IF EXISTS "Users can view friendships" ON public.friendships;
+         * CREATE POLICY "Users can view friendships" ON public.friendships FOR SELECT USING (status = 'accepted');
+         */
+
         import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
         const SUPABASE_URL = "https://lnmvtxxfeireptqurpoj.supabase.co";
@@ -714,6 +797,7 @@
 
         const CREATOR_EMAIL = "aathirhussain019@gmail.com";
         const CREATOR_USERNAME = "bhat"; 
+        const DEFAULT_STATUS = "Hey there! I am using Dear.";
 
         let currentUser = null;
         let activeDraftId = null;
@@ -726,6 +810,7 @@
         let isRealtimeSubscribed = false;
         let inboxChannel = null; 
         let atriumChannel = null;
+        let presenceChannel = null; // WhatsApp-like Presence
         let activeTargetLetterToUnseal = null;
         let countdownInterval = null; 
         let pendingPostcardUrl = null; 
@@ -833,6 +918,17 @@
             return { topic: 'general', text: rawContent };
         }
 
+        // Helper to handle 12-hour status expiration
+        function getDisplayStatus(profile) {
+            if (!profile.status_text) return DEFAULT_STATUS;
+            const updatedAt = profile.status_updated_at ? new Date(profile.status_updated_at).getTime() : 0;
+            const twelveHours = 12 * 60 * 60 * 1000;
+            if (Date.now() - updatedAt > twelveHours) {
+                return DEFAULT_STATUS;
+            }
+            return profile.status_text;
+        }
+
         function showViewRightPane(elementId) {
             const panes = ['right-col-empty', 'right-col-profile', 'active-letter-board', 'right-col-friend-profile'];
             panes.forEach(id => {
@@ -935,15 +1031,36 @@
         document.getElementById('btn-goto-forgot').addEventListener('click', () => toggleAuthView('forgot'));
         document.getElementById('btn-back-to-signin').addEventListener('click', () => toggleAuthView('signin'));
 
+        // Smart Auth: Auto create account if login fails
         document.getElementById('form-signin').addEventListener('submit', async (e) => {
             e.preventDefault(); clearAuthStatus();
             const email = document.getElementById('signin-email').value.trim();
             const password = document.getElementById('signin-password').value;
             const btn = e.target.querySelector('button[type="submit"]');
             try {
-                setButtonLoading(btn, true, 'Retrieving...');
+                setButtonLoading(btn, true, 'Verifying...');
                 const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-                if (error) throw error;
+                if (error) {
+                    if (error.message === "Invalid login credentials") {
+                        setButtonLoading(btn, true, 'Creating sanctuary...');
+                        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({ 
+                            email, 
+                            password, 
+                            options: { data: { username: email.split('@')[0].replace(/[^a-zA-Z0-9_]/g, ''), display_name: email.split('@')[0] } } 
+                        });
+                        if (signUpError) {
+                            if (signUpError.message.includes("already registered")) {
+                                throw new Error("Incorrect password. Please try again.");
+                            }
+                            throw signUpError;
+                        }
+                        currentUser = signUpData.user;
+                        showAuthStatus('Welcome! Your sanctuary has been sealed. Loading...', 'success');
+                        setTimeout(() => routeTo('view-dashboard'), 1500);
+                        return;
+                    }
+                    throw error;
+                }
                 currentUser = data.user;
                 showAuthStatus('Welcome back. Loading sanctuary...', 'success');
                 setTimeout(() => routeTo('view-dashboard'), 1000);
@@ -985,6 +1102,7 @@
         async function logoutSession() {
             if (inboxChannel) { await supabase.removeChannel(inboxChannel); inboxChannel = null; isRealtimeSubscribed = false; }
             if (atriumChannel) { await supabase.removeChannel(atriumChannel); atriumChannel = null; }
+            if (presenceChannel) { await supabase.removeChannel(presenceChannel); presenceChannel = null; }
             if (countdownInterval) clearInterval(countdownInterval);
             if (clientCronInterval) clearInterval(clientCronInterval);
             stopAmbience();
@@ -1010,6 +1128,11 @@
         document.getElementById('nav-more-btn').addEventListener('click', (e) => { e.stopPropagation(); document.getElementById('more-dropdown-modal').classList.toggle('hidden'); });
         document.getElementById('btn-open-composer').addEventListener('click', () => { activeDraftId = null; routeTo('view-composer'); });
         document.getElementById('btn-dropdown-profile').addEventListener('click', async () => { document.getElementById('more-dropdown-modal').classList.add('hidden'); await showProfilePane(); });
+        document.getElementById('btn-dropdown-settings').addEventListener('click', () => { 
+            document.getElementById('more-dropdown-modal').classList.add('hidden'); 
+            switchToCompanionsMode('settings'); 
+            updateBottomNavActive('settings');
+        });
         document.getElementById('btn-dropdown-logout').addEventListener('click', async () => { document.getElementById('more-dropdown-modal').classList.add('hidden'); await logoutSession(); });
         window.addEventListener('click', () => { document.getElementById('more-dropdown-modal').classList.add('hidden'); });
 
@@ -1027,9 +1150,16 @@
             switchToCompanionsMode('friends');
             updateBottomNavActive('friends');
         });
+        document.getElementById('bottom-settings').addEventListener('click', () => {
+            switchToCompanionsMode('settings');
+            updateBottomNavActive('settings');
+        });
+
+        // Settings shortcut button inside the settings panel
+        document.getElementById('btn-settings-view-profile').addEventListener('click', async () => await showProfilePane());
 
         function updateBottomNavActive(tab) {
-            const tabs = ['inbox', 'atrium', 'friends'];
+            const tabs = ['inbox', 'atrium', 'friends', 'settings'];
             tabs.forEach(t => {
                 const btn = document.getElementById(`bottom-${t}`);
                 if (t === tab) {
@@ -1056,45 +1186,59 @@
         // Online/Offline Sync Listeners for Deep Offline Mode
         window.addEventListener('online', syncOfflineDrafts);
 
+        // ==========================================
+        // TAB ISOLATION & STATE LEAK PREVENTION
+        // ==========================================
         function switchToCompanionsMode(targetMode) {
+            // Strict isolation to prevent content leaking between tabs
             currentViewMode = targetMode;
-            const folderTabs = document.getElementById('mailbox-folder-tabs');
-            const searchBar = document.getElementById('filter-search-container');
-            const lettersList = document.getElementById('letters-list');
-            const companionsPanel = document.getElementById('friends-panel');
-            const settingsPanel = document.getElementById('settings-panel');
-            const atriumPanel = document.getElementById('atrium-panel');
-            const atriumComposer = document.getElementById('atrium-composer');
-            const atriumFilters = document.getElementById('atrium-topic-filters');
+            activeLetterOnDesk = null;
+            activeTargetLetterToUnseal = null;
+            showViewRightPane('right-col-empty');
+            showMobileRightPane(false);
+
+            // Hide all primary panels to ensure no overlap
+            document.getElementById('mailbox-folder-tabs').classList.add('hidden');
+            document.getElementById('filter-search-container').classList.add('hidden');
+            document.getElementById('letters-list').classList.add('hidden');
+            document.getElementById('friends-panel').classList.add('hidden');
+            document.getElementById('settings-panel').classList.add('hidden');
+            document.getElementById('atrium-panel').classList.add('hidden');
+            document.getElementById('atrium-composer').classList.add('hidden');
+            document.getElementById('atrium-topic-filters').classList.add('hidden');
             
-            folderTabs.classList.add('hidden'); searchBar.classList.add('hidden'); lettersList.classList.add('hidden'); companionsPanel.classList.add('hidden'); settingsPanel.classList.add('hidden'); atriumPanel.classList.add('hidden'); atriumComposer.classList.add('hidden'); atriumFilters.classList.add('hidden');
+            // Clear any active search input state
+            const searchInput = document.getElementById('filter-search-input');
+            if (searchInput) searchInput.value = '';
             
             if (targetMode === 'friends') {
-                companionsPanel.classList.remove('hidden');
+                document.getElementById('friends-panel').classList.remove('hidden');
                 document.getElementById('mailbox-title').textContent = 'Companions Directory';
                 document.getElementById('letter-count').textContent = 'Companions list';
-                initCompanionsEngine(); toggleDashboardState('list'); showMobileRightPane(false);
+                initCompanionsEngine(); toggleDashboardState('list'); 
             } else if (targetMode === 'settings') {
-                settingsPanel.classList.remove('hidden');
+                document.getElementById('settings-panel').classList.remove('hidden');
                 document.getElementById('mailbox-title').textContent = 'Sanctuary Settings';
                 document.getElementById('letter-count').textContent = 'Preferences';
-                toggleDashboardState('list'); showMobileRightPane(false);
+                toggleDashboardState('list'); 
             } else if (targetMode === 'atrium') {
-                atriumPanel.classList.remove('hidden');
-                atriumComposer.classList.remove('hidden');
-                atriumFilters.classList.remove('hidden');
+                document.getElementById('atrium-panel').classList.remove('hidden');
+                document.getElementById('atrium-composer').classList.remove('hidden');
+                document.getElementById('atrium-topic-filters').classList.remove('hidden');
                 document.getElementById('mailbox-title').textContent = 'The Atrium';
                 document.getElementById('letter-count').textContent = 'Public Board';
                 toggleDashboardState('list'); 
-                showMobileRightPane(false);
                 fetchAtriumPosts();
                 setupRealtimeAtriumChannel();
             } else {
-                folderTabs.classList.remove('hidden');
-                lettersList.classList.remove('hidden');
+                // Inbox
+                document.getElementById('mailbox-folder-tabs').classList.remove('hidden');
+                document.getElementById('letters-list').classList.remove('hidden');
                 document.getElementById('mailbox-title').textContent = 'Inbox';
+                currentFolder = 'delivered'; // Force reset to delivered to prevent sent leakage
+                document.querySelectorAll('.folder-tab-btn').forEach(b => b.classList.remove('border-forest', 'text-forest', 'font-semibold'));
+                document.querySelector('[data-folder="delivered"]')?.classList.add('border-forest', 'text-forest', 'font-semibold');
                 fetchInboxFeed();
-                showMobileRightPane(false);
             }
         }
 
@@ -1190,6 +1334,7 @@
             updateUnreadInboxBadge();
             setupRealtimeInboxChannel(); 
             syncOfflineDrafts(); // Attempt to sync any offline drafts on load
+            setupPresenceChannel(); // Start WhatsApp-like presence tracking
             
             if (!clientCronInterval) {
                 clientCronInterval = setInterval(async () => {
@@ -1207,7 +1352,6 @@
                     const letter = payload.new;
                     if (letter.status === 'delivered') {
                         triggerToastNotification(`A new envelope has been delivered: "${letter.subject || 'Correspondence'}"`);
-                        // System Push Notification
                         if (Notification.permission === 'granted') {
                             new Notification('A letter has arrived', { body: letter.subject || 'Correspondence', icon: './icon.svg' });
                         }
@@ -1231,6 +1375,42 @@
                 .subscribe();
         }
 
+        // ==========================================
+        // WHATSAPP-STYLE PRESENCE TRACKING
+        // ==========================================
+        function setupPresenceChannel() {
+            if (presenceChannel || !currentUser) return;
+            presenceChannel = supabase.channel('online-users', {
+                config: { presence: { key: currentUser.id } }
+            });
+            
+            presenceChannel
+                .on('presence', { event: 'sync' }, () => {
+                    const state = presenceChannel.presenceState();
+                    if (activeViewingUserId) {
+                        const isOnline = !!state[activeViewingUserId];
+                        updateFriendPresenceUI(isOnline);
+                    }
+                })
+                .subscribe(async (status) => {
+                    if (status === 'SUBSCRIBED') {
+                        await presenceChannel.track({ user_id: currentUser.id, online_at: new Date().toISOString() });
+                    }
+                });
+        }
+
+        function updateFriendPresenceUI(isOnline) {
+            const dot = document.getElementById('friend-presence-dot');
+            if (!dot) return;
+            if (isOnline) {
+                dot.classList.remove('hidden', 'bg-gray-400');
+                dot.classList.add('bg-green-500', 'presence-pulse');
+            } else {
+                dot.classList.add('hidden');
+                dot.classList.remove('bg-green-500', 'presence-pulse');
+            }
+        }
+
         function setupRealtimeAtriumChannel() {
             if (atriumChannel) return;
             atriumChannel = supabase
@@ -1241,6 +1421,8 @@
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_likes' }, () => fetchAtriumPosts())
                 .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'community_likes' }, () => fetchAtriumPosts())
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_replies' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'community_replies' }, () => fetchAtriumPosts())
+                .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'community_replies' }, () => fetchAtriumPosts())
                 .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'community_pins' }, () => fetchAtriumPosts())
                 .on('postgres_changes', { event: 'DELETE', schema: 'public', table: 'community_pins' }, () => fetchAtriumPosts())
                 .subscribe();
@@ -1258,6 +1440,11 @@
         }
 
         async function fetchInboxFeed() {
+            if (currentViewMode !== 'inbox') return; // HARD STOP IF NOT IN INBOX MODE
+            const list = document.getElementById('letters-list');
+            if (!list) return;
+            list.innerHTML = ''; // FORCE CLEAR
+            
             let query = supabase.from('letters').select('*, sender:profiles!letters_sender_id_fkey(display_name, username, avatar_url), recipient:profiles!letters_recipient_id_fkey(display_name, avatar_url)');
             
             if (currentFolder === 'delivered') {
@@ -1283,9 +1470,6 @@
             if (currentViewMode !== 'inbox') return;
 
             toggleDashboardState('list');
-            const list = document.getElementById('letters-list');
-            if (!list) return;
-            list.innerHTML = '';
             if (countdownInterval) clearInterval(countdownInterval);
 
             letters.forEach(letter => {
@@ -1359,13 +1543,17 @@
         }
 
         function toggleDashboardState(state) {
-            if (currentViewMode !== 'inbox') return;
+            if (currentViewMode !== 'inbox' && currentViewMode !== 'atrium' && currentViewMode !== 'friends' && currentViewMode !== 'settings') return;
             const list = document.getElementById('letters-list');
             const loader = document.getElementById('dashboard-loader');
             const empty = document.getElementById('dashboard-empty');
             if (loader) loader.classList.add('hidden');
             if (empty) empty.classList.add('hidden');
             if (list) list.classList.add('hidden');
+            
+            // Special handling for non-inbox tabs to prevent showing empty inbox state incorrectly
+            if (currentViewMode === 'atrium' || currentViewMode === 'friends' || currentViewMode === 'settings') return;
+
             if (state === 'loader' && loader) loader.classList.remove('hidden');
             else if (state === 'empty' && empty) empty.classList.remove('hidden');
             else if (list) list.classList.remove('hidden');
@@ -1422,7 +1610,6 @@
                 return;
             }
 
-            // Filter posts by topic on the client side
             const filteredPosts = currentAtriumFilter === 'all' ? posts : posts.filter(p => {
                 const { topic } = parseTopicFromContent(p.content);
                 return topic === currentAtriumFilter;
@@ -1465,6 +1652,7 @@
             const myPosts = filteredPosts.filter(p => p.user_id === currentUser.id);
             const globalPosts = filteredPosts.filter(p => p.user_id !== currentUser.id);
 
+            // Condensed Post Rendering
             const renderPost = (post) => {
                 const profile = profileMap[post.user_id] || {};
                 const displayName = profile.display_name || 'Anonymous';
@@ -1488,17 +1676,30 @@
                     const rProfile = profileMap[r.user_id] || {};
                     const rDisplayName = rProfile.display_name || 'Anonymous';
                     const rDateStr = new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+                    const isMyReply = r.user_id === currentUser.id;
+                    
+                    let replyActionsHtml = '';
+                    if (isMyReply) {
+                        replyActionsHtml = `
+                            <div class="flex items-center gap-2 ml-auto">
+                                <button class="edit-reply-btn text-ink/40 hover:text-forest transition-colors" data-reply-id="${r.id}"><i data-lucide="pencil" class="h-3 w-3"></i></button>
+                                <button class="delete-reply-btn text-ink/40 hover:text-red-500 transition-colors" data-reply-id="${r.id}"><i data-lucide="trash-2" class="h-3 w-3"></i></button>
+                            </div>
+                        `;
+                    }
+                    
                     return `
-                    <div class="flex items-start space-x-2 mt-2">
-                        <div class="h-6 w-6 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-[10px] overflow-hidden border border-beige">
+                    <div class="flex items-start space-x-2 mt-2" data-reply-id="${r.id}">
+                        <div class="h-5 w-5 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-[9px] overflow-hidden border border-beige">
                             ${rProfile.avatar_url ? `<img src="${rProfile.avatar_url}" class="h-full w-full object-cover">` : rDisplayName.charAt(0).toUpperCase()}
                         </div>
                         <div class="flex-1 bg-beige/30 rounded-lg p-2">
-                            <div class="flex items-baseline gap-2">
-                                <span class="text-[11px] font-semibold text-forest">${rDisplayName}</span>
-                                <span class="text-[9px] text-ink/40">${rDateStr}</span>
+                            <div class="flex items-center gap-2">
+                                <span class="text-[10px] font-semibold text-forest">${rDisplayName}</span>
+                                <span class="text-[8px] text-ink/40">${rDateStr}</span>
+                                ${replyActionsHtml}
                             </div>
-                            <p class="text-xs text-ink/80 mt-0.5 whitespace-pre-wrap">${r.content}</p>
+                            <p class="text-[11px] text-ink/80 mt-0.5 whitespace-pre-wrap reply-content" data-reply-id="${r.id}">${r.content}</p>
                         </div>
                     </div>`;
                 }).join('');
@@ -1506,51 +1707,51 @@
                 let actionButtons = '';
                 if (post.user_id === currentUser.id) {
                     actionButtons = `
-                        <div class="flex items-center gap-3 ml-auto">
-                            <button class="edit-post-btn text-ink/40 hover:text-forest transition-colors" data-post-id="${post.id}"><i data-lucide="pencil" class="h-3.5 w-3.5"></i></button>
-                            <button class="delete-post-btn text-ink/40 hover:text-red-500 transition-colors" data-post-id="${post.id}"><i data-lucide="trash-2" class="h-3.5 w-3.5"></i></button>
+                        <div class="flex items-center gap-2 ml-auto">
+                            <button class="edit-post-btn text-ink/40 hover:text-forest transition-colors" data-post-id="${post.id}"><i data-lucide="pencil" class="h-3 w-3"></i></button>
+                            <button class="delete-post-btn text-ink/40 hover:text-red-500 transition-colors" data-post-id="${post.id}"><i data-lucide="trash-2" class="h-3 w-3"></i></button>
                         </div>
                     `;
                 }
 
                 const item = document.createElement('div');
-                item.className = `bg-ivory border ${isCreatorPost ? 'border-gold/60 shadow-md' : 'border-beige shadow-sm'} rounded-xl p-4 transition-all hover:shadow-md`;
+                item.className = `bg-ivory border ${isCreatorPost ? 'border-gold/60 shadow-md' : 'border-beige shadow-sm'} rounded-xl p-3 transition-all hover:shadow-md`;
                 item.innerHTML = `
-                    <div class="flex items-start space-x-3">
-                        <div class="view-user-profile h-10 w-10 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-sm overflow-hidden border border-beige cursor-pointer hover:ring-2 hover:ring-gold transition-all" data-user-id="${post.user_id}">
+                    <div class="flex items-start space-x-2">
+                        <div class="view-user-profile h-8 w-8 rounded-full bg-beige flex-shrink-0 flex items-center justify-center font-bold text-forest text-xs overflow-hidden border border-beige cursor-pointer hover:ring-1 hover:ring-gold transition-all" data-user-id="${post.user_id}">
                             ${avatarUrl ? `<img src="${avatarUrl}" class="h-full w-full object-cover">` : displayName.charAt(0).toUpperCase()}
                         </div>
                         <div class="flex-1 min-w-0">
                             <div class="flex items-center justify-between">
-                                <div class="flex items-baseline gap-2">
-                                    <h4 class="view-user-profile text-sm font-semibold text-forest truncate cursor-pointer hover:text-gold" data-user-id="${post.user_id}">${displayName}</h4>
-                                    <span class="text-[10px] text-ink/40">${dateStr}</span>
-                                    ${isCreatorPost ? '<span class="hidden sm:inline-block px-1.5 py-0.5 bg-gold/20 text-gold text-[9px] font-bold rounded">CREATOR</span>' : ''}
-                                    <span class="px-1.5 py-0.5 ${topicColors[topic] || topicColors.general} text-[9px] font-bold rounded uppercase tracking-wider">${topic.replace('_', ' ')}</span>
+                                <div class="flex items-baseline gap-1.5">
+                                    <h4 class="view-user-profile text-xs font-semibold text-forest truncate cursor-pointer hover:text-gold" data-user-id="${post.user_id}">${displayName}</h4>
+                                    <span class="text-[9px] text-ink/40">${dateStr}</span>
+                                    ${isCreatorPost ? '<span class="hidden sm:inline-block px-1 py-0.5 bg-gold/20 text-gold text-[8px] font-bold rounded">CREATOR</span>' : ''}
+                                    <span class="px-1 py-0.5 ${topicColors[topic] || topicColors.general} text-[8px] font-bold rounded uppercase tracking-wider">${topic.replace('_', ' ')}</span>
                                 </div>
                                 ${actionButtons}
                             </div>
-                            <p class="post-content text-sm font-serif text-ink leading-relaxed mt-1 whitespace-pre-wrap" data-post-id="${post.id}">${parsedText}</p>
+                            <p class="post-content text-[13px] font-serif text-ink leading-relaxed mt-0.5 whitespace-pre-wrap" data-post-id="${post.id}">${parsedText}</p>
                             
-                            <div class="flex items-center gap-6 mt-3 text-ink/50">
-                                <button class="like-btn flex items-center gap-1.5 text-xs hover:text-red-500 transition-colors ${isLiked ? 'is-liked' : ''}" data-post-id="${post.id}">
-                                    <i data-lucide="heart" class="h-4 w-4"></i>
+                            <div class="flex items-center gap-4 mt-2 text-ink/50">
+                                <button class="like-btn flex items-center gap-1 text-[11px] hover:text-red-500 transition-colors ${isLiked ? 'is-liked' : ''}" data-post-id="${post.id}">
+                                    <i data-lucide="heart" class="h-3.5 w-3.5"></i>
                                     <span class="like-count">${postLikes.length}</span>
                                 </button>
-                                <button class="reply-btn flex items-center gap-1.5 text-xs hover:text-forest transition-colors" data-post-id="${post.id}">
-                                    <i data-lucide="message-circle" class="h-4 w-4"></i>
+                                <button class="reply-btn flex items-center gap-1 text-[11px] hover:text-forest transition-colors" data-post-id="${post.id}">
+                                    <i data-lucide="message-circle" class="h-3.5 w-3.5"></i>
                                     <span>${postReplies.length}</span>
                                 </button>
-                                <button class="pin-btn flex items-center gap-1.5 text-xs hover:text-gold transition-colors ${isPinned ? 'is-pinned' : ''}" data-post-id="${post.id}">
-                                    <i data-lucide="bookmark" class="h-4 w-4"></i>
+                                <button class="pin-btn flex items-center gap-1 text-[11px] hover:text-gold transition-colors ${isPinned ? 'is-pinned' : ''}" data-post-id="${post.id}">
+                                    <i data-lucide="bookmark" class="h-3.5 w-3.5"></i>
                                 </button>
                             </div>
                             
-                            <div class="replies-container mt-3 pt-3 border-t border-linen hidden" data-post-id="${post.id}">
+                            <div class="replies-container mt-2 pt-2 border-t border-linen hidden" data-post-id="${post.id}">
                                 ${repliesHtml}
-                                <div class="flex items-center space-x-2 mt-3">
-                                    <input type="text" class="reply-input flex-grow bg-[#FCFBF9] border border-beige rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-forest text-ink" placeholder="Write a reply..." data-post-id="${post.id}">
-                                    <button class="btn-submit-reply bg-forest text-ivory px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-forest/90 transition-colors" data-post-id="${post.id}">Reply</button>
+                                <div class="flex items-center space-x-2 mt-2">
+                                    <input type="text" class="reply-input flex-grow bg-[#FCFBF9] border border-beige rounded-lg px-2 py-1 text-[11px] focus:outline-none focus:border-forest text-ink" placeholder="Write a reply..." data-post-id="${post.id}">
+                                    <button class="btn-submit-reply bg-forest text-ivory px-2 py-1 rounded-lg text-[11px] font-semibold hover:bg-forest/90 transition-colors" data-post-id="${post.id}">Reply</button>
                                 </div>
                             </div>
                         </div>
@@ -1561,18 +1762,18 @@
 
             if (myPosts.length > 0) {
                 const myHeader = document.createElement('div');
-                myHeader.className = 'text-[10px] uppercase tracking-widest text-ink/40 font-bold pt-2';
+                myHeader.className = 'text-[9px] uppercase tracking-widest text-ink/40 font-bold pt-1';
                 myHeader.textContent = 'My Posts';
                 list.appendChild(myHeader);
                 myPosts.forEach(p => list.appendChild(renderPost(p)));
                 const spacer = document.createElement('div');
-                spacer.className = 'h-4';
+                spacer.className = 'h-3';
                 list.appendChild(spacer);
             }
 
             if (globalPosts.length > 0) {
                 const globalHeader = document.createElement('div');
-                globalHeader.className = 'text-[10px] uppercase tracking-widest text-ink/40 font-bold pt-2';
+                globalHeader.className = 'text-[9px] uppercase tracking-widest text-ink/40 font-bold pt-1';
                 globalHeader.textContent = 'Global Posts';
                 list.appendChild(globalHeader);
                 globalPosts.forEach(p => list.appendChild(renderPost(p)));
@@ -1645,6 +1846,7 @@
                 });
             });
 
+            // Edit Post Logic
             list.querySelectorAll('.edit-post-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -1661,13 +1863,14 @@
                             pEl.contentEditable = 'true';
                             pEl.classList.add('bg-beige/40', 'p-2', 'rounded');
                             pEl.focus();
-                            e.currentTarget.innerHTML = `<i data-lucide="check" class="h-3.5 w-3.5"></i>`;
+                            e.currentTarget.innerHTML = `<i data-lucide="check" class="h-3 w-3"></i>`;
                             lucide.createIcons();
                         }
                     }
                 });
             });
 
+            // Delete Post Logic
             list.querySelectorAll('.delete-post-btn').forEach(btn => {
                 btn.addEventListener('click', async (e) => {
                     e.stopPropagation();
@@ -1675,6 +1878,43 @@
                     const confirmed = await showAppConfirm('Delete Post', 'Are you sure you want to permanently delete this post? All likes and replies will be lost.');
                     if (confirmed) {
                         await supabase.from('community_posts').delete().eq('id', postId);
+                        fetchAtriumPosts();
+                    }
+                });
+            });
+
+            // Edit Reply Logic
+            list.querySelectorAll('.edit-reply-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const replyId = e.currentTarget.dataset.replyId;
+                    const pEl = list.querySelector(`.reply-content[data-reply-id="${replyId}"]`);
+                    if (pEl) {
+                        if (pEl.contentEditable === 'true') {
+                            pEl.contentEditable = 'false';
+                            pEl.classList.remove('bg-beige/60', 'p-1', 'rounded');
+                            const newText = pEl.innerText.trim();
+                            if (newText) await supabase.from('community_replies').update({ content: newText }).eq('id', replyId);
+                            fetchAtriumPosts();
+                        } else {
+                            pEl.contentEditable = 'true';
+                            pEl.classList.add('bg-beige/60', 'p-1', 'rounded');
+                            pEl.focus();
+                            e.currentTarget.innerHTML = `<i data-lucide="check" class="h-3 w-3"></i>`;
+                            lucide.createIcons();
+                        }
+                    }
+                });
+            });
+
+            // Delete Reply Logic
+            list.querySelectorAll('.delete-reply-btn').forEach(btn => {
+                btn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const replyId = e.currentTarget.dataset.replyId;
+                    const confirmed = await showAppConfirm('Delete Reply', 'Are you sure you want to permanently delete this reply?');
+                    if (confirmed) {
+                        await supabase.from('community_replies').delete().eq('id', replyId);
                         fetchAtriumPosts();
                     }
                 });
@@ -1695,7 +1935,6 @@
             const btn = document.getElementById('btn-post-atrium');
             setButtonLoading(btn, true, 'Posting...');
             
-            // Prepend topic tag to content
             const finalContent = `[TOPIC:${topicInput.value}]\n${text}`;
             const { error } = await supabase.from('community_posts').insert({ user_id: currentUser.id, content: finalContent });
             setButtonLoading(btn, false);
@@ -1753,7 +1992,7 @@
                                 </div>
                             `;
                         });
-                        lettersHtml += '</div>';
+                        lettersHtml = '</div>';
                     }
 
                     item.innerHTML = `
@@ -1879,36 +2118,19 @@
             document.getElementById('letter-subject').style.color = textInput;
         }
 
+        // Forced Unlock for all features
         function updateComposerUnlocks() {
             document.querySelectorAll('#ink-palette button').forEach(btn => {
-                const req = parseInt(btn.dataset.req);
-                if (userSentCount >= req) {
-                    btn.classList.remove('opacity-30', 'cursor-not-allowed');
-                    btn.disabled = false;
-                } else {
-                    btn.classList.add('opacity-30', 'cursor-not-allowed');
-                    btn.disabled = true;
-                }
+                btn.classList.remove('opacity-30', 'cursor-not-allowed');
+                btn.disabled = false;
             });
             document.querySelectorAll('#paper-styles button').forEach(btn => {
-                const req = parseInt(btn.dataset.req);
-                if (userSentCount >= req) {
-                    btn.classList.remove('opacity-30', 'cursor-not-allowed');
-                    btn.disabled = false;
-                } else {
-                    btn.classList.add('opacity-30', 'cursor-not-allowed');
-                    btn.disabled = true;
-                }
+                btn.classList.remove('opacity-30', 'cursor-not-allowed');
+                btn.disabled = false;
             });
             document.querySelectorAll('#typeface-styles button').forEach(btn => {
-                const req = parseInt(btn.dataset.req);
-                if (userSentCount >= req) {
-                    btn.classList.remove('opacity-30', 'cursor-not-allowed');
-                    btn.disabled = false;
-                } else {
-                    btn.classList.add('opacity-30', 'cursor-not-allowed');
-                    btn.disabled = true;
-                }
+                btn.classList.remove('opacity-30', 'cursor-not-allowed');
+                btn.disabled = false;
             });
         }
 
@@ -2028,7 +2250,6 @@
             };
 
             if (!navigator.onLine) {
-                // Save offline
                 await localforage.setItem('offline_draft_' + Date.now(), payload);
                 if (autosaveText) autosaveText.textContent = "Saved Offline (Will sync when online)";
                 return;
@@ -2339,6 +2560,20 @@
             if (profile && !error) {
                 document.getElementById('profile-display-name').textContent = profile.display_name || 'Dear Companion';
                 document.getElementById('profile-username').textContent = `@${profile.username || 'username'}`;
+                
+                // WhatsApp-like Status loading with 12h auto-reset
+                const displayStatus = getDisplayStatus(profile);
+                const statusDisplay = document.getElementById('profile-status-display');
+                const statusInput = document.getElementById('edit-status');
+                statusDisplay.innerHTML = `<i data-lucide="quote" class="h-3 w-3"></i> ${displayStatus}`;
+                statusInput.value = (displayStatus === DEFAULT_STATUS) ? '' : displayStatus;
+                
+                // Auto-reset status in DB if expired
+                if (profile.status_text !== DEFAULT_STATUS && displayStatus === DEFAULT_STATUS) {
+                    await supabase.from('profiles').update({ status_text: DEFAULT_STATUS, status_updated_at: new Date().toISOString() }).eq('id', currentUser.id);
+                }
+                lucide.createIcons();
+
                 updateAvatarUI(profile.avatar_url, profile.display_name);
                 document.getElementById('edit-display-name').value = profile.display_name || '';
                 document.getElementById('edit-bio').value = profile.bio || '';
@@ -2346,8 +2581,8 @@
                 document.getElementById('profile-email-input').value = currentUser.email || '';
                 document.getElementById('profile-joined-text').textContent = `Joined: ${new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
                 await fetchAndRenderProfileStats();
+                await renderProfileFriends(currentUser.id, 'profile-friends-list');
 
-                // Wax Seal Collection
                 const { data: senders } = await supabase.from('letters')
                     .select('sender:profiles!letters_sender_id_fkey(display_name, username, avatar_url)')
                     .eq('recipient_id', currentUser.id).neq('status', 'draft');
@@ -2378,7 +2613,6 @@
                     });
                 }
 
-                // Creator Theme Logic
                 if (isCreator(currentUser)) {
                     document.getElementById('creator-badge-profile').classList.remove('hidden');
                     document.getElementById('profile-header-bg').classList.remove('bg-forest');
@@ -2402,6 +2636,35 @@
                 document.querySelector(`#wax-color-palette button[data-wax="${activeWaxColor}"]`)?.classList.replace('border-transparent', 'border-forest');
                 document.getElementById('edit-monogram').value = activeMonogram;
             }
+        }
+
+        // Reusable function to fetch and render friends list on profiles
+        async function renderProfileFriends(userId, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            container.innerHTML = '';
+            
+            const { data: friendships } = await supabase.from('friendships')
+                .select('sender_id, receiver_id, sender:profiles!friendships_sender_id_fkey(id, display_name, avatar_url), receiver:profiles!friendships_receiver_id_fkey(id, display_name, avatar_url)')
+                .or(`sender_id.eq.${userId},receiver_id.eq.${userId}`)
+                .eq('status', 'accepted');
+            
+            if (!friendships || friendships.length === 0) {
+                container.innerHTML = `<p class="text-[10px] italic text-ink/40">No companions recorded yet.</p>`;
+                return;
+            }
+
+            friendships.forEach(f => {
+                const friend = f.sender_id === userId ? f.receiver : f.sender;
+                const el = document.createElement('div');
+                el.className = "flex items-center space-x-2 bg-[#FCFBF9] p-1.5 pr-3 rounded-full cursor-pointer hover:bg-beige/40 border border-beige/60 transition-colors";
+                el.innerHTML = `
+                    ${friend.avatar_url ? `<img src="${friend.avatar_url}" class="h-6 w-6 rounded-full object-cover">` : `<div class="h-6 w-6 rounded-full bg-beige flex items-center justify-center font-bold text-forest text-[10px]">${friend.display_name.charAt(0).toUpperCase()}</div>`}
+                    <span class="text-[11px] font-semibold text-ink/70 truncate max-w-[80px]">${friend.display_name}</span>
+                `;
+                el.addEventListener('click', () => viewUserProfile(friend.id));
+                container.appendChild(el);
+            });
         }
 
         document.getElementById('tab-profile').addEventListener('click', () => {
@@ -2549,11 +2812,19 @@
             const displayName = document.getElementById('edit-display-name').value.trim();
             const bio = document.getElementById('edit-bio').value.trim();
             const country = document.getElementById('edit-country').value.trim();
+            const statusText = document.getElementById('edit-status').value.trim(); 
             const monogram = document.getElementById('edit-monogram').value.trim().toUpperCase() || 'D';
+            
             if (!displayName) { showProfileStatus('A display name is required.', 'error'); return; }
             try {
                 showProfileStatus('Updating database records...', 'info');
-                const { error } = await supabase.from('profiles').update({ display_name: displayName, bio: bio, country: country }).eq('id', currentUser.id);
+                const { error } = await supabase.from('profiles').update({ 
+                    display_name: displayName, 
+                    bio: bio, 
+                    country: country,
+                    status_text: statusText,
+                    status_updated_at: new Date().toISOString() // Record timestamp for 12h reset
+                }).eq('id', currentUser.id);
                 if (error) throw error;
                 
                 const { error: metaError } = await supabase.auth.updateUser({ data: { wax_color: activeWaxColor, monogram: monogram } });
@@ -2562,6 +2833,16 @@
 
                 showProfileStatus('Profile configuration updated successfully.', 'success');
                 document.getElementById('profile-display-name').textContent = displayName;
+                
+                // Update status display live
+                const statusDisplay = document.getElementById('profile-status-display');
+                if (statusText) {
+                    statusDisplay.innerHTML = `<i data-lucide="quote" class="h-3 w-3"></i> ${statusText}`;
+                } else {
+                    statusDisplay.innerHTML = `<i data-lucide="quote" class="h-3 w-3"></i> ${DEFAULT_STATUS}`;
+                }
+                lucide.createIcons();
+
                 const img = document.getElementById('profile-avatar-img');
                 if (img.classList.contains('hidden')) { document.getElementById('profile-avatar-fallback').textContent = displayName.charAt(0).toUpperCase(); }
             } catch (err) { showProfileStatus(err.message, 'error'); }
@@ -2611,6 +2892,11 @@
             document.getElementById('friend-joined').textContent = new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
             document.getElementById('friend-bio').textContent = profile.bio || 'No shared musings compiled yet...';
             
+            // Render friend's WhatsApp-like status
+            const displayStatus = getDisplayStatus(profile);
+            const friendStatusText = document.getElementById('friend-status-text');
+            friendStatusText.innerHTML = `<i data-lucide="quote" class="h-3 w-3"></i> ${displayStatus}`;
+
             const img = document.getElementById('friend-profile-img');
             const fallback = document.getElementById('friend-profile-fallback');
             if (profile.avatar_url) { img.src = profile.avatar_url; img.classList.remove('hidden'); fallback.classList.add('hidden'); } 
@@ -2678,6 +2964,17 @@
                 }
                 document.getElementById('friend-letters-list').innerHTML = `<p class="text-xs italic text-ink/40">Become companions to view your correspondence log.</p>`;
             }
+            
+            await renderProfileFriends(userId, 'friend-friends-list');
+            
+            // Manually trigger presence check for this specific user
+            if (presenceChannel) {
+                const state = presenceChannel.presenceState();
+                updateFriendPresenceUI(!!state[userId]);
+            } else {
+                updateFriendPresenceUI(false);
+            }
+            
             lucide.createIcons();
         }
 
@@ -2779,4 +3076,4 @@
         initAppSession();
     </script>
 </body>
-                    </html>
+                            </html>

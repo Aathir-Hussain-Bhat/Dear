@@ -71,6 +71,8 @@
         .drying-blot { width: 100px; height: 100px; background: #3A2F28; border-radius: 50%; filter: blur(10px); opacity: 0.8; animation: dry 2.5s ease-in-out forwards; }
         @keyframes dry { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(0.8); opacity: 0; } }
 
+        #signature-canvas { touch-action: none; cursor: crosshair; }
+
         @media (max-width: 768px) {
             #envelope-modal { padding: 4px; }
             #envelope-container { height: 85vh; max-height: 500px; }
@@ -594,7 +596,8 @@
 
         localforage.config({ name: 'DearSanctuary', storeName: 'offline_drafts' });
 
-        if ('serviceWorker' in navigator) {
+        // Safe Service Worker Registration (Skip on file:// protocol)
+        if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
             window.addEventListener('load', () => {
                 try { navigator.serviceWorker.register('./sw.js').then(reg => console.log('SW registered:', reg.scope)).catch(err => console.log('SW skipped:', err.message)); } catch (e) {}
             });
@@ -834,19 +837,21 @@
 
         async function checkFloatingMemories() {
             if (!currentUser) return;
-            const { data: letters } = await supabase.from('letters').select('subject, content, created_at').eq('sender_id', currentUser.id).neq('status', 'draft').order('created_at', { ascending: false });
-            if (!letters || letters.length === 0) return;
-            const now = new Date();
-            const pastLetter = letters.find(l => {
-                const created = new Date(l.created_at);
-                return (now.getFullYear() - created.getFullYear() >= 1) && now.getMonth() === created.getMonth() && now.getDate() === created.getDate();
-            });
-            if (pastLetter) {
-                document.getElementById('floating-memory-text').textContent = `"${pastLetter.subject || 'A letter'}" written on ${new Date(pastLetter.created_at).toLocaleDateString()}.`;
-                const modal = document.getElementById('floating-memory-modal');
-                modal.classList.remove('hidden');
-                gsap.fromTo('#floating-memory-box', { scale: 0.9, opacity: 0 }, { duration: 0.4, scale: 1, opacity: 1, ease: 'power2.out' });
-            }
+            try {
+                const { data: letters } = await supabase.from('letters').select('subject, content, created_at').eq('sender_id', currentUser.id).neq('status', 'draft').order('created_at', { ascending: false });
+                if (!letters || letters.length === 0) return;
+                const now = new Date();
+                const pastLetter = letters.find(l => {
+                    const created = new Date(l.created_at);
+                    return (now.getFullYear() - created.getFullYear() >= 1) && now.getMonth() === created.getMonth() && now.getDate() === created.getDate();
+                });
+                if (pastLetter) {
+                    document.getElementById('floating-memory-text').textContent = `"${pastLetter.subject || 'A letter'}" written on ${new Date(pastLetter.created_at).toLocaleDateString()}.`;
+                    const modal = document.getElementById('floating-memory-modal');
+                    modal.classList.remove('hidden');
+                    gsap.fromTo('#floating-memory-box', { scale: 0.9, opacity: 0 }, { duration: 0.4, scale: 1, opacity: 1, ease: 'power2.out' });
+                }
+            } catch(e) { console.warn("Network error fetching memories"); }
         }
         document.getElementById('btn-close-floating-memory').addEventListener('click', () => { gsap.to('#floating-memory-box', { duration: 0.2, scale: 0.9, opacity: 0, onComplete: () => document.getElementById('floating-memory-modal').classList.add('hidden') }); });
 
@@ -895,7 +900,16 @@
             if (currentViewMode !== 'inbox') return; const list = document.getElementById('letters-list'); if (!list) return; list.innerHTML = ''; 
             let query = supabase.from('letters').select('*, sender:profiles!letters_sender_id_fkey(display_name, username, avatar_url), recipient:profiles!letters_recipient_id_fkey(display_name, avatar_url)');
             if (currentFolder === 'delivered') { query = query.eq('recipient_id', currentUser.id).in('status', ['delivered', 'read', 'scheduled']); } else if (currentFolder === 'scheduled') { query = query.eq('sender_id', currentUser.id).eq('status', 'scheduled'); } else if (currentFolder === 'sent') { query = query.eq('sender_id', currentUser.id).in('status', ['delivered', 'read', 'sent', 'archived', 'scheduled']); } else if (currentFolder === 'draft') { query = query.eq('sender_id', currentUser.id).eq('status', 'draft'); }
-            const { data: letters, error } = await query.order('created_at', { ascending: false });
+            
+            let letters, error;
+            try {
+                const res = await query.order('created_at', { ascending: false });
+                letters = res.data; error = res.error;
+            } catch(e) {
+                console.warn("Network error fetching inbox");
+                return;
+            }
+
             if (error || !letters || letters.length === 0) { if (currentViewMode === 'inbox') toggleDashboardState('empty'); document.getElementById('letter-count').textContent = '0 Letters'; return; }
             document.getElementById('letter-count').textContent = `${letters.length} Letter${letters.length === 1 ? '' : 's'}`;
             if (currentViewMode !== 'inbox') return; toggleDashboardState('list'); if (countdownInterval) clearInterval(countdownInterval);
@@ -945,7 +959,20 @@
 
         function showMobileRightPane(show) { const leftCol = document.getElementById('dashboard-left-col'); const rightCol = document.getElementById('dashboard-right-col'); const bottomNav = document.getElementById('bottom-nav'); if (show) { leftCol.classList.add('hidden'); leftCol.classList.remove('md:flex'); rightCol.classList.remove('hidden'); rightCol.classList.add('flex'); if (window.innerWidth < 768 && bottomNav) bottomNav.style.display = 'none'; } else { leftCol.classList.remove('hidden'); leftCol.classList.add('md:flex'); rightCol.classList.add('hidden'); rightCol.classList.remove('flex'); if (bottomNav) bottomNav.style.display = 'flex'; } }
 
-        document.getElementById('btn-back-to-list').addEventListener('click', () => showMobileRightPane(false)); const btnBackProfile = document.getElementById('btn-back-to-list-profile'); if (btnBackProfile) btnBackProfile.addEventListener('click', () => showMobileRightPane(false)); document.getElementById('btn-back-to-list-friend-profile').addEventListener('click', () => showMobileRightPane(false));
+        document.getElementById('btn-back-to-list').addEventListener('click', async () => {
+            if (activeLetterOnDesk) {
+                const { ephemeral } = parsePostcardFromContent(activeLetterOnDesk.content);
+                if (ephemeral) {
+                    await supabase.from('letters').delete().eq('id', activeLetterOnDesk.id);
+                    triggerToastNotification('The fragile letter has been burned.');
+                    activeLetterOnDesk = null;
+                }
+            }
+            showMobileRightPane(false);
+        });
+
+        document.getElementById('btn-back-to-list-profile').addEventListener('click', () => showMobileRightPane(false));
+        document.getElementById('btn-back-to-list-friend-profile').addEventListener('click', () => showMobileRightPane(false));
 
         async function fetchAtriumPosts() {
             const list = document.getElementById('atrium-list'); if (!list) return; list.innerHTML = `<div class="animate-spin rounded-full h-4 w-4 border-b-2 border-forest mx-auto"></div>`;
@@ -1161,12 +1188,68 @@
                 if (profile.status_text !== DEFAULT_STATUS && displayStatus === DEFAULT_STATUS) { await supabase.from('profiles').update({ status_text: DEFAULT_STATUS, status_updated_at: new Date().toISOString() }).eq('id', currentUser.id); } lucide.createIcons();
                 updateAvatarUI(profile.avatar_url, profile.display_name); document.getElementById('edit-display-name').value = profile.display_name || ''; document.getElementById('edit-bio').value = profile.bio || ''; document.getElementById('edit-country').value = profile.country || ''; document.getElementById('profile-email-input').value = currentUser.email || ''; document.getElementById('profile-joined-text').textContent = `Joined: ${new Date(profile.joined_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
                 
-                const sigCanvas = document.getElementById('signature-canvas'); const ctx = sigCanvas.getContext('2d'); ctx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
-                if (profile.signature_url) { const img = new Image(); img.onload = () => ctx.drawImage(img, 0, 0); img.src = profile.signature_url; signatureDataUrl = profile.signature_url; }
+                // Touch & Mouse Signature Canvas Logic
+                const sigCanvas = document.getElementById('signature-canvas'); 
+                const ctx = sigCanvas.getContext('2d'); 
+                ctx.clearRect(0, 0, sigCanvas.width, sigCanvas.height);
+                
+                if (profile.signature_url) { 
+                    const img = new Image(); 
+                    img.onload = () => ctx.drawImage(img, 0, 0); 
+                    img.src = profile.signature_url; 
+                    signatureDataUrl = profile.signature_url; 
+                } else {
+                    signatureDataUrl = null;
+                }
+                
                 let drawing = false;
-                sigCanvas.onmousedown = (e) => { drawing = true; ctx.beginPath(); ctx.moveTo(e.offsetX, e.offsetY); };
-                sigCanvas.onmousemove = (e) => { if (!drawing) return; ctx.lineTo(e.offsetX, e.offsetY); ctx.stroke(); };
-                sigCanvas.onmouseup = () => { drawing = false; signatureDataUrl = sigCanvas.toDataURL(); };
+                let lastX = 0;
+                let lastY = 0;
+
+                const getPos = (e) => {
+                    const rect = sigCanvas.getBoundingClientRect();
+                    const x = (e.touches ? e.touches[0].clientX : e.clientX) - rect.left;
+                    const y = (e.touches ? e.touches[0].clientY : e.clientY) - rect.top;
+                    return { x, y };
+                };
+
+                const startDraw = (e) => {
+                    e.preventDefault();
+                    drawing = true;
+                    const pos = getPos(e);
+                    lastX = pos.x;
+                    lastY = pos.y;
+                };
+
+                const draw = (e) => {
+                    if (!drawing) return;
+                    e.preventDefault();
+                    const pos = getPos(e);
+                    ctx.beginPath();
+                    ctx.moveTo(lastX, lastY);
+                    ctx.lineTo(pos.x, pos.y);
+                    ctx.strokeStyle = "#3A2F28";
+                    ctx.lineWidth = 2;
+                    ctx.lineCap = "round";
+                    ctx.stroke();
+                    lastX = pos.x;
+                    lastY = pos.y;
+                };
+
+                const endDraw = () => {
+                    if (!drawing) return;
+                    drawing = false;
+                    signatureDataUrl = sigCanvas.toDataURL();
+                };
+
+                sigCanvas.onmousedown = startDraw;
+                sigCanvas.onmousemove = draw;
+                sigCanvas.onmouseup = endDraw;
+                sigCanvas.onmouseleave = endDraw;
+                
+                sigCanvas.ontouchstart = startDraw;
+                sigCanvas.ontouchmove = draw;
+                sigCanvas.ontouchend = endDraw;
 
                 await fetchAndRenderProfileStats(); await renderProfileFriends(currentUser.id, 'profile-friends-list');
                 const { data: senders } = await supabase.from('letters').select('sender:profiles!letters_sender_id_fkey(display_name, username, avatar_url)').eq('recipient_id', currentUser.id).neq('status', 'draft');
@@ -1253,4 +1336,4 @@
         initAppSession();
     </script>
 </body>
-    </html>
+                                </html>

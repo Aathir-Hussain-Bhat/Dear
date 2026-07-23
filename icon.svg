@@ -1,6 +1,64 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="115" fill="#1F4D3A"/>
-  <circle cx="256" cy="256" r="150" fill="#801818" stroke="#601010" stroke-width="8"/>
-  <circle cx="256" cy="256" r="110" fill="none" stroke="#A02020" stroke-width="4" stroke-dasharray="10 10"/>
-  <text x="256" y="330" font-family="Cormorant Garamond, serif" font-size="180" font-weight="bold" fill="#FFFDF8" text-anchor="middle" font-style="italic">D</text>
+  <defs>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000000" flood-opacity="0.12"/>
+    </filter>
+
+    <linearGradient id="paper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFDF9"/>
+      <stop offset="100%" stop-color="#F5EFE6"/>
+    </linearGradient>
+
+    <linearGradient id="seal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#B03A3A"/>
+      <stop offset="100%" stop-color="#7E1F1F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="120" fill="#FFFFFF"/>
+
+  <!-- Envelope -->
+  <g filter="url(#shadow)">
+    <rect x="96" y="130" width="320" height="240" rx="18" fill="url(#paper)"/>
+
+    <path
+      d="M96 130 L256 255 L416 130"
+      fill="none"
+      stroke="#D8D2C8"
+      stroke-width="6"/>
+
+    <path
+      d="M96 370 L210 245"
+      fill="none"
+      stroke="#E7E1D8"
+      stroke-width="5"/>
+
+    <path
+      d="M416 370 L302 245"
+      fill="none"
+      stroke="#E7E1D8"
+      stroke-width="5"/>
+  </g>
+
+  <!-- Wax Seal -->
+  <circle
+      cx="256"
+      cy="255"
+      r="44"
+      fill="url(#seal)"
+      filter="url(#shadow)"/>
+
+  <!-- Letter D -->
+  <text
+      x="256"
+      y="272"
+      text-anchor="middle"
+      font-family="Cormorant Garamond, serif"
+      font-size="52"
+      font-style="italic"
+      font-weight="700"
+      fill="#FFFDF8">
+      D
+  </text>
 </svg>
